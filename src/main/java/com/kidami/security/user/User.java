@@ -12,16 +12,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
+
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Table(name= "users")
+@Entity
+@Table(name= "user")
 public class User implements UserDetails {
     @Id
     @GeneratedValue
-    private Long id;
+    private Integer id;
     private String firstname;
     private String lastname;
     private String email;
@@ -41,8 +42,9 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return null;
     }
+
 
     @Override
     public boolean isAccountNonExpired() {
