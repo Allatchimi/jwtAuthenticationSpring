@@ -1,4 +1,4 @@
-package com.kidami.security.user;
+package com.kidami.security.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,15 +18,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name= "user")
+@Table(name = "users ")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String firstname;
     private String lastname;
     private String email;
     private String password;
+    private String phone;
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -42,7 +43,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return email;
     }
 
 

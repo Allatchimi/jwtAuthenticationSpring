@@ -1,4 +1,4 @@
-package com.kidami.security.user;
+package com.kidami.security.models;
 
 public enum Role {
     USER,
