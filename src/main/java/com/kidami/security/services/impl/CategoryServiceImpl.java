@@ -21,8 +21,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public String addCategory(CategorySaveDTO categorySaveDTO) {
         Category category = new Category(
-                categorySaveDTO.getCategoryName(),
-                categorySaveDTO.getCour()
+                categorySaveDTO.getCategoryName()
         );
         categoryRepository.save(category);
         return category.getCategoryName();
@@ -37,9 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
         for(Category c:getAllCategorys){
             CategoryDTO categoryDTO = new CategoryDTO(
                     c.getCategoryId(),
-                    c.getCategoryName(),
-                    c.getCour()
-
+                    c.getCategoryName()
             );
             categoryDTOList.add(categoryDTO);
         }
@@ -52,7 +49,6 @@ public class CategoryServiceImpl implements CategoryService {
         if(categoryRepository.existsById(categoryUpdateDTO.getCategoryId())){
             Category category = categoryRepository.getReferenceById(categoryUpdateDTO.getCategoryId());
             category.setCategoryName(categoryUpdateDTO.getCategoryName());
-            category.setCour(categoryUpdateDTO.getCour());
 
             categoryRepository.save(category);
         }else {
