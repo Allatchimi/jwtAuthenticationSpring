@@ -14,7 +14,8 @@ public class Cour {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id" ,referencedColumnName = "categoryId")
     private Category category;
     @Column(name = "content")
     private String content;
