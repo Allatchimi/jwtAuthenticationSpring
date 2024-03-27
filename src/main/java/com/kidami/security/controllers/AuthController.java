@@ -20,8 +20,6 @@ public class AuthController {
     @PostMapping(value = { "/login","/signin"})
     public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO){
 
-
-
         return ResponseEntity.ok("hello");
     }
 

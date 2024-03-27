@@ -17,11 +17,11 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private UserRepository userRepository;
     @Override
-    public String login(LoginDTO loginDTO) {
+    public LoginDTO login(LoginDTO loginDTO) {
 
         LoginDTO login = new LoginDTO(loginDTO.getUsernameOrEmail(),loginDTO.getPassword());
 
-        return "connected";
+        return login;
     }
 
     @Override
