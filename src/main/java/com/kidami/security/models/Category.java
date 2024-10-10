@@ -1,6 +1,7 @@
 package com.kidami.security.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 
 @Entity
@@ -11,7 +12,24 @@ public class Category {
     @Column(name = "categoryId")
     private Long categoryId;
     private String categoryName;
+    private  String description;
+    private Integer order;
 
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Category() {
     }

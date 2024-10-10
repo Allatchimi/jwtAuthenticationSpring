@@ -3,7 +3,7 @@ package com.kidami.security.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-@Data
+
 @Entity
 @Table(name= "user")
 public class User  {
