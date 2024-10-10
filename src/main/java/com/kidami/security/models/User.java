@@ -10,7 +10,7 @@ public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="userID")
-    private Integer id;
+    private Long id;
     @Column(name="firstname", length =50 )
     private String firstname;
     @Column(name="lastname", length = 50)
@@ -19,6 +19,7 @@ public class User  {
     private String email;
     @Column(name="password", length =200)
     private String password;
+    private String provider;
     @Column(name="role", length = 50)
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -26,19 +27,21 @@ public class User  {
     public User() {
     }
 
-    public User(Integer id, String firstname, String lastname, String email, String password, Role role) {
+    public User(Long id, String firstname, String provider,String lastname, String email, String password, Role role) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
+        this.provider = provider;
         this.role = role;
     }
 
-    public User(String firstname, String lastname, String email, Role role) {
+    public User(String firstname, String provider,String lastname, String email, Role role) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
+        this.provider = provider;
         this.role = role;
     }
 
@@ -64,6 +67,14 @@ public class User  {
 
     public Role getRole() {
         return role;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
     @Override

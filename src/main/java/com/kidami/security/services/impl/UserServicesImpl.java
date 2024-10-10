@@ -5,7 +5,7 @@ import com.kidami.security.dto.UserSaveDTO;
 import com.kidami.security.dto.UserUpdateDTO;
 import com.kidami.security.models.User;
 import com.kidami.security.repository.UserRepository;
-import com.kidami.security.services.UserService;
+import com.kidami.security.services.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServicesImpl implements UserServices {
     @Autowired
     private UserRepository userRepository;
     @Override
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
         if(userRepository.existsById(userUpdateDTO.getId())){
 
-            User user  = userRepository.getById(userUpdateDTO.getId());
+            User user  = userRepository.(userUpdateDTO.getId());
             user.setFirstname(userUpdateDTO.getFirstname());
             user.setLastname(userUpdateDTO.getLastname());
             user.setEmail(userUpdateDTO.getEmail());

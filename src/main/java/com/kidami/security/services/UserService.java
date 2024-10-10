@@ -1,18 +1,32 @@
 package com.kidami.security.services;
 
-import com.kidami.security.dto.UserDTO;
-import com.kidami.security.dto.UserSaveDTO;
-import com.kidami.security.dto.UserUpdateDTO;
+import com.kidami.security.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+@Service
+public class UserService implements UserDetailsService {
+    @Autowired
+    private UserRepository userRepository;
 
-public interface UserService {
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
-    String addUser(UserSaveDTO userSaveDTO);
+    public User registerNewUser(String email, String password) {
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setProvider("LOCAL");
+        return userRepository.save(user);
+    }
 
-    List<UserDTO> getAllUsers();
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 
-    String updateUser(UserUpdateDTO userUpdateDTO);
-
-    boolean deleteUser(int id);
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
 }
