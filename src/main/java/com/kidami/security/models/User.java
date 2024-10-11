@@ -1,8 +1,6 @@
 package com.kidami.security.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
 
 @Entity
 @Table(name= "user")
@@ -10,11 +8,9 @@ public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="userID")
-    private Long id;
-    @Column(name="firstname", length =50 )
-    private String firstname;
-    @Column(name="lastname", length = 50)
-    private String lastname;
+    private Integer id;
+    @Column(name="name", length =50 )
+    private String name;
     @Column(name="email", length =100 )
     private String email;
     @Column(name="password", length =200)
@@ -22,24 +18,22 @@ public class User  {
     private String provider;
     @Column(name="role", length = 50)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private String role;
 
     public User() {
     }
 
-    public User(Long id, String firstname, String provider,String lastname, String email, String password, Role role) {
+    public User(Integer id, String name, String provider, String email, String password, String role) {
         this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.provider = provider;
         this.role = role;
     }
 
-    public User(String firstname, String provider,String lastname, String email, Role role) {
-        this.firstname = firstname;
-        this.lastname = lastname;
+    public User(String name, String provider, String email, String role) {
+        this.name = name;
         this.email = email;
         this.provider = provider;
         this.role = role;
@@ -48,41 +42,30 @@ public class User  {
     public Integer getId() {
         return id;
     }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {
         return email;
     }
-
     public String getPassword() {
         return password;
     }
-
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
-
     public String getProvider() {
         return provider;
     }
-
     public void setProvider(String provider) {
         this.provider = provider;
     }
-
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
+                ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", role=" + role +
                 '}';
@@ -92,13 +75,11 @@ public class User  {
         this.id = id;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
+
 
     public void setEmail(String email) {
         this.email = email;
@@ -108,7 +89,7 @@ public class User  {
         this.password = password;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 }

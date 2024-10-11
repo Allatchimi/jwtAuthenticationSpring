@@ -3,7 +3,7 @@ package com.kidami.security.controllers;
 import com.kidami.security.dto.UserDTO;
 import com.kidami.security.dto.UserSaveDTO;
 import com.kidami.security.dto.UserUpdateDTO;
-import com.kidami.security.services.UserServices;
+import com.kidami.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserServices userService;
+    private UserService userService;
     @PostMapping("/save")
     public  String saveUser(@RequestBody  UserSaveDTO userSaveDTO){
         String id = userService.addUser(userSaveDTO);

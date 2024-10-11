@@ -3,29 +3,33 @@ package com.kidami.security.controllers;
 import com.kidami.security.dto.LoginDTO;
 import com.kidami.security.dto.RegisterDTO;
 import com.kidami.security.services.AuthService;
+import com.kidami.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/auth")
+@Controller
 public class AuthController {
-
     @Autowired
-    private AuthService authService;
-    @PostMapping(value = { "/login","/signin"})
-    public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO){
+    private UserService userService;
 
-        return ResponseEntity.ok("hello");
+    @GetMapping("/register")
+    public String showRegistrationForm() {
+        return "register";
     }
 
-    @PostMapping(value = {"/register", "/signup"})
-    public ResponseEntity<String> register(@RequestBody RegisterDTO registerDTO){
-        String response = authService.register(registerDTO);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    @PostMapping("/register")
+    public String registerUser(@RequestParam String email, @RequestParam String password) {
+        userService.registerNewUser(email, password);
+        return "redirect:/login";
+    }
+
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login";
     }
 }

@@ -5,81 +5,38 @@ import com.kidami.security.dto.UserSaveDTO;
 import com.kidami.security.dto.UserUpdateDTO;
 import com.kidami.security.models.User;
 import com.kidami.security.repository.UserRepository;
-import com.kidami.security.services.UserServices;
+import com.kidami.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class UserServicesImpl implements UserServices {
+public class UserServicesImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
-    @Override
-    public String addUser(UserSaveDTO userSaveDTO) {
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
-        User user = new User(
-                userSaveDTO.getFirstname(),
-                userSaveDTO.getLastname(),
-                userSaveDTO.getEmail(),
-                userSaveDTO.getRole()
-
-        );
-
-    userRepository.save(user);
-
-        return user.getFirstname();
+    public User registerNewUser(String email, String password) {
+        String hashedPassword = passwordEncoder.encode(password);
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(hashedPassword);
+        user.setProvider("LOCAL");
+        return userRepository.save(user);
     }
 
-    @Override
-    public List<UserDTO> getAllUsers() {
-        List<User> getUsers = userRepository.findAll();
-        List<UserDTO> userDTOList = new ArrayList<>();
-
-       for(User s:getUsers){
-           UserDTO userDTO = new UserDTO(
-                   s.getId(),
-                   s.getFirstname(),
-                   s.getLastname(),
-                   s.getEmail(),
-                   s.getPassword(),
-                   s.getRole()
-           );
-           userDTOList.add(userDTO);
-       }
-        return userDTOList;
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-    @Override
-    public String updateUser(UserUpdateDTO userUpdateDTO) {
 
-        if(userRepository.existsById(userUpdateDTO.getId())){
-
-            User user  = userRepository.(userUpdateDTO.getId());
-            user.setFirstname(userUpdateDTO.getFirstname());
-            user.setLastname(userUpdateDTO.getLastname());
-            user.setEmail(userUpdateDTO.getEmail());
-            user.setRole(userUpdateDTO.getRole());
-            user.setPassword(userUpdateDTO.getPassword());
-
-            userRepository.save(user);
-        }else {
-            System.out.println("User ID not Exists");
-        }
-        return null;
-    }
-
-    @Override
-    public boolean deleteUser(int id) {
-
-        if(userRepository.existsById(id)){
-            userRepository.deleteById(id);
-        }
-        else{
-            System.out.println("User ID not Exists");
-        }
-        return false;
-    }
 
 }

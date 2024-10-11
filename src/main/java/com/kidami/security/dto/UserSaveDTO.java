@@ -16,6 +16,6 @@ public class UserSaveDTO {
     private String lastname;
     private String email;
     private String password;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    //@Enumerated(EnumType.STRING)
+    private String role;
 }
