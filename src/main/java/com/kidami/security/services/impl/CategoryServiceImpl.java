@@ -4,7 +4,7 @@ import com.kidami.security.dto.CategoryDTO;
 import com.kidami.security.dto.CategorySaveDTO;
 import com.kidami.security.dto.CategoryUpdateDTO;
 import com.kidami.security.models.Category;
-import com.kidami.security.repository.CategoryRepository;
+
 import com.kidami.security.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
 @Service
-
 public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
@@ -71,3 +71,4 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
 }
+*/

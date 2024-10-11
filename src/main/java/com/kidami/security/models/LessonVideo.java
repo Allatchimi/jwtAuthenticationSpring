@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
-@Entity
+/*@Entity
 public class LessonVideo {
 
     @Id
@@ -43,3 +43,4 @@ public class LessonVideo {
         isPlay = play;
     }
 }
+*/

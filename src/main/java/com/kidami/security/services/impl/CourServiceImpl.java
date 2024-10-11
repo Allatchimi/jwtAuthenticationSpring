@@ -3,16 +3,16 @@ package com.kidami.security.services.impl;
 import com.kidami.security.dto.CourDTO;
 import com.kidami.security.dto.CourSaveDTO;
 import com.kidami.security.dto.CourUpdateDTO;
-import com.kidami.security.models.Cour;
-import com.kidami.security.repository.CourRepository;
-import com.kidami.security.services.CourService;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+//@Service
+/*
 public class CourServiceImpl implements CourService {
     @Autowired
     private CourRepository courRepository;
@@ -78,3 +78,4 @@ public class CourServiceImpl implements CourService {
         return false;
     }
 }
+*/

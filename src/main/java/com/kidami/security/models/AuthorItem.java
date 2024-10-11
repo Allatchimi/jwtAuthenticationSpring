@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 
 import jakarta.persistence.*;
 
-
+/*
 @Entity
 public class AuthorItem {
     @Id
@@ -51,3 +51,4 @@ public class AuthorItem {
 
     // Getters and setters...
 }
+*/

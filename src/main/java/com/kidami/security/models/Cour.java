@@ -1,10 +1,18 @@
 package com.kidami.security.models;
 
 import jakarta.persistence.*;
-
+/*
 @Entity
 @Table(name= "cour")
 public class Cour {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "courId")
+    private Integer id;
+    @Column(name = "score")
+    private Integer score;
     @Column(name = "userToken")
     private String userToken;
     @Column(name = "name")
@@ -38,12 +46,7 @@ public class Cour {
         this.type_id = type_id;
     }
 
-    @Column(name = "score")
-    private Integer score;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "courId")
-    private Integer id;
+
 
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -73,3 +76,4 @@ public class Cour {
 
 
 }
+*/

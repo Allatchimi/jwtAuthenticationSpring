@@ -3,12 +3,12 @@ package com.kidami.security.controllers;
 import com.kidami.security.dto.CourDTO;
 import com.kidami.security.dto.CourSaveDTO;
 import com.kidami.security.dto.CourUpdateDTO;
-import com.kidami.security.services.CourService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+/*
 @RestController
 @RequestMapping( "api/v1/cour")
 public class CourController {
@@ -40,3 +40,4 @@ public class CourController {
     }
 
 }
+*/

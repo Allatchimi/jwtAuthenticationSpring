@@ -2,7 +2,7 @@ package com.kidami.security.models;
 
 import jakarta.persistence.*;
 
-@Entity
+/*@Entity
 public class LessonVideoItem {
 
     @Id
@@ -53,3 +53,4 @@ public class LessonVideoItem {
         this.thumbnail = thumbnail;
     }
 }
+*/

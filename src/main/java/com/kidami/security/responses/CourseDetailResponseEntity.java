@@ -1,9 +1,9 @@
 package com.kidami.security.responses;
 
-import com.kidami.security.models.Cour;
+//import com.kidami.security.models.Cour;
 import jakarta.persistence.*;
 import lombok.Data;
-
+/*
 @Data
 public class CourseDetailResponseEntity {
 
@@ -46,3 +46,4 @@ public class CourseDetailResponseEntity {
         this.data = data;
     }
 }
+*/

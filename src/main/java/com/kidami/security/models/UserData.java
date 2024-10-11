@@ -3,7 +3,7 @@ package com.kidami.security.models;
 
 import jakarta.persistence.*;
 
-@Entity
+/*@Entity
 public class UserData {
 
     @Id
@@ -76,3 +76,4 @@ public class UserData {
         this.online = online;
     }
 }
+*/

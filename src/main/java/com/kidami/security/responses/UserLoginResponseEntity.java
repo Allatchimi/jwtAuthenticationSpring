@@ -1,5 +1,5 @@
 package com.kidami.security.responses;
-
+/*
 import com.kidami.security.models.UserProfile;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -61,3 +61,4 @@ public class UserLoginResponseEntity {
     }
 }
 
+*/

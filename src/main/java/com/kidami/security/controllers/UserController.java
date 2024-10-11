@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@CrossOrigin
-@RequestMapping( "api/v1/user")
+//@RestController
+//
+
+
+/*// @CrossOrigin
+//@RequestMapping( "api/v1/user")
 public class UserController {
 
     @Autowired
@@ -38,3 +41,4 @@ public class UserController {
     }
 
 }
+*/

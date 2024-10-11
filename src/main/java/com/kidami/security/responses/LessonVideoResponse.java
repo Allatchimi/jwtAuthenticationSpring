@@ -1,5 +1,5 @@
 package com.kidami.security.responses;
-
+/*
 import com.kidami.security.models.LessonVideoItem;
 import lombok.Data;
 
@@ -45,3 +45,4 @@ public class LessonVideoResponse {
         isPlay = play;
     }
 }
+*/

@@ -1,6 +1,6 @@
 package com.kidami.security.responses;
 
-import com.kidami.security.models.Cour;
+/*import com.kidami.security.models.Cour;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -49,3 +49,4 @@ public class CourseListResponseEntity {
         this.data = data;
     }
 }
+*/
