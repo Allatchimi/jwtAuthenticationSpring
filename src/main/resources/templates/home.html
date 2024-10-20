@@ -1,12 +1,21 @@
-<!-- src/main/resources/templates/home.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Home</title>
 </head>
 <body>
-<h1>Welcome to the Home Page!</h1>
-<p>You're now logged in.</p>
-<a th:href="@{/logout}">Logout</a>
+<h2>Welcome to the Home Page</h2>
+
+<!-- Afficher les informations de l'utilisateur -->
+<div th:if="${user != null}">
+    <h3>Welcome, <span th:text="${user.email}">User Email</span>!</h3>
+    <p>Your role is: <span th:text="${user.role}">User Role</span></p>
+</div>
+
+<!-- Si l'utilisateur n'est pas trouvé, afficher un message -->
+<div th:if="${user == null}">
+    <p>User not found!</p>
+</div>
+
 </body>
 </html>

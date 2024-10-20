@@ -1,49 +1,67 @@
 package com.kidami.security.config;
 
+import com.kidami.security.services.impl.CustomOAuth2UserService;
+import com.kidami.security.services.impl.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    @Lazy // Ajout
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    @Lazy // Ajout
+    private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    @Lazy // Ajout
+    private CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF if working with REST APIs
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/", "/auth/register", "/auth/login").permitAll(); // Allow access to registration and login pages
-                    auth.anyRequest().authenticated(); // All other requests require authentication
+                    auth.requestMatchers("/", "/register", "/login").permitAll();
+                    auth.anyRequest().authenticated();
                 })
                 .formLogin(form -> form
-                        .loginPage("/auth/login").permitAll() // Specify the custom login page
-                        .defaultSuccessUrl("/home", true) // Redirect to /home after successful login
-                        .failureUrl("/auth/login?error=true") // Redirect to login page with error if login fails
+                        .loginPage("/login").permitAll()
+                        .defaultSuccessUrl("/home", true)
+                        .failureUrl("/login?error=true")
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/auth/login?logout=true").permitAll() // Redirect to login page after logout
+                        .logoutSuccessUrl("/login?logout=true").permitAll()
                 )
-                .oauth2Login(form -> form
-                        .loginPage("/auth/login") // Use the same login page for OAuth2 login
-                        .defaultSuccessUrl("/home", true) // Redirect to /home after successful login via OAuth2
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/home", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
                 )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user =
-                User.withDefaultPasswordEncoder()
-                        .username("user")
-                        .password("password")
-                        .roles("USER")
-                        .build();
-
-        return new InMemoryUserDetailsManager(user);
+    public AuthenticationManager authenticationManagerBean(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+        return authenticationManagerBuilder.build();
     }
 
     @Bean

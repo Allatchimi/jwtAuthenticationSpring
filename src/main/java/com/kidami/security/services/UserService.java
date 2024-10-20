@@ -10,5 +10,5 @@ import java.util.Optional;
 
 public interface UserService {
     User registerNewUser(String email, String password);
-    Optional<User> findByEmail(String email);
+    User findByEmail(String email);
 }

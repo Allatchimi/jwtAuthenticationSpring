@@ -3,21 +3,23 @@ package com.kidami.security.controllers;
 import com.kidami.security.dto.CategoryDTO;
 import com.kidami.security.dto.CategorySaveDTO;
 import com.kidami.security.dto.CategoryUpdateDTO;
-import com.kidami.security.services.CategoryService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+/*
 @RestController
 @RequestMapping( "api/v1/category")
 public class CategoryController {
-    @Autowired
-    private CategoryService categoryService;
+   // @Autowired
+   // private CategoryService categoryService;
     @PostMapping("/saveCategory")
     public String saveCour(@RequestBody CategorySaveDTO categorySaveDTO){
 
-        String id = categoryService.addCategory(categorySaveDTO);
+      //  String id = categoryService.addCategory(categorySaveDTO);
         return id;
 
     }
@@ -39,3 +41,4 @@ public class CategoryController {
     }
 
 }
+*/

@@ -5,7 +5,7 @@ import com.kidami.security.dto.CategorySaveDTO;
 import com.kidami.security.dto.CategoryUpdateDTO;
 
 import java.util.List;
-
+/*
 public interface CategoryService {
 
     String addCategory(CategorySaveDTO categorySaveDTO);
@@ -14,3 +14,4 @@ public interface CategoryService {
 
     boolean deleteCategory(Long id);
 }
+*/

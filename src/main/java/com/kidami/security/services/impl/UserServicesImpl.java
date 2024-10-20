@@ -26,12 +26,13 @@ public class UserServicesImpl implements UserService {
         User user = new User();
         user.setEmail(email);
         user.setPassword(hashedPassword);
+        user.setRole("USER");
         user.setProvider("LOCAL");
         return userRepository.save(user);
     }
 
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 
 
