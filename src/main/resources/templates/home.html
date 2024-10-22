@@ -9,7 +9,13 @@
 <!-- Afficher les informations de l'utilisateur -->
 <div th:if="${user != null}">
     <h3>Welcome, <span th:text="${user.email}">User Email</span>!</h3>
-    <p>Your role is: <span th:text="${user.role}">User Role</span></p>
+    <p>Your role is: <span th:each="role : ${user.roles}" th:text="${role}">Role</span>
+    </p>
+    <p>Your roles:</p>
+    <ul>
+        <li th:each="role : ${user.roles}" th:text="${role}">Role</li>
+    </ul>
+
 </div>
 
 <!-- Si l'utilisateur n'est pas trouvé, afficher un message -->

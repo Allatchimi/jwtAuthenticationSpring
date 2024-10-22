@@ -23,6 +23,7 @@ import java.util.Optional;
 public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -49,7 +50,6 @@ public class AuthController {
 
     @GetMapping("/login")
     public String showLoginForm() {
-        logger.info("Accessing login form");
         return "login";
     }
 
@@ -58,14 +58,21 @@ public class AuthController {
                         @RequestParam String password,
                         Model model) {
         try {
+            // Authentifier l'utilisateur
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
 
-            // Si l'authentification réussit, redirige vers la page d'accueil
+            // Log après authentification réussie
+            logger.info("User authenticated successfully: {}", email);
+
+            // Générer un token JWT après authentification
+            String jwtToken = jwtService.generateToken(email);
+
+            // Ajouter le token au modèle ou gérer la redirection comme nécessaire
             return "redirect:/home";
         } catch (AuthenticationException e) {
-            // Si l'authentification échoue, retourner à la page de connexion avec un message d'erreur
+            logger.error("Authentication failed for user: {}", email);
             model.addAttribute("loginError", "Invalid email or password");
             return "login";
         }

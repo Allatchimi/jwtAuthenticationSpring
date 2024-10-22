@@ -2,6 +2,9 @@ package com.kidami.security.models;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name= "user")
 public class User  {
@@ -11,33 +14,29 @@ public class User  {
     private Integer id;
     @Column(name="name", length =50 )
     private String name;
-    @Column(name="email", length =100 )
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
     @Column(name="password", length =200)
     private String password;
     private String provider;
-    @Column(name="role", length = 50)
-    //@Enumerated(EnumType.STRING)
-    private String role;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING) // ou EnumType.ORDINAL si vous préférez
+    private Set<Role> roles = new HashSet<>(); // Utilisation d'un ensemble pour les rôles
+
 
     public User() {
     }
 
-    public User(Integer id, String name, String provider, String email, String password, String role) {
+    public User(Integer id, String name, String provider, String email, String password, Set<Role> roles) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.provider = provider;
-        this.role = role;
+        this.roles = roles;
     }
 
-    public User(String name, String provider, String email, String role) {
-        this.name = name;
-        this.email = email;
-        this.provider = provider;
-        this.role = role;
-    }
+
 
     public Integer getId() {
         return id;
@@ -52,8 +51,8 @@ public class User  {
     public String getPassword() {
         return password;
     }
-    public String getRole() {
-        return role;
+    public Set<Role> getRoles() {
+        return roles;
     }
     public String getProvider() {
         return provider;
@@ -67,7 +66,7 @@ public class User  {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", role=" + role +
+                ", role=" + roles +
                 '}';
     }
 
@@ -89,7 +88,7 @@ public class User  {
         this.password = password;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }
