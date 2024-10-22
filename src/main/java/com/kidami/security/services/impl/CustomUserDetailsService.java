@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Récupérer les rôles sous forme de Set<Role> et les convertir en GrantedAuthority
         Set<SimpleGrantedAuthority> authorities = userEntity.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.name())) // Convertir le rôle en chaîne de caractères
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name())) // Convertir le rôle en chaîne de caractères
                 .collect(Collectors.toSet());
 
         final String email  = userEntity.getEmail();
