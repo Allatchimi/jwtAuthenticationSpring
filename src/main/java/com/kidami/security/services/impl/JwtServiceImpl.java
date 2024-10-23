@@ -1,32 +1,64 @@
 package com.kidami.security.services.impl;
 
+import com.kidami.security.models.User;
 import com.kidami.security.services.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 
 @Service
 public class JwtServiceImpl implements JwtService {
     private static final String SECRET_KEY = "AFCAF4422DF2188A2828D1A3B7C97";
+
+
+   /*
     @Override
-    public String generateToken(String email) {
+   public String generateToken(Authentication authentication) {
+        User user = (User) authentication.getPrincipal(); // Récupérer l'utilisateur authentifié
+
+        // Inclure les rôles de l'utilisateur dans les claims du JWT
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", user.getRoles());
+
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setSubject(user.getEmail())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 heures
+                .signWith(getSiginKey(), SignatureAlgorithm.HS256)
+                .compact();
+
+        return token;
+    }
+        public String generateRefreshToken(Authentication authentication) {
+        String email = authentication.getName();
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "refresh");
+
         return Jwts.builder()
-                .subject(email)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-               // .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .setClaims(claims)
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // Expiration après 7 jours
                 .signWith(getSiginKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-    /*
+
+    */
+   @Override
     public String generateToken(UserDetails userDetails){
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
@@ -35,7 +67,18 @@ public class JwtServiceImpl implements JwtService {
                 .signWith(getSiginKey(), SignatureAlgorithm.HS256)
                 .compact();
 
-    }*/
+    }
+    public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails){
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 604800000))
+                .signWith(getSiginKey(), SignatureAlgorithm.HS256)
+                .compact();
+
+    }
+
 
     @Override
     public String extractEmail(String token) {

@@ -3,7 +3,6 @@ package com.kidami.security.controllers;
 
 import com.kidami.security.dto.AuthResponseDto;
 import com.kidami.security.dto.LoginDTO;
-import com.kidami.security.dto.RefreshTokenRequest;
 import com.kidami.security.models.User;
 import com.kidami.security.services.AuthService;
 import com.kidami.security.services.JwtService;
@@ -21,21 +20,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/api/auth")
-public class AuthController {
+public class WebController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private AuthService authService;
-    @Autowired
     private JwtService jwtService;
+    @Autowired
+    private AuthService authService;
     @Autowired
     private UserService userService;
     @GetMapping("/register")
@@ -62,28 +59,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+    public String login(@RequestBody LoginDTO loginDTO,Model model) {
         try {
-            //01 - Receive the token from AuthService
-            AuthResponseDto authResponseDto = authService.login(loginDTO);
+            // Authentifier l'utilisateur
+               authService.login(loginDTO);
 
-
-            // Log après authentification réussie
-            logger.info("User authenticated successfully: {}", loginDTO.getEmail());
-
-
-            //03 - Return the response to the user
-            return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
+            // Ajouter le token au modèle ou gérer la redirection comme nécessaire
+            return "redirect:/home";
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDTO.getEmail());
-
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            model.addAttribute("loginError", "Invalid email or password");
+            return "login";
         }
-    }
-    @PostMapping("/refresh")
-    public ResponseEntity<AuthResponseDto> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
-
-        return ResponseEntity.ok(authService.refreshToken(refreshTokenRequest));
     }
 
     @GetMapping("/protected-endpoint")
