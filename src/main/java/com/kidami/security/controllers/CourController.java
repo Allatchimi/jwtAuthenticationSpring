@@ -4,18 +4,19 @@ import com.kidami.security.dto.CourDTO;
 import com.kidami.security.dto.CourSaveDTO;
 import com.kidami.security.dto.CourUpdateDTO;
 
+import com.kidami.security.services.CourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-/*
 @RestController
-@RequestMapping( "api/v1/cour")
+@RequestMapping("/api/cour")
 public class CourController {
 
     @Autowired
     private CourService courService;
     @PostMapping("/saveCour")
+    @ResponseBody
     public String saveCour(@RequestBody CourSaveDTO courSaveDTO){
 
         String id =courService.addCour(courSaveDTO);
@@ -23,6 +24,7 @@ public class CourController {
 
     }
     @GetMapping("/getAllCours")
+    @ResponseBody
     List<CourDTO> getAllCour(){
         List<CourDTO> allCours = courService.getAllCours();
 
@@ -34,10 +36,9 @@ public class CourController {
         return id;
     }
     @DeleteMapping("/deleteCourId/{id}")
-    public  String deleteCour(@PathVariable(value="id") Long id){
+    public  String deleteCour(@PathVariable(value="id") Integer id){
         boolean deletecour = courService.deleteCour(id);
         return "deleted!!!!!!!!";
     }
 
 }
-*/

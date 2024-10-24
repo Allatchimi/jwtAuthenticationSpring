@@ -6,10 +6,8 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,10 +27,13 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
 
     private final String jwtKey = "1525668cda001cf3dd995ef460fb3d7eb3d8af3826ff87611cb271083b99892e";
+
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
 
@@ -42,6 +43,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/", "/register", "/login","/api/auth/**").permitAll();
+                    auth.requestMatchers("/api/admin").hasRole("ADMIN");
+                    auth.requestMatchers("/api/user/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(form -> form
@@ -55,12 +58,8 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true").permitAll()
                 )
-                /*
-                .sessionManagement((sessionManagement)->
-                        sessionManagement
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
-                )*/
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                         .defaultSuccessUrl("/home", true)
@@ -73,15 +72,6 @@ public class SecurityConfig {
                 .build();
     }
 
-/*
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder());
-        return auth.build();
-    }*/
-
-
     @Bean
     public AuthenticationManager authenticationManagerBean(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -89,27 +79,19 @@ public class SecurityConfig {
         return authenticationManagerBuilder.build();
     }
 
-    /*
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
-
-    }
-*/
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(this.jwtKey.getBytes()));
     }
+
     @Bean
     public JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKey = new SecretKeySpec(this.jwtKey.getBytes(), 0, this.jwtKey.getBytes().length,"RSA");
+        SecretKeySpec secretKey = new SecretKeySpec(this.jwtKey.getBytes(), 0, this.jwtKey.getBytes().length, "RSA");
         return NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build();
     }
-
 }

@@ -1,5 +1,6 @@
 package com.kidami.security.services.impl;
 
+import com.kidami.security.controllers.AuthController;
 import com.kidami.security.models.User;
 import com.kidami.security.services.JwtService;
 import io.jsonwebtoken.Claims;
@@ -7,6 +8,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -20,21 +23,21 @@ import java.util.function.Function;
 
 @Service
 public class JwtServiceImpl implements JwtService {
-    private static final String SECRET_KEY = "AFCAF4422DF2188A2828D1A3B7C97";
+    private static final String SECRET_KEY = "AFCAF4422DF2188A2828D1A3B7C97AFCAF4422DF2188A2828D1A3B7C97AFCAF4422DF2188A2828D1A3B7C97";
+    private static final Logger logger = LoggerFactory.getLogger(JwtServiceImpl.class);
 
 
-   /*
     @Override
    public String generateToken(Authentication authentication) {
-        User user = (User) authentication.getPrincipal(); // Récupérer l'utilisateur authentifié
 
+        String email = authentication.getName();
         // Inclure les rôles de l'utilisateur dans les claims du JWT
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", user.getRoles());
+        claims.put("roles", authentication.getAuthorities());
 
         String token = Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getEmail())
+                .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 heures
                 .signWith(getSiginKey(), SignatureAlgorithm.HS256)
@@ -57,27 +60,6 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    */
-   @Override
-    public String generateToken(UserDetails userDetails){
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-                .signWith(getSiginKey(), SignatureAlgorithm.HS256)
-                .compact();
-
-    }
-    public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails){
-        return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 604800000))
-                .signWith(getSiginKey(), SignatureAlgorithm.HS256)
-                .compact();
-
-    }
 
 
     @Override
@@ -107,9 +89,16 @@ public class JwtServiceImpl implements JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
     }
+
     private Claims extractAllClaims(String token){
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Token cannot be null or empty");
+        }
+
         return Jwts.parser().setSigningKey(getSiginKey()).build().parseClaimsJws(token).getBody();
     }
+
+
     private Key getSiginKey(){
         byte[] key = Decoders.BASE64.decode("2879c5b4a1a8bfe972529ee8b3358b9fb23c1ac31528c3a05a2246067356e43e");
         return Keys.hmacShaKeyFor(key);

@@ -1,13 +1,13 @@
 package com.kidami.security.controllers;
 
 
-import com.kidami.security.dto.AuthResponseDto;
-import com.kidami.security.dto.LoginDTO;
-import com.kidami.security.dto.RefreshTokenRequest;
+import com.kidami.security.dto.*;
+import com.kidami.security.models.Role;
 import com.kidami.security.models.User;
 import com.kidami.security.services.AuthService;
 import com.kidami.security.services.JwtService;
 import com.kidami.security.services.UserService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
+
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/auth")
@@ -45,10 +49,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestParam String email, @RequestParam String password) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody RegisterDTO registerDTO) {
         try {
-            logger.info("Registering user with email: {}", email);
-            userService.registerNewUser(email, password);
+            logger.info("Registering user with registerDTO: {}", registerDTO);
+            userService.registerNewUser(registerDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
         } catch (Exception e) {
             logger.error("Error registering user: {}", e.getMessage());
@@ -69,7 +73,7 @@ public class AuthController {
 
 
             // Log après authentification réussie
-            logger.info("User authenticated successfully: {}", loginDTO.getEmail());
+          //  logger.info("User authenticated successfully: {}", loginDTO.getEmail());
 
 
             //03 - Return the response to the user
@@ -77,13 +81,14 @@ public class AuthController {
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDTO.getEmail());
 
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
         }
     }
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponseDto> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
-
-        return ResponseEntity.ok(authService.refreshToken(refreshTokenRequest));
+        AuthResponseDto authResponseDto =  authService.refreshToken(refreshTokenRequest);
+        return new  ResponseEntity<>(authResponseDto, HttpStatus.OK);
     }
 
     @GetMapping("/protected-endpoint")

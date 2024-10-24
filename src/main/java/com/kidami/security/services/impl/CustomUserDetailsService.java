@@ -28,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Récupérer l'utilisateur par email
         User userEntity = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        logger.info("Retrieved OAuth2 user attributes: {}", userEntity);
+        //logger.info("Retrieved OAuth2 user attributes: {}", userEntity);
 
         // Récupérer les rôles sous forme de Set<Role> et les convertir en GrantedAuthority
         Set<SimpleGrantedAuthority> authorities = userEntity.getRoles().stream()
@@ -39,12 +39,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         final String name  = userEntity.getName();
 
         // Log specific attributes
-        logger.info("User email: {}", email);
-        logger.info("User name: {}", name);
-        logger.info("User roles: {}", userEntity.getRoles());
+        //logger.info("User email: {}", email);
+       // logger.info("User name: {}", name);
+       // logger.info("User roles: {}", userEntity.getRoles());
 
-        // Log pour vérifier l'utilisateur trouvé
-        System.out.println("User found: " + userEntity);
 
         // Créer et retourner un UserDetails
         return org.springframework.security.core.userdetails.User

@@ -1,4 +1,4 @@
-package com.kidami.security.exception;
+package com.kidami.security.exceptions;
 
 import org.springframework.http.HttpStatus;
 

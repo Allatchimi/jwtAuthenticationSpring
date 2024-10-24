@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 
 public class CategorySaveDTO {
     private String categoryName;
+    private  String description;
 
 }

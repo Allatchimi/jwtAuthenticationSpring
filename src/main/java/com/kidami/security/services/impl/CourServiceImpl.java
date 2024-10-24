@@ -5,25 +5,37 @@ import com.kidami.security.dto.CourSaveDTO;
 import com.kidami.security.dto.CourUpdateDTO;
 
 
+import com.kidami.security.models.Cour;
+import com.kidami.security.repository.CourRepository;
+import com.kidami.security.services.CourService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//@Service
-/*
+@Service
 public class CourServiceImpl implements CourService {
     @Autowired
     private CourRepository courRepository;
+
+
     @Override
     public String addCour(CourSaveDTO courSaveDTO) {
-        Cour cour =new Cour(
-                courSaveDTO.getTitle(),
-                courSaveDTO.getDescription(),
-                courSaveDTO.getContent(),
-                courSaveDTO.getCategory()
-        );
+        Cour cour = new Cour();
+        cour.setName(courSaveDTO.getName());
+               cour.setDescription(courSaveDTO.getDescription());
+               cour.setPrice(courSaveDTO.getPrice());
+               cour.setVideo(courSaveDTO.getVideo());
+                cour.setThumbnail(courSaveDTO.getThumbnail());
+                cour.setUserToken(courSaveDTO.getUserToken());
+                cour.setAmountTotal(courSaveDTO.getAmountTotal());
+                cour.setLessonNum(courSaveDTO.getLessonNum());
+                cour.setVideoLen(courSaveDTO.getVideoLen());
+                cour.setFollow(courSaveDTO.getFollow());
+                cour.setType_id(courSaveDTO.getType_id());
+               cour.setDownNum(courSaveDTO.getDownNum());
+               cour.setScore(courSaveDTO.getScore());
         courRepository.save(cour);
 
         return cour.getDescription();
@@ -37,11 +49,9 @@ public class CourServiceImpl implements CourService {
         for(Cour c:getCours){
             CourDTO courDTO = new CourDTO(
                     c.getId(),
-                    c.getTitle(),
+                    c.getName(),
                     c.getDescription(),
-                    c.getCategory(),
-                    c.getContent()
-
+                    c.getVideo()
             );
             courDTOList.add(courDTO);
         }
@@ -52,10 +62,9 @@ public class CourServiceImpl implements CourService {
     public String updateCour(CourUpdateDTO courUpdateDTO) {
         if(courRepository.existsById(courUpdateDTO.getId())){
             Cour cour= courRepository.getReferenceById(courUpdateDTO.getId());
-            cour.setTitle(courUpdateDTO.getTitle());
+            cour.setName(courUpdateDTO.getName());
             cour.setDescription(courUpdateDTO.getDescription());
-            cour.setContent(courUpdateDTO.getContent());
-            cour.setCategory(courUpdateDTO.getCategory());
+            cour.setVideo(courUpdateDTO.getVideo());
 
             courRepository.save(cour);
 
@@ -66,7 +75,7 @@ public class CourServiceImpl implements CourService {
     }
 
     @Override
-    public boolean deleteCour(Long id) {
+    public boolean deleteCour(Integer id) {
         if(courRepository.existsById(id))
         {
             courRepository.deleteById(id);
@@ -78,4 +87,3 @@ public class CourServiceImpl implements CourService {
         return false;
     }
 }
-*/

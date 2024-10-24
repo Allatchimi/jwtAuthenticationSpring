@@ -1,11 +1,12 @@
 package com.kidami.security.models;
 
 import jakarta.persistence.*;
-/*
+import lombok.Data;
+
 @Entity
+@Data
 @Table(name= "cour")
 public class Cour {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,27 +39,12 @@ public class Cour {
     @Column(name = "type_id")
     private Integer type_id;
 
-    public Integer getType_id() {
-        return type_id;
-    }
-
-    public void setType_id(Integer type_id) {
-        this.type_id = type_id;
-    }
 
 
-
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "category_id" ,referencedColumnName = "categoryId")
-    private Category category;
-
-    public Cour() {
-    }
-
-    public Cour(String userToken, String name, String description, String thumbnail,
-                      String video, String price, String amountTotal, Integer lessonNum,
-                      Integer videoLen, Integer downNum, Integer follow, Integer score, Integer id) {
+    public Cour(){}
+    public Cour( String userToken, String name, String description, String thumbnail, String video, String price, String amountTotal, Integer lessonNum, Integer videoLen, Integer downNum, Integer follow, Integer type_id,Integer id, Integer score) {
+        this.id = id;
+        this.score = score;
         this.userToken = userToken;
         this.name = name;
         this.description = description;
@@ -70,10 +56,6 @@ public class Cour {
         this.videoLen = videoLen;
         this.downNum = downNum;
         this.follow = follow;
-        this.score = score;
-        this.id = id;
+        this.type_id = type_id;
     }
-
-
 }
-*/

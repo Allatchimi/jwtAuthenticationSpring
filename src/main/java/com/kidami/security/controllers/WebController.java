@@ -3,10 +3,12 @@ package com.kidami.security.controllers;
 
 import com.kidami.security.dto.AuthResponseDto;
 import com.kidami.security.dto.LoginDTO;
+import com.kidami.security.dto.RegisterDTO;
 import com.kidami.security.models.User;
 import com.kidami.security.services.AuthService;
 import com.kidami.security.services.JwtService;
 import com.kidami.security.services.UserService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +44,12 @@ public class WebController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestParam String email, @RequestParam String password) {
+    public ResponseEntity<String> registerUser(@Valid @ModelAttribute RegisterDTO registerDTO) {
         try {
-            logger.info("Registering user with email: {}", email);
-            userService.registerNewUser(email, password);
+           // logger.info("Registering user with email: {}", registerDTO);
+            userService.registerNewUser(registerDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+
         } catch (Exception e) {
             logger.error("Error registering user: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error registering user: " + e.getMessage());

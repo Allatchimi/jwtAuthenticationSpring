@@ -9,19 +9,12 @@ import lombok.Data;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "categoryId")
-    private Long categoryId;
+    @Column(name = "catId")
+    private Integer categoryId;
     private String categoryName;
     private  String description;
-    private Integer order;
 
-    public Integer getOrder() {
-        return order;
-    }
 
-    public void setOrder(Integer order) {
-        this.order = order;
-    }
 
     public String getDescription() {
         return description;
@@ -34,20 +27,21 @@ public class Category {
     public Category() {
     }
 
-    public Category(Long categoryId, String categoryName) {
+    public Category(Integer categoryId, String categoryName, String description) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
+        this.description = description;
     }
 
     public Category(String categoryName) {
         this.categoryName = categoryName;
     }
 
-    public Long getCategoryId() {
+    public Integer getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Long categoryId) {
+    public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
     }
 

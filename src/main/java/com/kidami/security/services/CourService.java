@@ -6,13 +6,12 @@ import com.kidami.security.dto.CourUpdateDTO;
 
 import java.util.List;
 
-/*
+
 public interface CourService {
 
     String addCour(CourSaveDTO courSaveDTO);
-
     List<CourDTO> getAllCours();
     String updateCour(CourUpdateDTO courUpdateDTO);
-    boolean deleteCour(Long id);
+
+    boolean deleteCour(Integer id);
 }
-*/

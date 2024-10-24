@@ -30,11 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // Exclure certaines routes comme /login et /register
+        // Exclure certaines routes comme /api/auth/login, /api/login, /api/auth/register, et /api/register
         String requestURI = request.getRequestURI();
-        if (requestURI.equals("/login") || requestURI.equals("/register")) {
+
+        if (requestURI.startsWith("/api/auth/login") || requestURI.startsWith("/api/login") ||
+                requestURI.startsWith("/api/auth/register") || requestURI.startsWith("/api/register")) {
             chain.doFilter(request, response);
-            return; // ne pas appliquer le filtre pour ces routes
+            return;
         }
 
         final String authorizationHeader = request.getHeader("Authorization");
@@ -43,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Vérifier si le header contient un token JWT valide
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            chain.doFilter(request, response); // continuer sans traitement JWT si pas de token
+            chain.doFilter(request, response); // Continuer sans traitement JWT si pas de token
             return;
         }
 
@@ -58,7 +60,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // Vérifier si le token est valide
             if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
-
                 // Créer un objet d'authentification et le définir dans le contexte de sécurité
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
