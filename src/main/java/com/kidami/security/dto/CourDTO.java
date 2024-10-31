@@ -29,20 +29,10 @@ public class CourDTO {
     private String price;
     private String amountTotal;
 
-    public CourDTO(Integer id, String name, String description, String video) {
+
+    public CourDTO(Integer id, String name, String description) {
         this.id = id;
-        this.score = score;
-        this.userToken = userToken;
         this.name = name;
         this.description = description;
-        this.thumbnail = thumbnail;
-        this.video = video;
-        this.price = price;
-        this.amountTotal = amountTotal;
-        this.lessonNum = lessonNum;
-        this.videoLen = videoLen;
-        this.downNum = downNum;
-        this.follow = follow;
-        this.type_id = type_id;
     }
 }

@@ -17,9 +17,12 @@ public class LessonVideoItemController {
     @Autowired
     private LessonVideoItemService lessonVideoItemService;
 
+    // Ajouter une vidéo à une leçon par ID
     @PostMapping("/add")
-    public ResponseEntity<LessonVideoItemRep> addLessonVideoItem(@RequestBody LessonVideoItemReq lessonVideoItemReq) {
-        LessonVideoItemRep response = lessonVideoItemService.addLessonVideoItem(lessonVideoItemReq);
+    public ResponseEntity<LessonVideoItemRep> addLessonVideoItem(
+            @RequestParam Integer lessonId,
+            @RequestBody LessonVideoItemReq lessonVideoItemReq) {
+        LessonVideoItemRep response = lessonVideoItemService.addLessonVideoItem(lessonId, lessonVideoItemReq);
         return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retourne l'objet avec un statut 201
     }
 

@@ -6,6 +6,8 @@ import com.kidami.security.dto.CourUpdateDTO;
 
 import com.kidami.security.services.CourService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,23 +19,23 @@ public class CourController {
     private CourService courService;
     @PostMapping("/saveCour")
     @ResponseBody
-    public String saveCour(@RequestBody CourSaveDTO courSaveDTO){
+    public ResponseEntity<CourDTO> saveCour(@RequestBody CourSaveDTO courSaveDTO){
 
-        String id =courService.addCour(courSaveDTO);
-        return id;
+        CourDTO courDTO =courService.addCour(courSaveDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(courDTO);
 
     }
     @GetMapping("/getAllCours")
     @ResponseBody
-    List<CourDTO> getAllCour(){
+    ResponseEntity<List<CourDTO>> getAllCour(){
         List<CourDTO> allCours = courService.getAllCours();
 
-        return allCours;
+        return ResponseEntity.ok(allCours);
     }
     @PutMapping("/updateCour")
-    public  String updateUser(@RequestBody CourUpdateDTO courUpdateDTO){
-        String id = courService.updateCour(courUpdateDTO);
-        return id;
+    public  ResponseEntity<CourDTO> updateUser(@RequestBody CourUpdateDTO courUpdateDTO){
+        CourDTO courDTO = courService.updateCour(courUpdateDTO);
+        return ResponseEntity.ok(courDTO);
     }
     @DeleteMapping("/deleteCourId/{id}")
     public  String deleteCour(@PathVariable(value="id") Integer id){

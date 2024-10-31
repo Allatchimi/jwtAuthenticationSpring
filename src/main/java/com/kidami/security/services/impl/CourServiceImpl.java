@@ -21,7 +21,7 @@ public class CourServiceImpl implements CourService {
 
 
     @Override
-    public String addCour(CourSaveDTO courSaveDTO) {
+    public CourDTO addCour(CourSaveDTO courSaveDTO) {
         Cour cour = new Cour();
         cour.setName(courSaveDTO.getName());
                cour.setDescription(courSaveDTO.getDescription());
@@ -38,7 +38,12 @@ public class CourServiceImpl implements CourService {
                cour.setScore(courSaveDTO.getScore());
         courRepository.save(cour);
 
-        return cour.getDescription();
+        CourDTO courDTO = new CourDTO();
+        courDTO.setId(cour.getId());
+        courDTO.setName(cour.getName());
+        courDTO.setDescription(cour.getDescription());
+
+        return courDTO;
     }
 
     @Override
@@ -50,8 +55,8 @@ public class CourServiceImpl implements CourService {
             CourDTO courDTO = new CourDTO(
                     c.getId(),
                     c.getName(),
-                    c.getDescription(),
-                    c.getVideo()
+                    c.getDescription()
+
             );
             courDTOList.add(courDTO);
         }
@@ -59,12 +64,11 @@ public class CourServiceImpl implements CourService {
     }
 
     @Override
-    public String updateCour(CourUpdateDTO courUpdateDTO) {
+    public CourDTO updateCour(CourUpdateDTO courUpdateDTO) {
         if(courRepository.existsById(courUpdateDTO.getId())){
             Cour cour= courRepository.getReferenceById(courUpdateDTO.getId());
             cour.setName(courUpdateDTO.getName());
             cour.setDescription(courUpdateDTO.getDescription());
-            cour.setVideo(courUpdateDTO.getVideo());
 
             courRepository.save(cour);
 

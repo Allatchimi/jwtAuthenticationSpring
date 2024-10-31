@@ -11,10 +11,12 @@ import java.util.List;
 
 public interface LessonVideoItemService {
 
-    LessonVideoItemRep addLessonVideoItem(LessonVideoItemReq lessonVideoItemReq);
+   // LessonVideoItemRep addLessonVideoItem(LessonVideoItemReq lessonVideoItemReq);
+
+    LessonVideoItemRep addLessonVideoItem(Integer lessonId, LessonVideoItemReq lessonVideoItemReq);
+
     List<LessonVideoItemRep> getAllLessonVideoItem();
     LessonVideoItemRep updateLessonVideoItem(LessonVideoItemReq lessonVideoItemReq);
-
 
     // Méthode pour supprimer un cours par son ID
     ResponseEntity<String> deleteLessonVideoItem(Integer id);

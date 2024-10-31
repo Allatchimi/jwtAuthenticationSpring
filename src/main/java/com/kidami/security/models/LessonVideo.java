@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 
 
 import java.util.List;
-
-/*@Entity
+/*
+@Entity
 public class LessonVideo {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

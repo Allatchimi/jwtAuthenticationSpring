@@ -10,9 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LessonVideoItemRep {
 
-    private Integer id;
-    private String name;
-    private String url;
-    private String thumbnail;
+    private Integer id;           // ID de l'élément vidéo
+    private String name;          // Nom de l'élément vidéo
+    private String url;           // URL de l'élément vidéo
+    private String thumbnail;      // URL de la miniature
+    private Integer lessonId;      // ID de la leçon associée
+    private String lessonName;     // Nom de la leçon associée
 
 }

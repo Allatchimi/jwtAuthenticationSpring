@@ -4,21 +4,25 @@ import jakarta.persistence.*;
 
 @Entity
 public class LessonVideoItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
     private String url;
     private String thumbnail;
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
+    private Lesson lesson;
 
     public LessonVideoItem() {
     }
 
-    public LessonVideoItem(String name, String url, String thumbnail) {
+    public LessonVideoItem(Integer id, String name, String url, String thumbnail, Lesson lesson) {
+        this.id = id;
         this.name = name;
         this.url = url;
         this.thumbnail = thumbnail;
+        this.lesson = lesson;
     }
 
     public Integer getId() {
@@ -51,5 +55,13 @@ public class LessonVideoItem {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public Lesson getLesson() {
+        return lesson;
+    }
+
+    public void setLesson(Lesson lesson) {
+        this.lesson = lesson;
     }
 }

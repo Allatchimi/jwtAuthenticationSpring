@@ -1,10 +1,9 @@
 package com.kidami.security.services.impl;
 
-import com.kidami.security.dto.CourDTO;
-import com.kidami.security.dto.CourSaveDTO;
-import com.kidami.security.dto.CourUpdateDTO;
 import com.kidami.security.exceptions.ResourceNotFoundException;
+import com.kidami.security.models.Lesson;
 import com.kidami.security.models.LessonVideoItem;
+import com.kidami.security.repository.LessonRepository;
 import com.kidami.security.repository.LessonVideoItemRepository;
 import com.kidami.security.requests.LessonVideoItemReq;
 import com.kidami.security.responses.LessonVideoItemRep;
@@ -22,26 +21,49 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
 
     @Autowired
     private LessonVideoItemRepository lessonVideoItemRepository;
+    @Autowired
+    private LessonRepository lessonRepository;
 
+    /*
     @Override
     public LessonVideoItemRep addLessonVideoItem(LessonVideoItemReq lessonVideoItemReq) {
+        // Rechercher la leçon existante par son ID
+        Lesson lesson = lessonRepository.findById(lessonVideoItemReq.getLessonId())
+                .orElseThrow(() -> new RuntimeException("Leçon introuvable pour l'ID : " + lessonVideoItemReq.getLessonId()));
+        // ... (le reste de votre logique)
+    }*/
 
+    @Override
+    public LessonVideoItemRep addLessonVideoItem(Integer lessonId, LessonVideoItemReq lessonVideoItemReq) {
+        // Rechercher la leçon existante par son ID
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new RuntimeException("Leçon introuvable pour l'ID : " + lessonId));
+
+        // Créer et remplir un nouvel objet LessonVideoItem
         LessonVideoItem lessonVideoItem = new LessonVideoItem();
         lessonVideoItem.setName(lessonVideoItemReq.getName());
         lessonVideoItem.setThumbnail(lessonVideoItemReq.getThumbnail());
         lessonVideoItem.setUrl(lessonVideoItemReq.getUrl());
 
-        lessonVideoItem = lessonVideoItemRepository.save(lessonVideoItem);
+        // Associer la leçon existante à l'élément vidéo
+        lessonVideoItem.setLesson(lesson);
 
-        // Logique pour ajouter l'item
+        // Ajouter cet item à la liste des vidéos de la leçon
+        lesson.getVideo().add(lessonVideoItem);
+
+        // Sauvegarder l'item vidéo et mettre à jour la leçon dans la base de données
+        lessonRepository.save(lesson);
+
+        // Préparer et retourner le DTO de réponse
         LessonVideoItemRep response = new LessonVideoItemRep();
-        // Remplir response avec les données
         response.setId(lessonVideoItem.getId());
         response.setName(lessonVideoItem.getName());
         response.setUrl(lessonVideoItem.getUrl());
         response.setThumbnail(lessonVideoItem.getThumbnail());
+
         return response;
     }
+
 
     @Override
     public List<LessonVideoItemRep> getAllLessonVideoItem() {
@@ -56,6 +78,11 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
             response.setUrl(lessonVideoItem.getUrl());
             response.setName(lessonVideoItem.getName());
             response.setThumbnail(lessonVideoItem.getThumbnail());
+            // Récupérez l'ID et le nom de la leçon associée
+            if (lessonVideoItem.getLesson() != null) {
+                response.setLessonId(lessonVideoItem.getLesson().getId());
+                response.setLessonName(lessonVideoItem.getLesson().getName());
+            }
             return response;
         }).collect(Collectors.toList());
     }

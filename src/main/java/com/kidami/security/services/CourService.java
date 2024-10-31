@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface CourService {
 
-    String addCour(CourSaveDTO courSaveDTO);
+    CourDTO addCour(CourSaveDTO courSaveDTO);
     List<CourDTO> getAllCours();
-    String updateCour(CourUpdateDTO courUpdateDTO);
+    CourDTO updateCour(CourUpdateDTO courUpdateDTO);
 
     boolean deleteCour(Integer id);
 }
