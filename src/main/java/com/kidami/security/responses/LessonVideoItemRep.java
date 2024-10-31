@@ -14,7 +14,7 @@ public class LessonVideoItemRep {
     private String name;          // Nom de l'élément vidéo
     private String url;           // URL de l'élément vidéo
     private String thumbnail;      // URL de la miniature
-    private Integer lessonId;      // ID de la leçon associée
+    private Integer lesson_id;      // ID de la leçon associée
     private String lessonName;     // Nom de la leçon associée
 
 }

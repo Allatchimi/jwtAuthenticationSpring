@@ -23,5 +23,5 @@ public class CourSaveDTO {
     private Integer videoLen;
     private Integer downNum;
     private Integer follow;
-    private Integer type_id;
+    private Integer categorieId;
 }

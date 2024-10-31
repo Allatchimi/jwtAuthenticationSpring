@@ -1,6 +1,7 @@
 package com.kidami.security.dto;
 
 
+import com.kidami.security.models.Cour;
 import com.kidami.security.models.LessonVideoItem;
 import com.kidami.security.responses.LessonVideoItemRep;
 import jakarta.persistence.CascadeType;
@@ -20,6 +21,8 @@ public class LessonDTO {
     private Integer id;
     private  String name;
     //private Cour cour;
+    //private String courNom;
+    private Integer courId;
     private String thumbnail;
     private String description;
     private List<LessonVideoItemRep> video;

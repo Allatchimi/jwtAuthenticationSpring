@@ -18,7 +18,7 @@ import java.util.List;
 public class LessonSaveDTO {
 
     private  String name;
-    //private Cour cour;
+    private Integer courId;
     private String thumbnail;
     private String description;
     private List<LessonVideoItemRep> video;

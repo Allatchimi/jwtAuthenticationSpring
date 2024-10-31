@@ -36,13 +36,16 @@ public class Cour {
     private Integer downNum;
     @Column(name = "follow")
     private Integer follow;
-    @Column(name = "type_id")
-    private Integer type_id;
+    @ManyToOne
+    @JoinColumn(name = "categorie_id")
+    private Category categorie;
+   // @Column(name = "type_id")
+   // private Integer type_id;
 
 
 
     public Cour(){}
-    public Cour( String userToken, String name, String description, String thumbnail, String video, String price, String amountTotal, Integer lessonNum, Integer videoLen, Integer downNum, Integer follow, Integer type_id,Integer id, Integer score) {
+    public Cour( String userToken, String name, String description, String thumbnail, String video, String price, String amountTotal, Integer lessonNum, Integer videoLen, Integer downNum, Integer follow, Integer type_id,Integer id, Integer score,Category categorie) {
         this.id = id;
         this.score = score;
         this.userToken = userToken;
@@ -56,6 +59,8 @@ public class Cour {
         this.videoLen = videoLen;
         this.downNum = downNum;
         this.follow = follow;
-        this.type_id = type_id;
+        //this.type_id = type_id;
+        this.categorie = categorie;
     }
+
 }

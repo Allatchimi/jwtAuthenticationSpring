@@ -1,7 +1,5 @@
 package com.kidami.security.services.impl;
 
-import com.kidami.security.controllers.AuthController;
-import com.kidami.security.models.User;
 import com.kidami.security.services.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,7 +9,6 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;

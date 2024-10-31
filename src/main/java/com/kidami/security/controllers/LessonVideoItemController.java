@@ -3,10 +3,8 @@ package com.kidami.security.controllers;
 import com.kidami.security.requests.LessonVideoItemReq;
 import com.kidami.security.responses.LessonVideoItemRep;
 import com.kidami.security.services.LessonVideoItemService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,8 +12,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/LessonVideoItem")
 public class LessonVideoItemController {
-    @Autowired
-    private LessonVideoItemService lessonVideoItemService;
+    private final LessonVideoItemService lessonVideoItemService;
+
+    public LessonVideoItemController(LessonVideoItemService lessonVideoItemService) {
+        this.lessonVideoItemService = lessonVideoItemService;
+    }
 
     // Ajouter une vidéo à une leçon par ID
     @PostMapping("/add")
@@ -37,6 +38,12 @@ public class LessonVideoItemController {
     public ResponseEntity<List<LessonVideoItemRep>> getAllLessonVideoItems() {
         List<LessonVideoItemRep> lessonVideoItem = lessonVideoItemService.getAllLessonVideoItem();
         return ResponseEntity.ok(lessonVideoItem);
+    }
+
+    @PostMapping("/byLesson/{lessonId}")
+    public  ResponseEntity<List<LessonVideoItemRep>> getLessonVideoItemByLessonId(@PathVariable Integer lessonId){
+    List<LessonVideoItemRep> lessonVideoItemRepList = lessonVideoItemService.getLessonsByLessonId(lessonId);
+    return ResponseEntity.ok(lessonVideoItemRepList);
     }
 
     // Méthode pour supprimer un cours par son ID

@@ -15,5 +15,6 @@ public interface LessonService {
     List<LessonDTO> getAllLesson();
     ResponseEntity<String> deleteLesson(Integer id);
    LessonDTO getLessonByName(String name);
+    List<LessonDTO> getLessonsByCourId(Integer courId);
 
 }

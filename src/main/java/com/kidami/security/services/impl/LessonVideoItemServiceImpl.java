@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,7 +81,7 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
             response.setThumbnail(lessonVideoItem.getThumbnail());
             // Récupérez l'ID et le nom de la leçon associée
             if (lessonVideoItem.getLesson() != null) {
-                response.setLessonId(lessonVideoItem.getLesson().getId());
+                response.setLesson_id(lessonVideoItem.getLesson().getId());
                 response.setLessonName(lessonVideoItem.getLesson().getName());
             }
             return response;
@@ -117,5 +118,24 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
         // Supprimez le cours
         lessonVideoItemRepository.deleteById(id);
         return ResponseEntity.ok("lessonVideoItem supprimé avec succès !");
+    }
+
+    @Override
+    public List<LessonVideoItemRep> getLessonsByLessonId(Integer lesson_id) {
+        List<LessonVideoItem> lessonVideoItems = lessonVideoItemRepository.findByLessonId(lesson_id);
+
+        List<LessonVideoItemRep> lessonVideoItemRepList = new ArrayList<>();
+         for( LessonVideoItem lessonVideoItem : lessonVideoItems ){
+             LessonVideoItemRep lessonVideoItemRep = new LessonVideoItemRep();
+             lessonVideoItemRep.setId(lessonVideoItem.getId());
+             lessonVideoItemRep.setName(lessonVideoItem.getName());
+             lessonVideoItemRep.setUrl(lessonVideoItem.getUrl());
+             lessonVideoItemRep.setThumbnail(lessonVideoItem.getThumbnail());
+             lessonVideoItemRep.setLesson_id(lessonVideoItem.getLesson().getId());
+             lessonVideoItemRep.setLessonName(lessonVideoItem.getLesson().getName());
+
+             lessonVideoItemRepList.add(lessonVideoItemRep);
+         }
+        return lessonVideoItemRepList;
     }
 }

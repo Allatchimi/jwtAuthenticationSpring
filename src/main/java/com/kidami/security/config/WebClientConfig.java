@@ -1,4 +1,5 @@
 package com.kidami.security.config;
+/*
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,4 +15,4 @@ public class WebClientConfig {
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
-}
+}*/

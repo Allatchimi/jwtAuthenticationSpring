@@ -1,35 +1,25 @@
 package com.kidami.security.responses;
 
-/*import com.kidami.security.models.Cour;
-import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
-public class CourseListResponseEntity {
-
-    private Integer code;
+public class CourseListResponseEntity<T> {
+    private String code;
     private String msg;
+    private T data;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_list_id")
-    private List<Cour> data = new ArrayList<>();
-
-    public CourseListResponseEntity() {}
-
-    public CourseListResponseEntity(Integer code, String msg, List<Cour> data) {
+    public CourseListResponseEntity(String code, String msg, T data) {
         this.code = code;
         this.msg = msg;
         this.data = data;
     }
 
-    public Integer getCode() {
+    // Getters et Setters
+    public String getCode() {
         return code;
     }
 
-    public void setCode(Integer code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
@@ -41,12 +31,11 @@ public class CourseListResponseEntity {
         this.msg = msg;
     }
 
-    public List<Cour> getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(List<Cour> data) {
+    public void setData(T data) {
         this.data = data;
     }
 }
-*/

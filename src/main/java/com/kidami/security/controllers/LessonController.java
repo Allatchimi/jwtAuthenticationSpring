@@ -33,6 +33,11 @@ public class LessonController {
         List<LessonDTO> lessonDTOList = lessonService.getAllLesson();
         return ResponseEntity.ok(lessonDTOList);
     }
+    @PostMapping("/byCourse/{courId}")
+    public ResponseEntity<List<LessonDTO>> getLessonsByCourseId(@PathVariable Integer courId) {
+       List<LessonDTO>  lessonDTOList = lessonService.getLessonsByCourId(courId);
+        return ResponseEntity.ok(lessonDTOList);
+    }
     @GetMapping("/by-name")
     public ResponseEntity<LessonDTO> getLessonByName(@RequestParam String name) {
         LessonDTO lessonDTO = lessonService.getLessonByName(name);

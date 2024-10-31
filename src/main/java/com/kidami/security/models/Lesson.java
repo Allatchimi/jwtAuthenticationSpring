@@ -11,7 +11,9 @@ public class Lesson {
     @Id
     private Integer id;
     private  String name;
-    //private Cour cour;
+    @ManyToOne
+    @JoinColumn(name = "courId")
+    private Cour cour;
     private String thumbnail;
     private String description;
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -22,12 +24,13 @@ public class Lesson {
     }
 
 
-    public Lesson(Integer id, String name, String thumbnail, String description, List<LessonVideoItem> video) {
+    public Lesson(Integer id, String name, String thumbnail, String description, List<LessonVideoItem> video, Cour cour) {
         this.id = id;
         this.name = name;
         this.thumbnail = thumbnail;
         this.description = description;
         this.video = video;
+        this.cour = cour;
     }
 
     public Integer getId() {
@@ -71,4 +74,11 @@ public class Lesson {
     }
 
 
+    public Cour getCour() {
+        return cour;
+    }
+
+    public void setCour(Cour cour) {
+        this.cour = cour;
+    }
 }
