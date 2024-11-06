@@ -1,6 +1,7 @@
 package com.kidami.security.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 
 @Entity
@@ -8,28 +9,39 @@ import jakarta.persistence.*;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "categoryId")
-    private Long categoryId;
+    @Column(name = "catId")
+    private Integer categoryId;
     private String categoryName;
+    private  String description;
 
+
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Category() {
     }
 
-    public Category(Long categoryId, String categoryName) {
+    public Category(Integer categoryId, String categoryName, String description) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
+        this.description = description;
     }
 
     public Category(String categoryName) {
         this.categoryName = categoryName;
     }
 
-    public Long getCategoryId() {
+    public Integer getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Long categoryId) {
+    public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
     }
 

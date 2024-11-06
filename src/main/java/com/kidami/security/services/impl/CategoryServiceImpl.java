@@ -4,6 +4,8 @@ import com.kidami.security.dto.CategoryDTO;
 import com.kidami.security.dto.CategorySaveDTO;
 import com.kidami.security.dto.CategoryUpdateDTO;
 import com.kidami.security.models.Category;
+
+
 import com.kidami.security.repository.CategoryRepository;
 import com.kidami.security.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,19 +14,22 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
 
+@Service
 public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
     @Override
-    public String addCategory(CategorySaveDTO categorySaveDTO) {
-        Category category = new Category(
-                categorySaveDTO.getCategoryName()
-        );
+    public Category addCategory(CategorySaveDTO categorySaveDTO) {
+        Category category = new Category();
+
+        category.setCategoryName(categorySaveDTO.getCategoryName());
+        category.setDescription( categorySaveDTO.getDescription());
+
         categoryRepository.save(category);
-        return category.getCategoryName();
+
+        return category;
     }
 
     @Override
@@ -34,10 +39,12 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryDTO> categoryDTOList= new ArrayList<>();
 
         for(Category c:getAllCategorys){
-            CategoryDTO categoryDTO = new CategoryDTO(
-                    c.getCategoryId(),
-                    c.getCategoryName()
-            );
+            CategoryDTO categoryDTO = new CategoryDTO();
+
+            categoryDTO.setCategoryId(c.getCategoryId());
+            categoryDTO.setCategoryName(c.getCategoryName());
+            categoryDTO.setDescription(c.getDescription());
+
             categoryDTOList.add(categoryDTO);
         }
         return categoryDTOList;
@@ -49,6 +56,8 @@ public class CategoryServiceImpl implements CategoryService {
         if(categoryRepository.existsById(categoryUpdateDTO.getCategoryId())){
             Category category = categoryRepository.getReferenceById(categoryUpdateDTO.getCategoryId());
             category.setCategoryName(categoryUpdateDTO.getCategoryName());
+            category.setDescription(categoryUpdateDTO.getDescription());
+
 
             categoryRepository.save(category);
         }else {
@@ -58,7 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean deleteCategory(Long id) {
+    public boolean deleteCategory(Integer id) {
         if(categoryRepository.existsById(id))
         {
             categoryRepository.deleteById(id);
