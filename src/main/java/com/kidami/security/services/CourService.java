@@ -12,7 +12,7 @@ public interface CourService {
 
     CourDTO addCour(CourSaveDTO courSaveDTO);
     List<CourDTO> getAllCours();
+    CourDeteailDTO courtDetails(Integer courId);
     CourDTO updateCour(CourUpdateDTO courUpdateDTO);
     boolean deleteCour(Integer id);
-    CourDeteailDTO courtDetails(Integer courId);
 }

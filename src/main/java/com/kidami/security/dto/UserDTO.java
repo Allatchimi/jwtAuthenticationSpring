@@ -14,7 +14,7 @@ import java.util.Set;
 @Data
 public class UserDTO {
 
-    private Integer id;
+    private Long id;
     private String name;
     @Column( unique = true)
     private String email;

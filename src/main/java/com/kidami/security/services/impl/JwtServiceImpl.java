@@ -1,5 +1,6 @@
 package com.kidami.security.services.impl;
 
+import com.kidami.security.models.User;
 import com.kidami.security.services.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -25,23 +26,23 @@ public class JwtServiceImpl implements JwtService {
 
 
     @Override
-   public String generateToken(Authentication authentication) {
+    public String generateToken(Authentication authentication) {
+        //CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
 
-        String email = authentication.getName();
-        // Inclure les rôles de l'utilisateur dans les claims du JWT
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", authentication.getAuthorities());
+        claims.put("roles", user.getAuthorities());
+        claims.put("name", user.getName());// URL avatar si tu as
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(email)
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 heures
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(getSiginKey(), SignatureAlgorithm.HS256)
                 .compact();
-
-        return token;
     }
+
         public String generateRefreshToken(Authentication authentication) {
         String email = authentication.getName();
 

@@ -13,14 +13,11 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface UserService {
-    User registerNewUser(RegisterDTO registerDTO);
+    UserDTO registerNewUser(RegisterDTO registerDTO);
     User findByEmail(String email);
     User addRolesToUser(String email, Set<Role> rolesToAdd);
-
     List<UserDTO> getAllUsers();
-
-    String updateUser(UserUpdateDTO userUpdateDTO);
-
+    UserDTO updateUser(UserUpdateDTO userUpdateDTO);
     boolean deleteUser(int id);
     String deleteUsers( Map<String, Integer> request);
 }

@@ -4,141 +4,187 @@ import com.kidami.security.dto.CourDTO;
 import com.kidami.security.dto.CourDeteailDTO;
 import com.kidami.security.dto.CourSaveDTO;
 import com.kidami.security.dto.CourUpdateDTO;
-
-
+import com.kidami.security.exceptions.DuplicateResourceException;
+import com.kidami.security.exceptions.ResourceNotFoundException;
+import com.kidami.security.mappers.CourMapper;
 import com.kidami.security.models.Category;
 import com.kidami.security.models.Cour;
 import com.kidami.security.repository.CategoryRepository;
 import com.kidami.security.repository.CourRepository;
 import com.kidami.security.services.CourService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
 public class CourServiceImpl implements CourService {
-    @Autowired
-    private CourRepository courRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(CourServiceImpl.class);
+    private final CourRepository courRepository;
+    private final CategoryRepository categoryRepository;
+    private final CourMapper courMapper;
+
+    public CourServiceImpl(CourMapper courMapper, CourRepository courRepository, CategoryRepository categoryRepository) {
+        this.courMapper = courMapper;
+        this.courRepository = courRepository;
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
     public CourDTO addCour(CourSaveDTO courSaveDTO) {
 
-        Category categorie = categoryRepository.findById(courSaveDTO.getCategorieId())
-                .orElseThrow(() -> new RuntimeException("Catégorie non trouvée"));
+        logger.debug("Tentative de création d'un cours: {}", courSaveDTO.getName());
+        validateCourSaveDTO(courSaveDTO);
+        // Vérifier si un cours avec le même nom existe déjà
+        if (courRepository.existsByName(courSaveDTO.getName())) {
+            logger.warn("Tentative de création d'un cours en double: {}", courSaveDTO.getName());
+            throw new DuplicateResourceException("Course", "name", courSaveDTO.getName());
+        }
 
-        Cour cour = new Cour();
-        cour.setName(courSaveDTO.getName());
-        cour.setDescription(courSaveDTO.getDescription());
-        cour.setPrice(courSaveDTO.getPrice());
-        cour.setVideo(courSaveDTO.getVideo());
-        cour.setThumbnail(courSaveDTO.getThumbnail());
-        cour.setUserToken(courSaveDTO.getUserToken());
-        cour.setAmountTotal(courSaveDTO.getAmountTotal());
-        cour.setLessonNum(courSaveDTO.getLessonNum());
-        cour.setVideoLen(courSaveDTO.getVideoLen());
-        cour.setFollow(courSaveDTO.getFollow());
-        cour.setCategorie(categorie);
-        cour.setDownNum(courSaveDTO.getDownNum());
-        cour.setScore(courSaveDTO.getScore());
-        courRepository.save(cour);
+        try {
+            // Récupérer la catégorie
+            Category categorie = categoryRepository.findById(courSaveDTO.getCategorieId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", courSaveDTO.getCategorieId()));
 
-        CourDTO courDTO = new CourDTO();
-        courDTO.setId(cour.getId());
-        courDTO.setName(cour.getName());
-        courDTO.setDescription(cour.getDescription());
-        courDTO.setCategorie(cour.getCategorie());
 
-        return courDTO;
+            // Utilisation du mapper
+            Cour cour = courMapper.createCourFromDTO(courSaveDTO, categorie);
+            Cour savedCour = courRepository.save(cour);
+
+            logger.info("Cours créé avec succès: {} (ID: {})", savedCour.getName(), savedCour.getId());
+            return courMapper.toDTO(savedCour);
+
+        } catch (ResourceNotFoundException | DuplicateResourceException e) {
+            // On laisse remonter les exceptions métier
+            throw e;
+        } catch (DataAccessException e) {
+            logger.error("Erreur d'accès aux données lors de la création du cours: {}", e.getMessage(), e);
+            throw new RuntimeException("Erreur technique lors de la création du cours", e);
+        } catch (Exception e) {
+            logger.error("Erreur inattendue lors de la création du cours: {}", e.getMessage(), e);
+            throw new RuntimeException("Erreur lors de la création du cours", e);
+        }
+    }
+
+    private void validateCourSaveDTO(CourSaveDTO dto) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom du cours est obligatoire");
+        }
+        if (dto.getCategorieId() == null) {
+            throw new IllegalArgumentException("L'ID de la catégorie est obligatoire");
+        }
     }
 
     @Override
     public List<CourDTO> getAllCours() {
-        List<Cour> getCours =courRepository.findAll();
-        List<CourDTO> courDTOList= new ArrayList<>();
+        logger.debug("Tentative de récupération de tous les cours");
 
-        for(Cour c:getCours){
-            CourDTO courDTO = new CourDTO(
-                    c.getId(),
-                    c.getScore(),
-                    c.getLessonNum(),
-                    c.getVideoLen(),
-                    c.getDownNum(),
-                    c.getFollow(),
-                    c.getCategorie(),
-                    c.getUserToken(),
-                    c.getName(),
-                    c.getDescription(),
-                    c.getThumbnail(),
-                    c.getVideo(),
-                    c.getPrice(),
-                    c.getAmountTotal()
-            );
-            courDTOList.add(courDTO);
-        }
-        return courDTOList;
+        List<Cour> cours = courRepository.findAll();
+
+        logger.info("{} cours récupérés avec succès", cours.size());
+
+        return cours.stream()
+                .map(courMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public CourDTO updateCour(CourUpdateDTO courUpdateDTO) {
-        if(courRepository.existsById(courUpdateDTO.getId())){
-            Cour cour= courRepository.getReferenceById(courUpdateDTO.getId());
-            cour.setName(courUpdateDTO.getName());
-            cour.setDescription(courUpdateDTO.getDescription());
-            cour.setThumbnail(courUpdateDTO.getThumbnail());
 
-            courRepository.save(cour);
+        logger.debug("Mise à jour du cours ID: {}", courUpdateDTO.getId());
+        // Vérifier si le cours existe
+        Cour cour = courRepository.findById(courUpdateDTO.getId())
+                .orElseThrow(() ->{
+                    logger.warn("le cours n existe pas: {}", courUpdateDTO.getName());
+                    return  new ResourceNotFoundException("Course", "id", courUpdateDTO.getId());
+                });
 
-        }else {
-            System.out.println("Lesson not Exist");
+        // Vérifier si le nouveau nom existe déjà (pour un autre cours)
+        if (courUpdateDTO.getName() != null &&
+                !cour.getName().equals(courUpdateDTO.getName()) &&
+                courRepository.existsByNameAndIdNot(courUpdateDTO.getName(), courUpdateDTO.getId())) {
+            logger.warn("le nouveau nom existe déjà pour un autre cours: {}", cour.getName());
+            throw new DuplicateResourceException("Course", "name", courUpdateDTO.getName());
         }
-        return null;
+
+        logger.trace("Données de mise à jour valides: {}", courUpdateDTO);
+        try {
+
+            // Mettre à jour les champs
+            if (courUpdateDTO.getName() != null) cour.setName(courUpdateDTO.getName());
+            if (courUpdateDTO.getDescription() != null) cour.setDescription(courUpdateDTO.getDescription());
+            if (courUpdateDTO.getThumbnail() != null) cour.setThumbnail(courUpdateDTO.getThumbnail());
+            if (courUpdateDTO.getVideo() != null) cour.setVideo(courUpdateDTO.getVideo());
+            if (courUpdateDTO.getPrice() != null) cour.setPrice(courUpdateDTO.getPrice());
+            if (courUpdateDTO.getAmountTotal() != null) cour.setAmountTotal(courUpdateDTO.getAmountTotal());
+            if (courUpdateDTO.getLessonNum() != null) cour.setLessonNum(courUpdateDTO.getLessonNum());
+            if (courUpdateDTO.getVideoLen() != null) cour.setVideoLen(courUpdateDTO.getVideoLen());
+            if (courUpdateDTO.getFollow() != null) cour.setFollow(courUpdateDTO.getFollow());
+            if (courUpdateDTO.getDownNum() != null) cour.setDownNum(courUpdateDTO.getDownNum());
+            if (courUpdateDTO.getScore() != null) cour.setScore(courUpdateDTO.getScore());
+            if (courUpdateDTO.getUserToken() != null) cour.setUserToken(courUpdateDTO.getUserToken());
+
+            // Mettre à jour la catégorie si nécessaire
+            if (courUpdateDTO.getCategorieId() != null) {
+                Category categorie = categoryRepository.findById(courUpdateDTO.getCategorieId())
+                        .orElseThrow(() -> {
+                            logger.warn("Categorie n existe pas: {}", courUpdateDTO.getCategorieId());
+                           return  new ResourceNotFoundException("Category", "id", courUpdateDTO.getCategorieId());
+                        });
+                cour.setCategorie(categorie);
+            }
+
+            Cour updatedCour = courRepository.save(cour);
+            logger.info("le cour a ete bien mise a jour : {}", updatedCour);
+            return courMapper.toDTO(updatedCour);
+
+        }catch (Exception e) {
+            logger.error("Erreur lors de la mise a jour du cour: {}", e.getMessage());
+            throw e;
+
+        }
     }
 
     @Override
     public boolean deleteCour(Integer id) {
-        if(courRepository.existsById(id))
-        {
+        logger.debug("Tentative de suppression du cours ID: {}", id);
+        // Vérifier si le cours existe
+        if (!courRepository.existsById(id)) {
+            logger.warn("Tentative de suppression d'un cours inexistant ID: {}", id);
+            throw new ResourceNotFoundException("Course", "id", id);
+        }
+        try {
             courRepository.deleteById(id);
+            logger.info("Cours supprimé avec succès ID: {}", id);
+            return true;
+        } catch (Exception e) {
+            logger.error("Erreur lors de la suppression du cours ID: {} - {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erreur lors de la suppression du cours", e);
         }
-        else {
-            System.out.println("Lesson ID not exist");
-
-        }
-        return false;
     }
 
     @Override
     public CourDeteailDTO courtDetails(Integer courId) {
+        logger.debug("Tentative de récupération du cours avec ID: {}", courId);
 
-        if (courRepository.existsById(courId)){
+        try {
+            Cour cour = courRepository.findById(courId)
+                    .orElseThrow(() -> {
+                        logger.warn("Cours non trouvé avec ID: {}", courId);
+                        return new ResourceNotFoundException("Course", "id", courId);
+                    });
 
-            Cour courDet = courRepository.getReferenceById(courId);
-            CourDeteailDTO courDeteailDTO = new CourDeteailDTO();
+            logger.info("Cours récupéré avec succès: {}", cour.getName());
+            return courMapper.toDetailDTO(cour);
 
-            courDeteailDTO.setId(courDet.getId());
-            courDeteailDTO.setName(courDet.getName());
-            courDeteailDTO.setDescription(courDet.getDescription());
-            courDeteailDTO.setPrice(courDet.getPrice());
-            courDeteailDTO.setVideo(courDet.getVideo());
-            courDeteailDTO.setThumbnail(courDet.getThumbnail());
-            courDeteailDTO.setUserToken(courDet.getUserToken());
-            courDeteailDTO.setAmountTotal(courDet.getAmountTotal());
-            courDeteailDTO.setLessonNum(courDet.getLessonNum());
-            courDeteailDTO.setVideoLen(courDet.getVideoLen());
-            courDeteailDTO.setFollow(courDet.getFollow());
-            courDeteailDTO.setCategorie(courDet.getCategorie());
-            courDeteailDTO.setDownNum(courDet.getDownNum());
-            courDeteailDTO.setScore(courDet.getScore());
-
-            return courDeteailDTO;
+        } catch (ResourceNotFoundException e) {
+            throw e;
         }
-       return null;
     }
+
 }

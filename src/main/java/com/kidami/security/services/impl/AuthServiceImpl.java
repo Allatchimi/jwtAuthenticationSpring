@@ -3,6 +3,7 @@ package com.kidami.security.services.impl;
 import com.kidami.security.dto.AuthResponseDto;
 import com.kidami.security.dto.LoginDTO;
 import com.kidami.security.dto.RefreshTokenRequest;
+import com.kidami.security.dto.RegisterDTO;
 import com.kidami.security.models.RefreshToken;
 import com.kidami.security.models.User;
 import com.kidami.security.repository.RefreshTokenRepository;
@@ -40,30 +41,23 @@ public class AuthServiceImpl implements AuthService {
                         loginDTO.getPassword()
                 )
         );
-
         // 02 - Stocker l'authentification dans le SecurityContextHolder
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         // 03 - Récupérer l'utilisateur
         User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-
         // 04 - Générer le token JWT et le refresh token
         String token = jwtService.generateToken(authentication);
         String refreshToken = jwtService.generateRefreshToken(authentication);
         Instant expiryDate = Instant.now().plus(Duration.ofDays(30));
-
         // Crée ou met à jour le refresh token
         createOrUpdateRefreshToken(user, refreshToken, expiryDate);
-
         // Créer la réponse
         AuthResponseDto authResponseDto = new AuthResponseDto();
         authResponseDto.setAccessToken(token);
         authResponseDto.setRefreshToken(refreshToken);
-
         return authResponseDto;
     }
-
     @Override
     public RefreshToken createOrUpdateRefreshToken(User user, String newToken, Instant newExpiryDate) {
         Optional<RefreshToken> existingToken = refreshTokenRepository.findByUser(user);
@@ -83,12 +77,10 @@ public class AuthServiceImpl implements AuthService {
             return refreshTokenRepository.save(refreshToken);
         }
     }
-
     @Override
     public void deleteRefreshTokenForUser(User user) {
         refreshTokenRepository.deleteByUser(user);
     }
-
     @Override
     public AuthResponseDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
         // 01 - Extraire l'email à partir du refresh token

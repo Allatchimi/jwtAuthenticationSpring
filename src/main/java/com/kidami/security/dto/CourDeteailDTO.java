@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class CourDeteailDTO {
 
     private Integer id;

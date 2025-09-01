@@ -6,8 +6,11 @@ import com.kidami.security.dto.UserSaveDTO;
 import com.kidami.security.dto.UserUpdateDTO;
 import com.kidami.security.models.Role;
 import com.kidami.security.models.User;
+import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.UserService;
+import com.kidami.security.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -19,53 +22,65 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    private final  UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/getAllUsers")
-    @ResponseBody
-    public List<UserDTO> getAllUser(){
+    public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUser(){
         List<UserDTO> allUsers= userService.getAllUsers();
-        return allUsers;
+        return ResponseEntity.ok(ResponseUtil.success("User retrieved successfully",allUsers,null));
     }
     @PutMapping("/update")
-    @ResponseBody
-    public  String updateUser(@RequestBody UserUpdateDTO userUpdateDTO){
-        String id = userService.updateUser(userUpdateDTO);
-        return id;
+    public  ResponseEntity<ApiResponse<UserDTO>> updateUser(@RequestBody UserUpdateDTO userUpdateDTO){
+        UserDTO userDTO = userService.updateUser(userUpdateDTO);
+        return ResponseEntity.ok(ResponseUtil.success("updated user",userDTO,null));
     }
-    @DeleteMapping("/deleteUserId/{id}")
-    @ResponseBody
-    public  String deleteUser(@PathVariable(value="id") int id){
+
+    @DeleteMapping("/{id}")
+    public  ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable(value="id") int id){
         boolean deleteuser = userService.deleteUser(id);
-        return "deleted!!!!!!!!";
+        if(deleteuser){
+            return ResponseEntity.ok(ResponseUtil.success("deleted user",null,null));
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseUtil.error("user not Found",null,null));
+        }
     }
+
     @DeleteMapping("/deleteUser")
-    @ResponseBody
-    public String deleteUser(@RequestBody Map<String, Integer> request) {
+    public ResponseEntity<ApiResponse<String>> deleteUser(@RequestBody Map<String, Integer> request) {
          String deleteUser = userService.deleteUsers(request);
-        return deleteUser;
+        if(deleteUser != null){
+            return ResponseEntity.ok(ResponseUtil.success("deleted user",deleteUser,null));
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ResponseUtil.error("user not Found",null,null));
+        }
+
     }
- @PostMapping("/addRole")
- @ResponseBody
- public ResponseEntity<?> addRole(@RequestBody AddRoleRequest request) {
-  String email = request.getEmail();
 
-  // Convert strings to Role enums
-  Set<Role> roles = request.getRoles().stream()
-          .map(roleName -> {
-           try {
-            return Role.valueOf(roleName.toUpperCase()); // Convert to uppercase for matching
-           } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Role " + roleName + " is not valid");
-           }
-          })
-          .collect(Collectors.toSet());
+    @PostMapping("/addRole")
+    public ResponseEntity<ApiResponse<?>> addRole(@RequestBody AddRoleRequest request) {
 
-  User user = userService.addRolesToUser(email, roles);
-  return ResponseEntity.ok(user);
- }
+        String email = request.getEmail();
+        // Convert strings to Role enums
+        Set<Role> roles = request.getRoles().stream()
+              .map(roleName -> {
+               try {
+                return Role.valueOf(roleName.toUpperCase()); // Convert to uppercase for matching
+               } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Role " + roleName + " is not valid");
+               }
+              })
+              .collect(Collectors.toSet());
+
+        User user = userService.addRolesToUser(email, roles);
+        return ResponseEntity.ok(ResponseUtil.success("attribut succes role",user,null));
+        }
 
 }

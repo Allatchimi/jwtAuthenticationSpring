@@ -3,6 +3,10 @@ package com.kidami.security.services.impl;
 import com.kidami.security.dto.RegisterDTO;
 import com.kidami.security.dto.UserDTO;
 import com.kidami.security.dto.UserUpdateDTO;
+import com.kidami.security.exceptions.DuplicateResourceException;
+import com.kidami.security.exceptions.ResourceNotFoundException;
+import com.kidami.security.mappers.UserMapper;
+import com.kidami.security.models.Category;
 import com.kidami.security.models.Role; // Importer l'énumération Role
 import com.kidami.security.models.User;
 import com.kidami.security.repository.UserRepository;
@@ -18,28 +22,56 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServicesImpl implements UserService {
+
     private final  static Logger log = LogManager.getLogger(UserServicesImpl.class);
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-    // Enregistrer un nouvel utilisateur avec un rôle par défaut
-    @Override
-    public User registerNewUser(RegisterDTO registerDTO) {
-        String hashedPassword = passwordEncoder.encode(registerDTO.getPassword());
-        User user = new User();
-        user.setEmail(registerDTO.getEmail());
-        user.setName(registerDTO.getName());
-        user.setPassword(hashedPassword);
-        // Ajouter un rôle par défaut à l'utilisateur (par exemple, ROLE_USER)
-        Set<Role> defaultRoles = new HashSet<>();
-        defaultRoles.add(Role.USER); // Supposons que vous ayez un rôle USER dans l'énumération
-        user.setRoles(defaultRoles);
-       // log.info("user role registered " + defaultRoles);
-        user.setProvider("LOCAL");
-        return userRepository.save(user);
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    UserServicesImpl(UserRepository userRepository, UserMapper userMapper, BCryptPasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    @Override
+    public UserDTO registerNewUser(RegisterDTO registerDTO) {
+        log.debug("Tentative de creation de user {}", registerDTO);
+
+        if(registerDTO.getEmail() == null || registerDTO.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("L'Email du user est obligatoire");
+        }
+
+        if (userRepository.existsByEmail(registerDTO.getEmail())) {
+            log.warn("Tentative de création d'un user en double: {}", registerDTO.getEmail());
+            throw new DuplicateResourceException("User", "email", registerDTO.getEmail());
+        }
+
+        try {
+            // Utiliser le mapper pour la conversion de base
+            User user = userMapper.registerDTOToUser(registerDTO);
+
+            // Gérer le hachage du mot de passe dans le service
+            String hashedPassword = passwordEncoder.encode(registerDTO.getPassword());
+            user.setPassword(hashedPassword);
+
+            // Gérer les rôles par défaut
+            Set<Role> defaultRoles = new HashSet<>();
+            defaultRoles.add(Role.USER);
+            user.setRoles(defaultRoles);
+            user.setProvider("LOCAL");
+
+            User userSaved = userRepository.save(user);
+            log.info("Créé avec succès : {}", userSaved.getEmail());
+
+            return userMapper.userToRegisterDTO(userSaved);
+        } catch (DuplicateResourceException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Erreur inattendue lors de la création du user: {}", e.getMessage(), e);
+            throw new RuntimeException("Erreur lors de la création du user", e);
+        }
+    }
     // Trouver un utilisateur par email
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
@@ -48,22 +80,22 @@ public class UserServicesImpl implements UserService {
     // Ajouter un ou plusieurs rôles à un utilisateur existant
     @Override
     public User addRolesToUser(String email, Set<Role> rolesToAdd) {
-        User user = findByEmail(email);
-        if (user != null) {
-            Set<Role> userRoles = user.getRoles(); // Récupérer les rôles actuels de l'utilisateur
-            userRoles.addAll(rolesToAdd); // Ajouter les nouveaux rôles
-            user.setRoles(userRoles); // Mettre à jour les rôles de l'utilisateur
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
-            return userRepository.save(user); // Enregistrer les modifications dans la base de données
-        }
-        return null; // Retourner null si l'utilisateur n'existe pas
+        // Éviter les doublons
+        Set<Role> userRoles = new HashSet<>(user.getRoles());
+        userRoles.addAll(rolesToAdd);
+        user.setRoles(userRoles);
+
+        return userRepository.save(user);
     }
 
     @Override
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(this::convertToUserDTO) // Convert each User to UserDTO
+                .map(userMapper::userToRegisterDTO) // Convert each User to UserDTO
                 .collect(Collectors.toList());
     }
     private UserDTO convertToUserDTO(User user) {
@@ -78,20 +110,31 @@ public class UserServicesImpl implements UserService {
     }
 
     @Override
-    public String updateUser(UserUpdateDTO userUpdateDTO) {
+    public UserDTO updateUser(UserUpdateDTO userUpdateDTO) {
+        log.debug("mise a jour de user {}", userUpdateDTO.getEmail());
         String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());
         User user = userRepository.findByEmail(userUpdateDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->{
+                    log.warn("user n existe pas : {}", userUpdateDTO.getEmail());
+                    return  new ResourceNotFoundException("Category", "id", userUpdateDTO.getEmail());
+                });
 
-        user.setName(userUpdateDTO.getName());
-        user.setEmail(userUpdateDTO.getEmail());
-        user.setProvider(userUpdateDTO.getProvider());
-        user.setRoles(userUpdateDTO.getRoles());
-        user.setPassword(hashedPassword);
-        // Update other fields as necessary
+        log.trace("Données de mise à jour valides: {}", userUpdateDTO);
+        try {
+            if (userUpdateDTO.getName() != null) user.setName(userUpdateDTO.getName());
+            if (userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
+            if (userUpdateDTO.getPassword() != null) user.setPassword(userUpdateDTO.getPassword());
+            if (userUpdateDTO.getProvider() != null) user.setProvider(userUpdateDTO.getProvider());
+            if (userUpdateDTO.getRoles() != null) user.setRoles(userUpdateDTO.getRoles());
 
-        userRepository.save(user);
-        return "User updated successfully!";
+
+             User userUpdated = userRepository.save(user);
+            log.info("le user a ete bien mise a jour : {}", userUpdated);
+            return userMapper.userToRegisterDTO(userUpdated);
+        }catch (Exception e) {
+            log.error("Erreur lors de la mise a jour du user: {}", e.getMessage());
+            throw e;
+        }
     }
 
     @Override
