@@ -1,67 +1,43 @@
 package com.kidami.security.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "lesson_video_items")
 public class LessonVideoItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @NotBlank(message = "Le nom est obligatoire")
+    @Size(min = 2, max = 255, message = "Le nom doit contenir entre 2 et 255 caractères")
+    @Column(nullable = false, length = 255)
     private String name;
+    @NotBlank(message = "L'URL est obligatoire")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String url;
+    @Column(columnDefinition = "TEXT")
     private String thumbnail;
-    @ManyToOne
-    @JoinColumn(name = "lesson_id")
+    // Ajouter la durée et l'ordre
+    //private Integer duration; // en secondes
+   // private Integer orderIndex; // ordre d'affichage
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lesson_id", nullable = false)
+    @JsonBackReference // ← Évite les boucles JSON
+    @Setter(AccessLevel.NONE)
     private Lesson lesson;
 
-    public LessonVideoItem() {
-    }
-
-    public LessonVideoItem(Integer id, String name, String url, String thumbnail, Lesson lesson) {
-        this.id = id;
-        this.name = name;
-        this.url = url;
-        this.thumbnail = thumbnail;
-        this.lesson = lesson;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public Lesson getLesson() {
-        return lesson;
-    }
-
+    // Méthode utilitaire pour la relation
     public void setLesson(Lesson lesson) {
         this.lesson = lesson;
+        if (lesson != null && !lesson.getVideos().contains(this)) {
+            lesson.getVideos().add(this);
+        }
     }
 }

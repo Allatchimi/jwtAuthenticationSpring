@@ -1,84 +1,69 @@
 package com.kidami.security.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "lessons")
 public class Lesson {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(nullable = false, length = 255)
+    @NotBlank(message = "Le nom est obligatoire")
+    @Size(min = 2, max = 255, message = "Le nom doit contenir entre 2 et 255 caractères")
     private  String name;
-    @ManyToOne
-    @JoinColumn(name = "courId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cour_id")
     private Cour cour;
+    @Column(length = 500)
     private String thumbnail;
+    @Column(columnDefinition = "TEXT")
     private String description;
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LessonVideoItem> video;
+    @JsonIgnore
+    private List<LessonVideoItem> videos = new ArrayList<>();
 
 
-    public Lesson() {
+    public void addVideoItem(LessonVideoItem videoItem) {
+        if (videos == null) {
+            videos = new ArrayList<>();
+        }
+        videos.add(videoItem);
+        videoItem.setLesson(this);
     }
 
-
-    public Lesson(Integer id, String name, String thumbnail, String description, List<LessonVideoItem> video, Cour cour) {
-        this.id = id;
-        this.name = name;
-        this.thumbnail = thumbnail;
-        this.description = description;
-        this.video = video;
-        this.cour = cour;
+    public void removeVideoItem(LessonVideoItem videoItem) {
+        if (videos != null) {
+            videos.remove(videoItem);
+            videoItem.setLesson(null);
+        }
     }
 
-    public Integer getId() {
-        return id;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Lesson)) return false;
+        Lesson lesson = (Lesson) o;
+        return Objects.equals(id, lesson.id);
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<LessonVideoItem> getVideo() {
-        return video;
-    }
-
-    public void setVideo(List<LessonVideoItem> video) {
-        this.video = video;
-    }
-
-
-    public Cour getCour() {
-        return cour;
-    }
-
-    public void setCour(Cour cour) {
-        this.cour = cour;
-    }
 }

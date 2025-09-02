@@ -1,12 +1,11 @@
 package com.kidami.security.mappers;
 
-import com.kidami.security.dto.CourDTO;
-import com.kidami.security.dto.CourDeteailDTO;
-import com.kidami.security.dto.CourSaveDTO;
+import com.kidami.security.dto.courDTO.CourDTO;
+import com.kidami.security.dto.courDTO.CourDeteailDTO;
+import com.kidami.security.dto.courDTO.CourSaveDTO;
 import com.kidami.security.models.Category;
 import com.kidami.security.models.Cour;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CourMapper {

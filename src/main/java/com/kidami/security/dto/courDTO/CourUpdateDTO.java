@@ -1,6 +1,5 @@
-package com.kidami.security.dto;
+package com.kidami.security.dto.courDTO;
 
-import com.kidami.security.models.Category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,16 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class CourDTO {
-
+public class CourUpdateDTO {
     private Integer id;
     private Integer score;
     private Integer lessonNum;
     private Integer videoLen;
     private Integer downNum;
     private Integer follow;
-    private Category categorie;
+    private Integer categorieId; // Changé de Category à Integer pour l'ID
     private String userToken;
     private String name;
     private String description;
@@ -25,5 +22,4 @@ public class CourDTO {
     private String video;
     private String price;
     private String amountTotal;
-
 }

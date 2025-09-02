@@ -1,8 +1,7 @@
 package com.kidami.security.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,47 +12,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name= "user")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name= "users")
 public class User implements UserDetails {
-    @Getter
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="userID")
     private Long id;
-    @Getter
-    @Setter
     @Column(name="name", length =50 )
     private String name;
-    @Getter
-    @Setter
     @Column(name = "email", nullable = false, unique = true)
     private String email;
-
-    @Setter
     @Column(name="password", length =200)
     private String password;
-    @Setter
-    @Getter
     private String provider;
-    @Getter
-    @Setter
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING) // ou EnumType.ORDINAL si vous préférez
     private Set<Role> roles = new HashSet<>(); // Utilisation d'un ensemble pour les rôles
-
-
-    public User() {
-    }
-
-    public User(Long id, String name, String provider, String email, String password, Set<Role> roles) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.provider = provider;
-        this.roles = roles;
-    }
 
 
     @Override

@@ -29,14 +29,19 @@ public class WebController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private AuthService authService;
-    @Autowired
-    private UserService userService;
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final AuthService authService;
+    private final UserService userService;
+
+    public WebController(AuthenticationManager authenticationManager, JwtService jwtService, AuthService authService,UserService userService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.authService = authService;
+        this.userService = userService;
+    }
+
     @GetMapping("/register")
     public String showRegistrationForm() {
         logger.info("Accessing registration form");

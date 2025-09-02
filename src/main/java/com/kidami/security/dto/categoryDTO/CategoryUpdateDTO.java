@@ -1,4 +1,4 @@
-package com.kidami.security.dto;
+package com.kidami.security.dto.categoryDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class CategoryDTO {
+public class CategoryUpdateDTO {
     private Integer categoryId;
     private String categoryName;
     private  String description;
 
 }
-

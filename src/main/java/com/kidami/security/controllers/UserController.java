@@ -1,15 +1,13 @@
 package com.kidami.security.controllers;
 
 import com.kidami.security.dto.AddRoleRequest;
-import com.kidami.security.dto.UserDTO;
-import com.kidami.security.dto.UserSaveDTO;
-import com.kidami.security.dto.UserUpdateDTO;
+import com.kidami.security.dto.userDTO.UserDTO;
+import com.kidami.security.dto.userDTO.UserUpdateDTO;
 import com.kidami.security.models.Role;
 import com.kidami.security.models.User;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.UserService;
 import com.kidami.security.utils.ResponseUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

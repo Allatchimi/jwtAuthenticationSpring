@@ -1,11 +1,15 @@
 package com.kidami.security.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name= "cour")
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name= "cours")
 public class Cour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,25 +45,5 @@ public class Cour {
    // @Column(name = "type_id")
    // private Integer type_id;
 
-
-
-    public Cour(){}
-    public Cour( String userToken, String name, String description, String thumbnail, String video, String price, String amountTotal, Integer lessonNum, Integer videoLen, Integer downNum, Integer follow, Integer type_id,Integer id, Integer score,Category categorie) {
-        this.id = id;
-        this.score = score;
-        this.userToken = userToken;
-        this.name = name;
-        this.description = description;
-        this.thumbnail = thumbnail;
-        this.video = video;
-        this.price = price;
-        this.amountTotal = amountTotal;
-        this.lessonNum = lessonNum;
-        this.videoLen = videoLen;
-        this.downNum = downNum;
-        this.follow = follow;
-        //this.type_id = type_id;
-        this.categorie = categorie;
-    }
 
 }

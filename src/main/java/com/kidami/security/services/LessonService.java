@@ -1,20 +1,20 @@
 package com.kidami.security.services;
 
-import com.kidami.security.dto.LessonDTO;
-import com.kidami.security.dto.LessonSaveDTO;
-import com.kidami.security.dto.LessonUpdateDTO;
-import org.springframework.http.ResponseEntity;
+import com.kidami.security.dto.lessonDTO.LessonDTO;
+import com.kidami.security.dto.lessonDTO.LessonDelete;
+import com.kidami.security.dto.lessonDTO.LessonSaveDTO;
+import com.kidami.security.dto.lessonDTO.LessonUpdateDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface LessonService {
 
     LessonDTO addLesson(LessonSaveDTO lessonSaveDTO);
     LessonDTO updateLesson(LessonUpdateDTO lessonUpdateDTO);
     List<LessonDTO> getAllLesson();
-    ResponseEntity<String> deleteLesson(Integer id);
-   LessonDTO getLessonByName(String name);
+    LessonDelete deleteLesson(Integer id);
+    LessonDTO getLessonByName(String name);
+    LessonDTO getLessonById(Integer id);
     List<LessonDTO> getLessonsByCourId(Integer courId);
 
 }

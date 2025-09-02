@@ -1,5 +1,6 @@
 package com.kidami.security.services.impl;
 
+import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemDTO;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.models.Lesson;
 import com.kidami.security.models.LessonVideoItem;
@@ -20,10 +21,13 @@ import java.util.stream.Collectors;
 @Service
 public class LessonVideoItemServiceImpl implements LessonVideoItemService {
 
-    @Autowired
-    private LessonVideoItemRepository lessonVideoItemRepository;
-    @Autowired
-    private LessonRepository lessonRepository;
+    private final  LessonVideoItemRepository lessonVideoItemRepository;
+    private final  LessonRepository lessonRepository;
+
+    public LessonVideoItemServiceImpl(LessonVideoItemRepository lessonVideoItemRepository,LessonRepository lessonRepository) {
+        this.lessonVideoItemRepository = lessonVideoItemRepository;
+        this.lessonRepository = lessonRepository;
+    }
 
     /*
     @Override
@@ -35,7 +39,7 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
     }*/
 
     @Override
-    public LessonVideoItemRep addLessonVideoItem(Integer lessonId, LessonVideoItemReq lessonVideoItemReq) {
+    public LessonVideoItemDTO addLessonVideoItem(Integer lessonId, LessonVideoItemReq lessonVideoItemReq) {
         // Rechercher la leçon existante par son ID
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Leçon introuvable pour l'ID : " + lessonId));
@@ -50,7 +54,7 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
         lessonVideoItem.setLesson(lesson);
 
         // Ajouter cet item à la liste des vidéos de la leçon
-        lesson.getVideo().add(lessonVideoItem);
+        lesson.getVideos().add(lessonVideoItem);
 
         // Sauvegarder l'item vidéo et mettre à jour la leçon dans la base de données
         lessonRepository.save(lesson);

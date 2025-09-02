@@ -1,7 +1,6 @@
 package com.kidami.security.responses;
 
-import com.kidami.security.dto.CourDeteailDTO;
-import jakarta.persistence.*;
+import com.kidami.security.dto.courDTO.CourDeteailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

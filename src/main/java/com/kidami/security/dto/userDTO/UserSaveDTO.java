@@ -1,4 +1,4 @@
-package com.kidami.security.dto;
+package com.kidami.security.dto.userDTO;
 
 import com.kidami.security.models.Role;
 import jakarta.persistence.*;
@@ -9,12 +9,11 @@ import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserUpdateDTO {
-
-    private Integer id;
+public class UserSaveDTO {
     private String name;
     @Column( unique = true)
     private String email;
@@ -23,6 +22,4 @@ public class UserUpdateDTO {
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING) // ou EnumType.ORDINAL si vous préférez
     private Set<Role> roles = new HashSet<>();
-
-
 }

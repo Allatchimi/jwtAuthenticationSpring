@@ -1,8 +1,13 @@
 package com.kidami.security.controllers;
 
+import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemDTO;
+import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemSaveDTO;
+import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemUpdateDTO;
 import com.kidami.security.requests.LessonVideoItemReq;
 import com.kidami.security.responses.LessonVideoItemRep;
 import com.kidami.security.services.LessonVideoItemService;
+import com.kidami.security.utils.ResponseUtil;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,32 +23,31 @@ public class LessonVideoItemController {
         this.lessonVideoItemService = lessonVideoItemService;
     }
 
-    // Ajouter une vidéo à une leçon par ID
     @PostMapping("/add")
-    public ResponseEntity<LessonVideoItemRep> addLessonVideoItem(
+    public ResponseEntity<ApiResponse<LessonVideoItemSaveDTO>> addLessonVideoItem(
             @RequestParam Integer lessonId,
             @RequestBody LessonVideoItemReq lessonVideoItemReq) {
-        LessonVideoItemRep response = lessonVideoItemService.addLessonVideoItem(lessonId, lessonVideoItemReq);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retourne l'objet avec un statut 201
+        LessonVideoItemDTO response = lessonVideoItemService.addLessonVideoItem(lessonId, lessonVideoItemReq);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.created("Video succes added",response,null)); // Retourne l'objet avec un statut 201
     }
 
     @PutMapping("/update")
-    public ResponseEntity<LessonVideoItemRep> updateLessonVideoItem(@RequestBody LessonVideoItemReq lessonVideoItemReq) {
-        LessonVideoItemRep response = lessonVideoItemService.updateLessonVideoItem(lessonVideoItemReq);
-        return ResponseEntity.ok(response); // Retourne l'objet mis à jour avec un statut 200
+    public ResponseEntity<LessonVideoItemDTO> updateLessonVideoItem(@RequestBody LessonVideoItemUpdateDTO lessonVideoItemUpdateDTO) {
+        LessonVideoItemRep response = lessonVideoItemService.updateLessonVideoItem(lessonVideoItemUpdateDTO);
+        return ResponseEntity.ok(ResponseUtil.success("Video updated succefully",response,null)); // Retourne l'objet mis à jour avec un statut 200
     }
 
     // Méthode pour récupérer tous les cours vidéo
-    @GetMapping("/all")
-    public ResponseEntity<List<LessonVideoItemRep>> getAllLessonVideoItems() {
-        List<LessonVideoItemRep> lessonVideoItem = lessonVideoItemService.getAllLessonVideoItem();
-        return ResponseEntity.ok(lessonVideoItem);
+    @GetMapping("/allVideoItems")
+    public ResponseEntity<List<LessonVideoItemDTO>> getAllLessonVideoItems() {
+        List<LessonVideoItemDTO> lessonVideoItem = lessonVideoItemService.getAllLessonVideoItem();
+        return ResponseEntity.ok(ResponseUtil.success("retrived all video succefully",null));
     }
 
-    @PostMapping("/byLesson/{lessonId}")
-    public  ResponseEntity<List<LessonVideoItemRep>> getLessonVideoItemByLessonId(@PathVariable Integer lessonId){
-    List<LessonVideoItemRep> lessonVideoItemRepList = lessonVideoItemService.getLessonsByLessonId(lessonId);
-    return ResponseEntity.ok(lessonVideoItemRepList);
+    @GetMapping("/byLesson/{lessonId}")
+    public  ResponseEntity<List<LessonVideoItemDTO>> getLessonVideoItemByLessonId(@PathVariable Integer lessonId){
+    List<LessonVideoItemDTO> lessonVideoItemRepList = lessonVideoItemService.getLessonsByLessonId(lessonId);
+    return ResponseEntity.ok(ResponseUtil.success("Retrived video succefully",null));
     }
 
     // Méthode pour supprimer un cours par son ID
@@ -51,9 +55,9 @@ public class LessonVideoItemController {
     public ResponseEntity<String> deleteLessonVideoItem(@PathVariable Integer id) {
         boolean isDeleted = lessonVideoItemService.deleteLessonVideoItem(id).hasBody();
         if (isDeleted) {
-            return ResponseEntity.ok("lessonVideoItem supprimé avec succès");
+            return ResponseEntity.ok(ResponseUtil.success("lessonVideoItem supprimé avec succès",null,null));
         } else {
-            return ResponseEntity.status(404).body("lessonVideoItem non trouvé");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseUtil.error("lessonVideoItem non trouvé",null,null));
         }
     }
 

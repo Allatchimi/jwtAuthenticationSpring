@@ -1,9 +1,9 @@
 package com.kidami.security.services.impl;
 
-import com.kidami.security.dto.CourDTO;
-import com.kidami.security.dto.CourDeteailDTO;
-import com.kidami.security.dto.CourSaveDTO;
-import com.kidami.security.dto.CourUpdateDTO;
+import com.kidami.security.dto.courDTO.CourDTO;
+import com.kidami.security.dto.courDTO.CourDeteailDTO;
+import com.kidami.security.dto.courDTO.CourSaveDTO;
+import com.kidami.security.dto.courDTO.CourUpdateDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.CourMapper;
@@ -37,22 +37,17 @@ public class CourServiceImpl implements CourService {
 
     @Override
     public CourDTO addCour(CourSaveDTO courSaveDTO) {
-
         logger.debug("Tentative de création d'un cours: {}", courSaveDTO.getName());
         validateCourSaveDTO(courSaveDTO);
-        // Vérifier si un cours avec le même nom existe déjà
         if (courRepository.existsByName(courSaveDTO.getName())) {
             logger.warn("Tentative de création d'un cours en double: {}", courSaveDTO.getName());
             throw new DuplicateResourceException("Course", "name", courSaveDTO.getName());
         }
-
         try {
-            // Récupérer la catégorie
             Category categorie = categoryRepository.findById(courSaveDTO.getCategorieId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", courSaveDTO.getCategorieId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", courSaveDTO.getCategorieId())
+                    );
 
-
-            // Utilisation du mapper
             Cour cour = courMapper.createCourFromDTO(courSaveDTO, categorie);
             Cour savedCour = courRepository.save(cour);
 
@@ -60,7 +55,6 @@ public class CourServiceImpl implements CourService {
             return courMapper.toDTO(savedCour);
 
         } catch (ResourceNotFoundException | DuplicateResourceException e) {
-            // On laisse remonter les exceptions métier
             throw e;
         } catch (DataAccessException e) {
             logger.error("Erreur d'accès aux données lors de la création du cours: {}", e.getMessage(), e);

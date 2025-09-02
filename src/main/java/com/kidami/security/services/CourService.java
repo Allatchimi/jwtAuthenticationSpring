@@ -1,9 +1,9 @@
 package com.kidami.security.services;
 
-import com.kidami.security.dto.CourDTO;
-import com.kidami.security.dto.CourDeteailDTO;
-import com.kidami.security.dto.CourSaveDTO;
-import com.kidami.security.dto.CourUpdateDTO;
+import com.kidami.security.dto.courDTO.CourDTO;
+import com.kidami.security.dto.courDTO.CourDeteailDTO;
+import com.kidami.security.dto.courDTO.CourSaveDTO;
+import com.kidami.security.dto.courDTO.CourUpdateDTO;
 
 import java.util.List;
 

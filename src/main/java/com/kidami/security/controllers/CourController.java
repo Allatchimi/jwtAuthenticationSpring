@@ -1,14 +1,13 @@
 package com.kidami.security.controllers;
 
-import com.kidami.security.dto.CourDTO;
-import com.kidami.security.dto.CourDeteailDTO;
-import com.kidami.security.dto.CourSaveDTO;
-import com.kidami.security.dto.CourUpdateDTO;
+import com.kidami.security.dto.courDTO.CourDTO;
+import com.kidami.security.dto.courDTO.CourDeteailDTO;
+import com.kidami.security.dto.courDTO.CourSaveDTO;
+import com.kidami.security.dto.courDTO.CourUpdateDTO;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.CourService;
 import com.kidami.security.utils.ResponseUtil;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +18,11 @@ import java.util.List;
 @RequestMapping("/api/cours")
 public class CourController {
 
-    @Autowired
-    private CourService courService;
+    private final CourService courService;
+
+    public CourController(CourService courService) {
+        this.courService = courService;
+    }
 
     @PostMapping("/creatCour")
     public ResponseEntity<ApiResponse<CourDTO>> saveCour(@Valid @RequestBody CourSaveDTO courSaveDTO){
@@ -31,12 +33,10 @@ public class CourController {
     @GetMapping("/getAllCours")
     public ResponseEntity<ApiResponse<List<CourDTO>>> getAllCours() {
         List<CourDTO> allCours = courService.getAllCours();
-
         if (allCours.isEmpty()) {
             return ResponseEntity.ok()
                     .body(ResponseUtil.success("No courses found", Collections.emptyList(), null));
         }
-
         return ResponseEntity.ok()
                 .body(ResponseUtil.success("Courses retrieved successfully", allCours, null));
     }
@@ -48,7 +48,7 @@ public class CourController {
     }
 
     @PutMapping("/updateCour")
-    public  ResponseEntity<ApiResponse<CourDTO>> updateUser(@RequestBody CourUpdateDTO courUpdateDTO){
+    public  ResponseEntity<ApiResponse<CourDTO>> updateCour(@RequestBody CourUpdateDTO courUpdateDTO){
         CourDTO courDTO = courService.updateCour(courUpdateDTO);
         return ResponseEntity.ok(ResponseUtil.success("Course updated successfully",courDTO,null));
     }

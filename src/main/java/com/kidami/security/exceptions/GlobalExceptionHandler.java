@@ -1,6 +1,8 @@
 package com.kidami.security.exceptions;
 
 import com.kidami.security.responses.ApiResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -9,9 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -79,6 +80,31 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
+
+
+    // 2. NOUVEAU : Validation JPA des entités (ConstraintViolationException)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleConstraintViolationException(
+            ConstraintViolationException ex, WebRequest request) {
+
+        Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
+        List<String> errors = violations.stream()
+                .map(violation ->
+                        String.format("%s: %s",
+                                violation.getPropertyPath(),
+                                violation.getMessage()))
+                .collect(Collectors.toList());
+
+        ApiResponse<Object> response = new ApiResponse<>(
+                "error",
+                "Data validation failed",
+                errors,
+                createErrorDetails(request, HttpStatus.BAD_REQUEST)
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
 
     // Méthode utilitaire pour créer les détails d'erreur
     private Map<String, Object> createErrorDetails(WebRequest request, HttpStatus status) {

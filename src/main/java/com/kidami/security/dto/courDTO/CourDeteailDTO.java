@@ -1,9 +1,7 @@
-package com.kidami.security.dto;
+package com.kidami.security.dto.courDTO;
 
 import com.kidami.security.models.Category;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 @Data

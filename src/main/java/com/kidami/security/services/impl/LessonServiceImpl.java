@@ -1,197 +1,240 @@
 package com.kidami.security.services.impl;
 
-import com.kidami.security.dto.LessonDTO;
-import com.kidami.security.dto.LessonSaveDTO;
-import com.kidami.security.dto.LessonUpdateDTO;
+import com.kidami.security.dto.lessonDTO.LessonDTO;
+import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemUpdateDTO;
+import com.kidami.security.mappers.LessonMapper;
+
+import com.kidami.security.dto.lessonDTO.LessonDelete;
+import com.kidami.security.dto.lessonDTO.LessonSaveDTO;
+import com.kidami.security.dto.lessonDTO.LessonUpdateDTO;
+import com.kidami.security.exceptions.DuplicateResourceException;
+import com.kidami.security.exceptions.ResourceNotFoundException;
+import com.kidami.security.mappers.LessonVideoItemMapper;
 import com.kidami.security.models.Cour;
 import com.kidami.security.models.Lesson;
 import com.kidami.security.models.LessonVideoItem;
 import com.kidami.security.repository.CourRepository;
 import com.kidami.security.repository.LessonRepository;
-import com.kidami.security.responses.LessonVideoItemRep;
+import com.kidami.security.repository.LessonVideoItemRepository;
 import com.kidami.security.services.LessonService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.transaction.Transactional;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.stream.Collectors;
 @Service
 public class LessonServiceImpl implements LessonService {
+
+    private static final Logger log = LoggerFactory.getLogger(LessonServiceImpl.class.getName());
     private final LessonRepository lessonRepository;
     private final CourRepository courRepository;
-    @Autowired
-    public LessonServiceImpl(LessonRepository lessonRepository ,CourRepository courRepository) {
+    private final LessonMapper lessonMapper;
+    private final LessonVideoItemMapper lessonVideoItemMapper;
+    private final LessonVideoItemRepository lessonVideoItemRepository;
+
+    public LessonServiceImpl(
+            LessonRepository lessonRepository ,
+            CourRepository courRepository,
+            LessonMapper lessonMapper,
+            LessonVideoItemMapper lessonVideoItemMapper,
+            LessonVideoItemRepository lessonVideoItemRepository
+        ) {
         this.lessonRepository = lessonRepository;
         this.courRepository = courRepository;
+        this.lessonMapper = lessonMapper;
+        this.lessonVideoItemMapper = lessonVideoItemMapper;
+        this.lessonVideoItemRepository = lessonVideoItemRepository;
     }
+
     @Override
     public LessonDTO addLesson(LessonSaveDTO lessonSaveDTO) {
-
-        Cour cour = courRepository.findById(lessonSaveDTO.getCourId())
-                .orElseThrow(() -> new  RuntimeException("Cour non trouvé"));
-        Lesson  lesson = new Lesson();
-        lesson.setName(lessonSaveDTO.getName());
-        lesson.setDescription(lessonSaveDTO.getDescription());
-        lesson.setThumbnail(lessonSaveDTO.getThumbnail());
-        lesson.setCour(cour);
-
-        // Convertir la liste de LessonVideoItemReq en LessonVideoItem et définir la leçon associée
-        Lesson finalLesson = lesson;
-        List<LessonVideoItem> videoItems = lessonSaveDTO.getVideo().stream()
-                .map(videoReq -> convertToLessonVideoItem(videoReq, finalLesson)) // passez `lesson` comme argument
-                .collect(Collectors.toList());
-
-        lesson.setVideo(videoItems);
-        // Sauvegarder l'entité dans le repository
-        lesson = lessonRepository.save(lesson);
-
-        LessonDTO lessonDTO = new LessonDTO();
-        lessonDTO.setId(lesson.getId());
-        lessonDTO.setName(lesson.getName());
-        // Récupère uniquement le nom de 'cour' au lieu de l'objet entier
-        if (lesson.getCour() != null) {
-           // lessonDTO.setCourNom(lesson.getCour().getName());
-           // lessonDTO.setCour(lesson.getCour());
-            lessonDTO.setCourId(lesson.getCour().getId());
+        log.debug("Tantative de  créer  d un  lesson {}", lessonSaveDTO.getName());
+        validateLessonSaveDTO(lessonSaveDTO);
+        if(lessonRepository.existsByName(lessonSaveDTO.getName())) {
+            log.warn("Tentative de création d'un Leçon en double: {}", lessonSaveDTO.getName());
+            throw new DuplicateResourceException("Lesson", "name", lessonSaveDTO.getName());
         }
-        lessonDTO.setDescription(lesson.getDescription());
-        lessonDTO.setThumbnail(lesson.getThumbnail());
+        try {
+            Cour cour = courRepository.findById(lessonSaveDTO.getCourId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Cour","id",lessonSaveDTO.getCourId()));
+            // Convertir DTO -> Entity avec MapStruct
+            Lesson lesson = lessonMapper.fromSaveDTO(lessonSaveDTO);
+            lesson.setCour(cour);
+            List<LessonVideoItem> videoItems = lessonSaveDTO.getVideo().stream()
+                    .map(videoSaveDTO -> {
+                        LessonVideoItem videoItem = lessonVideoItemMapper.fromSaveDTO(videoSaveDTO);
+                        videoItem.setLesson(lesson);
+                        return videoItem;
+                    })
+                    .collect(Collectors.toList());
 
-        // Convertir les objets LessonVideoItem en LessonVideoItemRep pour le DTO
-        List<LessonVideoItemRep> videoItemReps = lesson.getVideo().stream()
-                .map(this::convertToLessonVideoItemDTO)
-                .collect(Collectors.toList());
-        lessonDTO.setVideo(videoItemReps);
+            lesson.setVideos(videoItems);
+            // Sauvegarder
+            Lesson savedLesson = lessonRepository.save(lesson);
+            // Convertir Entity -> DTO avec MapStruct
+            log.info("Leçon créé avec succès: {} (ID: {})", savedLesson.getName(), savedLesson.getId());
+            return lessonMapper.toDTO(savedLesson);
 
-        return lessonDTO;
+        } catch (ResourceNotFoundException | DuplicateResourceException e) {
+            throw e;
+        } catch (DataAccessException e) {
+            log.error("Erreur d'accès aux données lors de la création du lecçon: {}", e.getMessage(), e);
+            throw new RuntimeException("Erreur technique lors de la création du lecçon", e);
+        } catch (Exception e) {
+            log.error("Erreur inattendue lors de la création du lecçon: {}", e.getMessage(), e);
+            throw new RuntimeException("Erreur lors de la création du lecçon", e);
+        }
+
     }
-    // Méthode pour convertir LessonVideoItemDTO en LessonVideoItem
-    private LessonVideoItem convertToLessonVideoItem(LessonVideoItemRep dto ,Lesson lesson) {
-        LessonVideoItem item = new LessonVideoItem();
-        item.setId(dto.getId());
-        item.setUrl(dto.getUrl());
-        item.setThumbnail(dto.getThumbnail());
-        item.setName(dto.getName());
-        item.setLesson(lesson);
-        return item;
-    }
 
-    // Méthode pour convertir LessonVideoItem en LessonVideoItemDTO
-    private LessonVideoItemRep convertToLessonVideoItemDTO(LessonVideoItem item) {
-        LessonVideoItemRep dto = new LessonVideoItemRep();
-        dto.setId(item.getId());
-        dto.setUrl(item.getUrl());
-        dto.setName(item.getName());
-        dto.setThumbnail(item.getThumbnail());
-
-        return dto;
+    private void validateLessonSaveDTO(LessonSaveDTO dto) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le nom du Leçon est obligatoire");
+        }
+        if (dto.getCourId() == null) {
+            throw new IllegalArgumentException("L'ID de la cour est obligatoire");
+        }
     }
 
     @Override
+    @Transactional
     public LessonDTO updateLesson(LessonUpdateDTO lessonUpdateDTO) {
-        return null;
+        log.debug("Mise à jour du Leçon ID: {}", lessonUpdateDTO.getId());
+
+        Lesson lesson = lessonRepository.findById(lessonUpdateDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson", "id", lessonUpdateDTO.getId()));
+
+        // Validation doublon nom
+        if (lessonUpdateDTO.getName() != null &&
+                !lesson.getName().equals(lessonUpdateDTO.getName()) &&
+                lessonRepository.existsByNameAndIdNot(lessonUpdateDTO.getName(), lessonUpdateDTO.getId())) {
+            throw new DuplicateResourceException("Lesson", "name", lessonUpdateDTO.getName());
+        }
+
+        // Mise à jour champs simples
+        if (lessonUpdateDTO.getName() != null) lesson.setName(lessonUpdateDTO.getName());
+        if (lessonUpdateDTO.getDescription() != null) lesson.setDescription(lessonUpdateDTO.getDescription());
+        if (lessonUpdateDTO.getThumbnail() != null) lesson.setThumbnail(lessonUpdateDTO.getThumbnail());
+
+        // Mise à jour cours
+        if (lessonUpdateDTO.getCourId() != null) {
+            Cour cour = courRepository.findById(lessonUpdateDTO.getCourId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Cour", "id", lessonUpdateDTO.getCourId()));
+            lesson.setCour(cour);
+        }
+
+        // Mise à jour des vidéos (APPROCHE ADDITIVE)
+        if (lessonUpdateDTO.getVideos() != null) {
+            updateVideosAdditive(lesson, lessonUpdateDTO.getVideos());
+        }
+
+        // Suppression explicite des vidéos
+        if (lessonUpdateDTO.getVideosToDelete() != null && !lessonUpdateDTO.getVideosToDelete().isEmpty()) {
+            deleteVideosExplicit(lesson, lessonUpdateDTO.getVideosToDelete());
+        }
+
+        Lesson savedLesson = lessonRepository.save(lesson);
+        log.info("Leçon mise à jour: {}", savedLesson.getName());
+        return lessonMapper.toDTO(savedLesson);
+    }
+
+    // APPROCHE ADDITIVE : Seules les vidéos envoyées sont modifiées/ajoutées
+    private void updateVideosAdditive(Lesson lesson, List<LessonVideoItemUpdateDTO> videosToUpdate) {
+        for (LessonVideoItemUpdateDTO videoDTO : videosToUpdate) {
+            if (videoDTO.getId() != null) {
+                // MISE À JOUR vidéo existante
+                updateExistingVideo(lesson, videoDTO);
+            }
+        }
+    }
+
+    private void updateExistingVideo(Lesson lesson, LessonVideoItemUpdateDTO videoDTO) {
+        // Trouver la vidéo dans la lesson
+        LessonVideoItem existingVideo = lesson.getVideos().stream()
+                .filter(v -> v.getId().equals(videoDTO.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Video", "id", videoDTO.getId()));
+
+        // Mise à jour avec MapStruct
+        lessonVideoItemMapper.updateFromDTO(videoDTO, existingVideo);
+    }
+
+    private void deleteVideosExplicit(Lesson lesson, List<Integer> videoIdsToDelete) {
+        // Filtrer les vidéos à supprimer
+        List<LessonVideoItem> videosToRemove = lesson.getVideos().stream()
+                .filter(video -> videoIdsToDelete.contains(video.getId()))
+                .collect(Collectors.toList());
+
+        // Supprimer de la collection
+        lesson.getVideos().removeAll(videosToRemove);
+        // Supprimer de la base de données
+        lessonVideoItemRepository.deleteAll(videosToRemove);
     }
 
     @Override
     public List<LessonDTO> getAllLesson() {
+        log.debug("Tentative de récupération de tous les Lesçons");
         List<Lesson> lessons = lessonRepository.findAll();
-        List<LessonDTO> lessonDTOList = new ArrayList<>();
-
-        for (Lesson lesson : lessons) {
-            LessonDTO lessonDTO = new LessonDTO();
-            lessonDTO.setId(lesson.getId());
-            lessonDTO.setName(lesson.getName());
-            lessonDTO.setDescription(lesson.getDescription());
-            lessonDTO.setThumbnail(lesson.getThumbnail());
-            if (lesson.getCour() != null) {
-               // lessonDTO.setCourNom(lesson.getCour().getName());
-                //lessonDTO.setCour(lesson.getCour());
-                lessonDTO.setCourId(lesson.getCour().getId());
-            }
-
-            // Convertir chaque LessonVideoItem en LessonVideoItemRep
-            List<LessonVideoItemRep> lessonVideoItemRepList = new ArrayList<>();
-            for (LessonVideoItem videoItem : lesson.getVideo()) {
-                LessonVideoItemRep lessonVideoItemRep = new LessonVideoItemRep();
-                lessonVideoItemRep.setId(videoItem.getId());
-                lessonVideoItemRep.setThumbnail(videoItem.getThumbnail());
-                lessonVideoItemRep.setUrl(videoItem.getUrl());
-                lessonVideoItemRep.setName(videoItem.getName());
-
-                lessonVideoItemRepList.add(lessonVideoItemRep);
-            }
-
-            lessonDTO.setVideo(lessonVideoItemRepList);
-            lessonDTOList.add(lessonDTO);
-        }
-        return lessonDTOList;
+        log.info("{} lessons récupérés avec succès", lessons.size());
+        return lessons.stream()
+                .map(lessonMapper::toDTO)
+                .collect(Collectors.toList());
     }
+
+    @Override
+    public LessonDTO getLessonById(Integer id) {
+        log.debug("Tentative de récupération de Lesçon ID: {}", id);
+        Lesson lesson = lessonRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson", "id", id));
+        log.info("lesson récupéré avec id {} est {}", lesson.getId(),lesson.getName());
+        return lessonMapper.toDTO(lesson); // ← PROPRE et CONCIS
+    }
+
+
    @Override
     public List<LessonDTO> getLessonsByCourId(Integer courId) {
+       log.debug("Tentative de récupération des Lesçons  de cour ID: {}", courId);
         List<Lesson> lessons = lessonRepository.findByCourId(courId);
-        List<LessonDTO> lessonDTOList = new ArrayList<>();
-
-        for (Lesson lesson : lessons) {
-            LessonDTO lessonDTO = new LessonDTO();
-            lessonDTO.setId(lesson.getId());
-            lessonDTO.setName(lesson.getName());
-            lessonDTO.setDescription(lesson.getDescription());
-            lessonDTO.setThumbnail(lesson.getThumbnail());
-
-            if (lesson.getCour() != null) {
-                lessonDTO.setCourId(lesson.getCour().getId());
-            }
-
-            // Convert each LessonVideoItem to LessonVideoItemRep
-            List<LessonVideoItemRep> lessonVideoItemRepList = new ArrayList<>();
-            for (LessonVideoItem videoItem : lesson.getVideo()) {
-                LessonVideoItemRep lessonVideoItemRep = new LessonVideoItemRep();
-                lessonVideoItemRep.setId(videoItem.getId());
-                lessonVideoItemRep.setThumbnail(videoItem.getThumbnail());
-                lessonVideoItemRep.setUrl(videoItem.getUrl());
-                lessonVideoItemRep.setName(videoItem.getName());
-
-                lessonVideoItemRepList.add(lessonVideoItemRep);
-            }
-
-            lessonDTO.setVideo(lessonVideoItemRepList);
-            lessonDTOList.add(lessonDTO);
-        }
-        return lessonDTOList;
+       log.info("{} Tous les lessons récupérés de cours sont ", lessons.size());
+        return lessons.stream()
+                .map(lessonMapper::toDTO)
+                .collect(Collectors.toList());
     }
-
 
     @Override
     public LessonDTO getLessonByName(String name) {
+        log.debug("Tentative de récupération de Lesçon avec le nom: {}", name);
         Lesson lesson = lessonRepository.findByName(name)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
-        return convertToLessonDTO(lesson);
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson", "name", name));
+
+        log.info("{} lessons récupérés avec ce noms", lesson.getName());
+        return lessonMapper.toDTO(lesson);
     }
-
-
-    // Convertit un Lesson en LessonDTO
-    private LessonDTO convertToLessonDTO(Lesson lesson) {
-        LessonDTO lessonDTO = new LessonDTO();
-        lessonDTO.setId(lesson.getId());
-        lessonDTO.setName(lesson.getName());
-        if (lesson.getCour() != null) {
-           // lessonDTO.setCourNom(lesson.getCour().getName());
-            //lessonDTO.setCour(lesson.getCour());
-            lessonDTO.setCourId(lesson.getCour().getId());
-        }
-        lessonDTO.setDescription(lesson.getDescription());
-        lessonDTO.setThumbnail(lesson.getThumbnail());
-        // ajoute les vidéos si nécessaire
-        return lessonDTO;
-    }
-
 
     @Override
-    public ResponseEntity<String> deleteLesson(Integer id) {
-        return null;
+    public LessonDelete deleteLesson(Integer id) {
+        log.debug("Tentative de suppression du leçon ID: {}", id);
+        Lesson lesson = lessonRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Tentative de suppression d'une leçon inexistante ID: {}", id);
+                    return new ResourceNotFoundException("Lesson", "id", id);
+                });
+        //String lessonName = lesson.getName();
+        try {
+            lessonRepository.deleteById(id);
+            log.info("leçon {} - '{}' supprimée avec succès", id, lesson.getName());
+            return new LessonDelete(
+                    "Suppression réussie",
+                    lesson.getName(),
+                    lesson.getId()
+            );
+        } catch (Exception e) {
+            log.error("Erreur lors de la suppression du leçon ID: {} - {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erreur lors de la suppression du leçon", e);
+        }
     }
 }

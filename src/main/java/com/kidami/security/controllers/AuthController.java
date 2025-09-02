@@ -2,7 +2,7 @@ package com.kidami.security.controllers;
 
 
 import com.kidami.security.dto.*;
-import com.kidami.security.models.Role;
+import com.kidami.security.dto.userDTO.UserDTO;
 import com.kidami.security.models.User;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.AuthService;
@@ -12,23 +12,14 @@ import com.kidami.security.utils.ResponseUtil;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/auth")
@@ -75,18 +66,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<?>> login(@RequestBody LoginDTO loginDTO) {
         try {
-            //01 - Receive the token from AuthService
             AuthResponseDto authResponseDto = authService.login(loginDTO);
-
-            // Log après authentification réussie
             // logger.info("User authenticated successfully: {}", loginDTO.getEmail());
-            //03 - Return the response to the user
-            return ResponseEntity.ok(ResponseUtil.success("authenticated with succes",authResponseDto,HttpStatus.OK));
+            return ResponseEntity.ok(ResponseUtil.success("authenticated with succes",authResponseDto,HttpStatus.ACCEPTED));
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDTO.getEmail());
-
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseUtil.error("Authentication failed for user",loginDTO.getEmail(), e.getMessage()));
-
         }
     }
 
@@ -98,16 +83,13 @@ public class AuthController {
 
     @GetMapping("/protected-endpoint")
     public ResponseEntity<ApiResponse<?>> getUserInfo(Authentication authentication) {
-        // Récupérer l'utilisateur connecté
-        String email = authentication.getName(); // Le nom de l'utilisateur est l'email
-        // Récupérer les informations de l'utilisateur à partir du UserService
-        User user = userService.findByEmail(email); // Assurez-vous d'avoir une méthode pour récupérer l'utilisateur
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
         if (user != null) {
             return ResponseEntity.ok(ResponseUtil.success("les informations de l'utilisateur Récupérer",user,null)); // Retourner les informations de l'utilisateur
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseUtil.error("user not found",null,null));
     }
-
 
     @GetMapping("/home")
     public String home(Model model, Authentication authentication) {
@@ -124,6 +106,5 @@ public class AuthController {
 
         return "home"; // Retourne le nom de la vue Thymeleaf
     }
-
 
 }

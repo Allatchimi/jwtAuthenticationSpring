@@ -9,4 +9,7 @@ import java.util.List;
 public interface LessonVideoItemRepository extends JpaRepository<LessonVideoItem,Integer> {
 
     List<LessonVideoItem> findByLessonId(Integer lesson_id);
+    // Méthode pour suppression multiple
+    void deleteAllByIdIn(List<Integer> ids);
+
 }

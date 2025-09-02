@@ -1,19 +1,17 @@
 package com.kidami.security.services.impl;
 
 import com.kidami.security.dto.RegisterDTO;
-import com.kidami.security.dto.UserDTO;
-import com.kidami.security.dto.UserUpdateDTO;
+import com.kidami.security.dto.userDTO.UserDTO;
+import com.kidami.security.dto.userDTO.UserUpdateDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.UserMapper;
-import com.kidami.security.models.Category;
-import com.kidami.security.models.Role; // Importer l'énumération Role
+import com.kidami.security.models.Role;
 import com.kidami.security.models.User;
 import com.kidami.security.repository.UserRepository;
 import com.kidami.security.services.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,25 +35,18 @@ public class UserServicesImpl implements UserService {
     @Override
     public UserDTO registerNewUser(RegisterDTO registerDTO) {
         log.debug("Tentative de creation de user {}", registerDTO);
-
         if(registerDTO.getEmail() == null || registerDTO.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("L'Email du user est obligatoire");
         }
-
         if (userRepository.existsByEmail(registerDTO.getEmail())) {
             log.warn("Tentative de création d'un user en double: {}", registerDTO.getEmail());
             throw new DuplicateResourceException("User", "email", registerDTO.getEmail());
         }
-
         try {
-            // Utiliser le mapper pour la conversion de base
-            User user = userMapper.registerDTOToUser(registerDTO);
 
-            // Gérer le hachage du mot de passe dans le service
+            User user = userMapper.registerDTOToUser(registerDTO);
             String hashedPassword = passwordEncoder.encode(registerDTO.getPassword());
             user.setPassword(hashedPassword);
-
-            // Gérer les rôles par défaut
             Set<Role> defaultRoles = new HashSet<>();
             defaultRoles.add(Role.USER);
             user.setRoles(defaultRoles);
@@ -72,12 +63,11 @@ public class UserServicesImpl implements UserService {
             throw new RuntimeException("Erreur lors de la création du user", e);
         }
     }
-    // Trouver un utilisateur par email
+
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    // Ajouter un ou plusieurs rôles à un utilisateur existant
     @Override
     public User addRolesToUser(String email, Set<Role> rolesToAdd) {
         User user = userRepository.findByEmail(email)
@@ -116,7 +106,7 @@ public class UserServicesImpl implements UserService {
         User user = userRepository.findByEmail(userUpdateDTO.getEmail())
                 .orElseThrow(() ->{
                     log.warn("user n existe pas : {}", userUpdateDTO.getEmail());
-                    return  new ResourceNotFoundException("Category", "id", userUpdateDTO.getEmail());
+                    return  new ResourceNotFoundException("User", "email", userUpdateDTO.getEmail());
                 });
 
         log.trace("Données de mise à jour valides: {}", userUpdateDTO);

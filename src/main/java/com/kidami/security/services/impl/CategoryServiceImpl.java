@@ -1,24 +1,20 @@
 package com.kidami.security.services.impl;
 
-import com.kidami.security.dto.CategoryDTO;
-import com.kidami.security.dto.CategorySaveDTO;
-import com.kidami.security.dto.CategoryUpdateDTO;
+import com.kidami.security.dto.categoryDTO.CategoryDTO;
+import com.kidami.security.dto.categoryDTO.CategorySaveDTO;
+import com.kidami.security.dto.categoryDTO.CategoryUpdateDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.CategoryMapper;
 import com.kidami.security.models.Category;
 
 
-import com.kidami.security.models.Cour;
 import com.kidami.security.repository.CategoryRepository;
 import com.kidami.security.services.CategoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
