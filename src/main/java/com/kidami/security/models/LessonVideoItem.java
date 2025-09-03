@@ -25,8 +25,8 @@ public class LessonVideoItem {
     @Column(columnDefinition = "TEXT")
     private String thumbnail;
     // Ajouter la durée et l'ordre
-    //private Integer duration; // en secondes
-   // private Integer orderIndex; // ordre d'affichage
+    private Integer duration; // en secondes
+    private Integer orderIndex; // ordre d'affichage
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id", nullable = false)
     @JsonBackReference // ← Évite les boucles JSON

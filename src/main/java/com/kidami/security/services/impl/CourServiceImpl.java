@@ -77,11 +77,8 @@ public class CourServiceImpl implements CourService {
     @Override
     public List<CourDTO> getAllCours() {
         logger.debug("Tentative de récupération de tous les cours");
-
         List<Cour> cours = courRepository.findAll();
-
         logger.info("{} cours récupérés avec succès", cours.size());
-
         return cours.stream()
                 .map(courMapper::toDTO)
                 .collect(Collectors.toList());
@@ -108,7 +105,6 @@ public class CourServiceImpl implements CourService {
 
         logger.trace("Données de mise à jour valides: {}", courUpdateDTO);
         try {
-
             // Mettre à jour les champs
             if (courUpdateDTO.getName() != null) cour.setName(courUpdateDTO.getName());
             if (courUpdateDTO.getDescription() != null) cour.setDescription(courUpdateDTO.getDescription());

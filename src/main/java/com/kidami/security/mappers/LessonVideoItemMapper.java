@@ -28,4 +28,7 @@ public interface LessonVideoItemMapper {
 
     @Mapping(target = "lesson", ignore = true)
     LessonVideoItem fromDTO(LessonVideoItemDTO dto);
+
+    @Mapping(source ="lessonId", target = "lesson.id")
+    LessonVideoItem toEntity(LessonVideoItemDTO lessonVideoItemDTO);
 }

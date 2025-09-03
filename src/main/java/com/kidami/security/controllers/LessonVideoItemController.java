@@ -3,11 +3,10 @@ package com.kidami.security.controllers;
 import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemDTO;
 import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemSaveDTO;
 import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemUpdateDTO;
-import com.kidami.security.requests.LessonVideoItemReq;
+import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.responses.LessonVideoItemRep;
 import com.kidami.security.services.LessonVideoItemService;
 import com.kidami.security.utils.ResponseUtil;
-import io.swagger.v3.oas.models.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,36 +23,36 @@ public class LessonVideoItemController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<LessonVideoItemSaveDTO>> addLessonVideoItem(
+    public ResponseEntity<ApiResponse<LessonVideoItemDTO>> addLessonVideoItem(
             @RequestParam Integer lessonId,
-            @RequestBody LessonVideoItemReq lessonVideoItemReq) {
-        LessonVideoItemDTO response = lessonVideoItemService.addLessonVideoItem(lessonId, lessonVideoItemReq);
+            @RequestBody LessonVideoItemSaveDTO lessonVideoItemSaveDTO) {
+        LessonVideoItemDTO response = lessonVideoItemService.addLessonVideoItem(lessonId, lessonVideoItemSaveDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.created("Video succes added",response,null)); // Retourne l'objet avec un statut 201
     }
 
     @PutMapping("/update")
-    public ResponseEntity<LessonVideoItemDTO> updateLessonVideoItem(@RequestBody LessonVideoItemUpdateDTO lessonVideoItemUpdateDTO) {
-        LessonVideoItemRep response = lessonVideoItemService.updateLessonVideoItem(lessonVideoItemUpdateDTO);
+    public ResponseEntity<ApiResponse<LessonVideoItemDTO>> updateLessonVideoItem(@RequestBody LessonVideoItemUpdateDTO lessonVideoItemUpdateDTO) {
+        LessonVideoItemDTO response = lessonVideoItemService.updateLessonVideoItem(lessonVideoItemUpdateDTO);
         return ResponseEntity.ok(ResponseUtil.success("Video updated succefully",response,null)); // Retourne l'objet mis à jour avec un statut 200
     }
 
     // Méthode pour récupérer tous les cours vidéo
     @GetMapping("/allVideoItems")
-    public ResponseEntity<List<LessonVideoItemDTO>> getAllLessonVideoItems() {
+    public ResponseEntity<ApiResponse<List<LessonVideoItemDTO>>> getAllLessonVideoItems() {
         List<LessonVideoItemDTO> lessonVideoItem = lessonVideoItemService.getAllLessonVideoItem();
-        return ResponseEntity.ok(ResponseUtil.success("retrived all video succefully",null));
+        return ResponseEntity.ok(ResponseUtil.success("retrived all video succefully",lessonVideoItem,null));
     }
 
     @GetMapping("/byLesson/{lessonId}")
-    public  ResponseEntity<List<LessonVideoItemDTO>> getLessonVideoItemByLessonId(@PathVariable Integer lessonId){
-    List<LessonVideoItemDTO> lessonVideoItemRepList = lessonVideoItemService.getLessonsByLessonId(lessonId);
-    return ResponseEntity.ok(ResponseUtil.success("Retrived video succefully",null));
+    public  ResponseEntity<ApiResponse<List<LessonVideoItemDTO>>> getLessonVideoItemByLessonId(@PathVariable Integer lessonId){
+    List<LessonVideoItemDTO> lessonVideoItemRepList = lessonVideoItemService.getVideoItemByLessonId(lessonId);
+    return ResponseEntity.ok(ResponseUtil.success("Retrived video succefully",lessonVideoItemRepList,null));
     }
 
     // Méthode pour supprimer un cours par son ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteLessonVideoItem(@PathVariable Integer id) {
-        boolean isDeleted = lessonVideoItemService.deleteLessonVideoItem(id).hasBody();
+    public ResponseEntity<ApiResponse<Void>> deleteLessonVideoItem(@PathVariable Integer id) {
+        boolean isDeleted = lessonVideoItemService.deleteLessonVideoItem(id);
         if (isDeleted) {
             return ResponseEntity.ok(ResponseUtil.success("lessonVideoItem supprimé avec succès",null,null));
         } else {

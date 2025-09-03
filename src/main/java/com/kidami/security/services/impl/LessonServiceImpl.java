@@ -194,7 +194,6 @@ public class LessonServiceImpl implements LessonService {
         return lessonMapper.toDTO(lesson); // ← PROPRE et CONCIS
     }
 
-
    @Override
     public List<LessonDTO> getLessonsByCourId(Integer courId) {
        log.debug("Tentative de récupération des Lesçons  de cour ID: {}", courId);
