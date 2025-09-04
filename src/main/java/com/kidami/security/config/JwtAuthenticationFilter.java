@@ -92,6 +92,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Exclure les endpoints qui ne nécessitent pas d'authentification JWT
         return path.startsWith("/api/auth/") ||
+                path.startsWith("/api/users/addUser") ||
                 path.startsWith("/login") ||
                 path.startsWith("/oauth2/") ||
                 path.startsWith("/swagger-ui/") ||

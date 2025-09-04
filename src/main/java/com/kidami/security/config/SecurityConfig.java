@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/users/addUser",
                                 "/api/public/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -61,7 +62,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/moderator/**").hasAnyRole("MODERATOR", "ADMIN")
-                        .requestMatchers("/api/user/**").hasAnyRole("USER", "MODERATOR", "ADMIN")
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "MODERATOR", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
