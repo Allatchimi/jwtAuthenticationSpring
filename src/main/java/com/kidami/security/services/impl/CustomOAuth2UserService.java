@@ -1,16 +1,15 @@
 package com.kidami.security.services.impl;
 
-import com.kidami.security.models.RefreshToken;
-import com.kidami.security.models.Role;
-import com.kidami.security.models.User;
+import com.kidami.security.models.*;
 import com.kidami.security.repository.RefreshTokenRepository;
 import com.kidami.security.repository.UserRepository;
+import com.kidami.security.services.JwtService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -25,69 +24,161 @@ import java.util.Set;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private static final Logger logger = LogManager.getLogger(CustomOAuth2UserService.class);
+    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtService jwtService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    public CustomOAuth2UserService(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository, JwtService jwtService) {
+        this.userRepository = userRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.jwtService = jwtService;
+    }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
-
-
-        //String email = oAuth2User.getAttribute("email");
-      //  String name = oAuth2User.getAttribute("name");
-
-        // Get OAuth2 access token
-        OAuth2AccessToken accessToken = userRequest.getAccessToken();
-        String accessTokenValue = accessToken.getTokenValue();
-
-        // Save user and token in the database using RefreshToken entity
-        saveOAuth2UserAndTokens(oAuth2User, accessTokenValue);
-
-        return oAuth2User;
+        try {
+            OAuth2User oAuth2User = super.loadUser(userRequest);
+            return processOAuth2User(userRequest, oAuth2User);
+        } catch (OAuth2AuthenticationException ex) {
+            logger.warn("OAuth2 authentication exception", ex);
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Unexpected error processing OAuth2 user", ex);
+            OAuth2AuthenticationException authException = new OAuth2AuthenticationException(
+                    "Authentication processing failed: " + ex.getMessage()
+            );
+            authException.initCause(ex);
+            throw authException;
+        }
     }
 
-    private void saveOAuth2UserAndTokens(OAuth2User oAuth2User, String accessToken) {
+    private OAuth2User processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
         String email = oAuth2User.getAttribute("email");
-        Optional<User> existingUser = userRepository.findByEmail(email);
+        String providerName = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
+        AuthProvider provider = AuthProvider.valueOf(providerName);
+        String providerId = extractProviderId(oAuth2User, provider);
 
-        User user;
+        if (email == null) {
+            throw new OAuth2AuthenticationException("Email not provided by OAuth2 provider");
+        }
+        Optional<User> userOptional = userRepository.findByProviderAndProviderId(provider, providerId);
+        if (!userOptional.isPresent()) {
+            userOptional = userRepository.findByEmail(email);
+        }
+        User user = userOptional.map(existingUser -> {
+            if (!existingUser.getProvider().equals(provider)) {
+                throw new OAuth2AuthenticationException("Vous vous êtes inscrit avec " + existingUser.getProvider() +
+                        ". Veuillez utiliser votre compte " + existingUser.getProvider() + " pour vous connecter.");
+            }
+            return updateExistingUser(existingUser, oAuth2User);
+        }).orElseGet(() -> registerNewUser(provider, providerId, oAuth2User));
 
-        if (existingUser.isPresent()) {
-            // If the user exists, use the existing user
-            user = existingUser.get();
-        } else {
-            // Create a new user
-            user = new User();
-            user.setEmail(email);
-            user.setName(oAuth2User.getAttribute("name"));
-            user.setProvider("GOOGLE");
-            //user.setRoles((Set<Role>) List.of(Role.USER));
-            Set<Role> defaultRoles = new HashSet<>();
-            defaultRoles.add(Role.USER); // Supposons que vous ayez un rôle USER dans l'énumération
-            user.setRoles(defaultRoles);
-            user = userRepository.save(user);  // Save the new user
+        saveOrUpdateRefreshToken(user);
+
+        return new CustomOAuth2User(user, oAuth2User.getAttributes());
+    }
+
+
+    private String extractProviderId(OAuth2User oAuth2User, AuthProvider provider) {
+        switch (provider) {
+            case GITHUB:
+            case FACEBOOK:
+                Object idAttribute = oAuth2User.getAttribute("id");
+                return idAttribute != null ? idAttribute.toString() : null;
+            case GOOGLE:
+            default:
+                Object subAttribute = oAuth2User.getAttribute("sub");
+                return subAttribute != null ? subAttribute.toString() : null;
+        }
+    }
+
+    private User registerNewUser(AuthProvider provider, String providerId, OAuth2User oAuth2User) {
+        User user = new User();
+        user.setProvider(provider);
+        user.setProviderId(providerId);
+        user.setEmail(oAuth2User.getAttribute("email"));
+        user.setFirstName(extractFirstName(oAuth2User));
+        user.setLastName(extractLastName(oAuth2User));
+        user.setName(extractFullName(oAuth2User));
+        user.setProfileImageUrl(oAuth2User.getAttribute("picture"));
+        user.setEmailVerified(true);
+
+        Set<Role> defaultRoles = new HashSet<>();
+        defaultRoles.add(Role.USER);
+        user.setRoles(defaultRoles);
+
+        return userRepository.save(user);
+    }
+
+    private User updateExistingUser(User existingUser, OAuth2User oAuth2User) {
+        existingUser.setFirstName(extractFirstName(oAuth2User));
+        existingUser.setLastName(extractLastName(oAuth2User));
+        existingUser.setName(extractFullName(oAuth2User));
+        existingUser.setProfileImageUrl(oAuth2User.getAttribute("picture"));
+        return userRepository.save(existingUser);
+    }
+
+    private String getStringAttribute(OAuth2User oAuth2User, String attributeName) {
+        Object attribute = oAuth2User.getAttribute(attributeName);
+        return attribute != null ? attribute.toString() : null;
+    }
+
+    private String getStringAttribute(OAuth2User oAuth2User, String... attributeNames) {
+        for (String attributeName : attributeNames) {
+            Object attribute = oAuth2User.getAttribute(attributeName);
+            if (attribute != null) {
+                return attribute.toString();
+            }
+        }
+        return null;
+    }
+
+    private String extractFirstName(OAuth2User oAuth2User) {
+        return getStringAttribute(oAuth2User, "given_name", "first_name", "firstname");
+    }
+
+    private String extractLastName(OAuth2User oAuth2User) {
+        return getStringAttribute(oAuth2User, "family_name", "last_name", "lastname");
+    }
+
+    private String extractFullName(OAuth2User oAuth2User) {
+        String name = getStringAttribute(oAuth2User, "name");
+        if (name != null) {
+            return name;
         }
 
-        // Check if there's already a refresh token entry for the user
-        Optional<RefreshToken> existingRefreshToken = refreshTokenRepository.findByUser(user);
+        // Construire le nom complet à partir des parties
+        String firstName = extractFirstName(oAuth2User);
+        String lastName = extractLastName(oAuth2User);
 
-        if (existingRefreshToken.isPresent()) {
-            // Update the existing refresh token with the new access token
-            RefreshToken refreshToken = existingRefreshToken.get();
-            refreshToken.setToken(accessToken);
-            refreshToken.setExpiryDate(Instant.now().plusSeconds(86400));  // Set expiry to 24 hours
-            refreshTokenRepository.save(refreshToken);
-        } else {
-            // Create a new refresh token entry
-            RefreshToken refreshToken = new RefreshToken();
-            refreshToken.setUser(user);
-            refreshToken.setToken(accessToken);
-            refreshToken.setExpiryDate(Instant.now().plusSeconds(86400));  // Set expiry to 24 hours
-            refreshTokenRepository.save(refreshToken);
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        } else if (firstName != null) {
+            return firstName;
+        } else if (lastName != null) {
+            return lastName;
         }
+
+        return null;
+    }
+
+    private void saveOrUpdateRefreshToken(User user) {
+        // Générer un VRAI refresh token JWT
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user, null, user.getAuthorities()
+        );
+
+        // Utiliser votre JwtService pour générer un vrai refresh token
+        String refreshTokenValue = jwtService.generateRefreshToken(authentication);
+
+        // Ensuite sauvegarder ce vrai refresh token
+        List<RefreshToken> userTokens = refreshTokenRepository.findByUser(user);
+        RefreshToken refreshToken = userTokens.isEmpty() ? new RefreshToken() : userTokens.get(0);
+
+        refreshToken.setUser(user);
+        refreshToken.setToken(refreshTokenValue);
+        refreshToken.setExpiryDate(Instant.now().plusSeconds(86400));
+
+        refreshTokenRepository.save(refreshToken);
     }
 }

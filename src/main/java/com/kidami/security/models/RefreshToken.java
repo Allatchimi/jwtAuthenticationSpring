@@ -1,51 +1,34 @@
 package com.kidami.security.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.Instant;
+import java.util.UUID;
 
+@Data
 @Entity
+@Table(name = "refresh_tokens")
 public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne
+    @ManyToOne // ← CHANGER de @OneToOne à @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
-
+    @Column(nullable = false, unique = true)
     private String token;
+    @Column(nullable = false)
     private Instant expiryDate;
+    private String sessionId; // ID unique pour chaque session
+    private String userAgent; // Navigateur/device info
+    private String ipAddress; // Adresse IP
+    private Instant createdAt;
 
-    // Getters et Setters
-    public Long getId() {
-        return id;
+    // Constructor
+    public RefreshToken() {
+        this.createdAt = Instant.now();
+        this.sessionId = UUID.randomUUID().toString();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public Instant getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Instant expiryDate) {
-        this.expiryDate = expiryDate;
-    }
 }

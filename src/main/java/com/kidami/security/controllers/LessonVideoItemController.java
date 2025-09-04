@@ -4,7 +4,6 @@ import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemDTO;
 import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemSaveDTO;
 import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemUpdateDTO;
 import com.kidami.security.responses.ApiResponse;
-import com.kidami.security.responses.LessonVideoItemRep;
 import com.kidami.security.services.LessonVideoItemService;
 import com.kidami.security.utils.ResponseUtil;
 import org.springframework.http.HttpStatus;
@@ -50,7 +49,7 @@ public class LessonVideoItemController {
     }
 
     // Méthode pour supprimer un cours par son ID
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteLessonVideoItem(@PathVariable Integer id) {
         boolean isDeleted = lessonVideoItemService.deleteLessonVideoItem(id);
         if (isDeleted) {

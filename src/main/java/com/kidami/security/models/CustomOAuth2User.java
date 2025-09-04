@@ -10,15 +10,30 @@ import java.util.Map;
 public class CustomOAuth2User implements OAuth2User, UserDetails {
     private final User user;
     private final Map<String, Object> attributes;
+    private final Collection<? extends GrantedAuthority> authorities;
 
+    public CustomOAuth2User(User user, Map<String, Object> attributes, Collection<? extends GrantedAuthority> authorities) {
+        this.user = user;
+        this.attributes = attributes;
+        this.authorities = authorities;
+    }
+
+    // Constructeur alternatif sans authorities (les récupère depuis l'user)
     public CustomOAuth2User(User user, Map<String, Object> attributes) {
         this.user = user;
         this.attributes = attributes;
+        this.authorities = user.getAuthorities(); // Utilise les authorities de l'user
     }
 
     @Override
     public String getName() {
-        return user.getName();
+        if (user.getName() != null && !user.getName().isEmpty()) {
+            return user.getName();
+        } else if (user.getFirstName() != null && user.getLastName() != null) {
+            return user.getFirstName() + " " + user.getLastName();
+        } else {
+            return user.getEmail();
+        }
     }
 
     @Override
@@ -28,40 +43,78 @@ public class CustomOAuth2User implements OAuth2User, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null; // Replace with actual roles if needed
+        return authorities;
     }
 
     @Override
     public String getPassword() {
-        return null; // Not applicable for OAuth2 users
+        return user.getPassword(); // Peut être null pour les utilisateurs OAuth2
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail(); // Using email as username
+        return user.getEmail();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Customize according to your logic
+        return user.isAccountNonExpired();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Customize according to your logic
+        return user.isAccountNonLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Customize according to your logic
+        return user.isCredentialsNonExpired();
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // Customize according to your logic
+        return user.isEnabled();
     }
 
     public User getUser() {
         return user;
+    }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    public String getFirstName() {
+        return user.getFirstName();
+    }
+
+    public String getLastName() {
+        return user.getLastName();
+    }
+
+    public String getProfileImageUrl() {
+        return user.getProfileImageUrl();
+    }
+
+    public AuthProvider getProvider() {
+        return user.getProvider();
+    }
+
+    public String getProviderId() {
+        return user.getProviderId();
+    }
+
+    // Méthode utilitaire pour vérifier si c'est un utilisateur OAuth2
+    public boolean isOAuth2User() {
+        return user.getProvider() != AuthProvider.LOCAL;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomOAuth2User{" +
+                "user=" + user +
+                ", email='" + getEmail() + '\'' +
+                ", provider=" + getProvider() +
+                '}';
     }
 }

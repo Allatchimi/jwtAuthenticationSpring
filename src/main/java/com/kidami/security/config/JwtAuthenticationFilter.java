@@ -7,10 +7,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,6 +22,8 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
     private JwtService jwtService;
@@ -30,47 +35,70 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // Exclure certaines routes comme /api/auth/login, /api/login, /api/auth/register, et /api/register
-        String requestURI = request.getRequestURI();
+        final String requestURI = request.getRequestURI();
 
-        if (requestURI.startsWith("/api/auth/login") || requestURI.startsWith("/api/login") ||
-                requestURI.startsWith("/api/auth/register") || requestURI.startsWith("/api/register")) {
+        // Ne pas filtrer les endpoints d'authentification et les endpoints publics
+        if (shouldNotFilter(request)) {
             chain.doFilter(request, response);
             return;
         }
 
         final String authorizationHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String email;
 
-        // Vérifier si le header contient un token JWT valide
+        // Vérifier la présence du header Authorization
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            chain.doFilter(request, response); // Continuer sans traitement JWT si pas de token
+            logger.warn("JWT Token is missing for URI: {}", requestURI);
+            chain.doFilter(request, response); // Laisser SecurityConfig gérer l'erreur
             return;
         }
 
-        jwt = authorizationHeader.substring(7); // Extraire le token
-        email = jwtService.extractEmail(jwt); // Extraire l'email à partir du token
+        try {
+            final String jwt = authorizationHeader.substring(7);
+            final String email = jwtService.extractEmail(jwt);
 
-        // S'assurer qu'il n'y a pas déjà une authentification pour cette session
-        if (StringUtils.isNotEmpty(email) && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // Charger les détails de l'utilisateur depuis la base de données
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-
-            // Vérifier si le token est valide
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
-                // Créer un objet d'authentification et le définir dans le contexte de sécurité
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Définir l'authentification dans le SecurityContext
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (StringUtils.isEmpty(email)) {
+                logger.warn("JWT Token does not contain email");
+                chain.doFilter(request, response);
+                return;
             }
+
+            // Vérifier si l'utilisateur n'est pas déjà authentifié
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+
+                if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    logger.debug("Authenticated user: {}", email);
+                } else {
+                    logger.warn("JWT Token is invalid for user: {}", email);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("JWT Authentication failed: {}", e.getMessage());
+            // Ne pas throw d'exception, laisser le SecurityConfig gérer via Http403ForbiddenEntryPoint
         }
 
-        // Continuer la chaîne de filtres
         chain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        // Exclure les endpoints qui ne nécessitent pas d'authentification JWT
+        return path.startsWith("/api/auth/") ||
+                path.startsWith("/login") ||
+                path.startsWith("/oauth2/") ||
+                path.startsWith("/swagger-ui/") ||
+                path.startsWith("/v3/api-docs/") ||
+                path.startsWith("/swagger-resources/") ||
+                path.startsWith("/webjars/") ||
+                path.equals("/") ||
+                path.startsWith("/register");
     }
 }

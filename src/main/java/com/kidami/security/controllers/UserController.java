@@ -1,13 +1,16 @@
 package com.kidami.security.controllers;
 
 import com.kidami.security.dto.AddRoleRequest;
+import com.kidami.security.dto.authDTO.RegisterDTO;
 import com.kidami.security.dto.userDTO.UserDTO;
+import com.kidami.security.dto.userDTO.UserSaveDTO;
 import com.kidami.security.dto.userDTO.UserUpdateDTO;
 import com.kidami.security.models.Role;
 import com.kidami.security.models.User;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.UserService;
 import com.kidami.security.utils.ResponseUtil;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,7 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-@Controller
+@RestController
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -27,6 +30,13 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @PostMapping("/addUser")
+    public ResponseEntity<ApiResponse<UserDTO>> addUser(@Valid  @RequestBody RegisterDTO registerDTO){
+
+        UserDTO userDTO = userService.registerNewUser(registerDTO);
+        return ResponseEntity.ok(ResponseUtil.created("registered user",userDTO,null));
     }
 
     @GetMapping("/getAllUsers")
@@ -41,7 +51,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public  ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable(value="id") int id){
+    public  ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable(value="id") Long id){
         boolean deleteuser = userService.deleteUser(id);
         if(deleteuser){
             return ResponseEntity.ok(ResponseUtil.success("deleted user",null,null));
@@ -51,7 +61,7 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUser")
-    public ResponseEntity<ApiResponse<String>> deleteUser(@RequestBody Map<String, Integer> request) {
+    public ResponseEntity<ApiResponse<String>> deleteUser(@RequestBody Map<String, Long> request) {
          String deleteUser = userService.deleteUsers(request);
         if(deleteUser != null){
             return ResponseEntity.ok(ResponseUtil.success("deleted user",deleteUser,null));

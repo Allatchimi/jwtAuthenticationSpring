@@ -1,12 +1,8 @@
-package com.kidami.security.dto.userDTO;
+package com.kidami.security.dto.authDTO;
 
 import com.kidami.security.models.AuthProvider;
 import com.kidami.security.models.Role;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,11 +10,11 @@ import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.Set;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-public class UserDTO {
-    private Long id;
+@NoArgsConstructor
+@AllArgsConstructor
+public class RegisterDTO {
+
     @NotBlank(message = "Le nom complet est obligatoire")
     @Size(min = 2, max = 50, message = "Le nom doit contenir entre 2 et 50 caractères")
     private String name;
@@ -34,9 +30,25 @@ public class UserDTO {
     private String password;
     @NotNull(message = "Le provider est obligatoire")
     private AuthProvider provider;
-    private String providerId; // Pour les utilisateurs OAuth2
-    private String profileImageUrl; // URL de l'avatar
-    private boolean emailVerified = false; // Vérification d'email
+    private String providerId;
+    private String profileImageUrl;
+    private boolean emailVerified = false;
     private Set<Role> roles = new HashSet<>();
 
+    // Validation conditionnelle selon le provider
+    @AssertTrue(message = "Le mot de passe est obligatoire pour l'inscription locale")
+    public boolean isPasswordValid() {
+        if (provider == AuthProvider.LOCAL) {
+            return password != null && !password.trim().isEmpty();
+        }
+        return true; // Pas de password requis pour OAuth2
+    }
+
+    @AssertTrue(message = "Le providerId est obligatoire pour les providers OAuth2")
+    public boolean isProviderIdValid() {
+        if (provider != null && provider != AuthProvider.LOCAL) {
+            return providerId != null && !providerId.trim().isEmpty();
+        }
+        return true; // Pas de providerId requis pour LOCAL
+    }
 }

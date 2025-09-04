@@ -1,11 +1,12 @@
 package com.kidami.security.services.impl;
 
-import com.kidami.security.dto.RegisterDTO;
+import com.kidami.security.dto.authDTO.RegisterDTO;
 import com.kidami.security.dto.userDTO.UserDTO;
 import com.kidami.security.dto.userDTO.UserUpdateDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.UserMapper;
+import com.kidami.security.models.AuthProvider;
 import com.kidami.security.models.Role;
 import com.kidami.security.models.User;
 import com.kidami.security.repository.UserRepository;
@@ -43,19 +44,30 @@ public class UserServicesImpl implements UserService {
             throw new DuplicateResourceException("User", "email", registerDTO.getEmail());
         }
         try {
-
             User user = userMapper.registerDTOToUser(registerDTO);
             String hashedPassword = passwordEncoder.encode(registerDTO.getPassword());
             user.setPassword(hashedPassword);
+            user.setProvider(registerDTO.getProvider());
+            if (registerDTO.getProvider() == AuthProvider.LOCAL) {
+                user.setProviderId(null);
+                user.setEmailVerified(false);
+            } else {
+                user.setProviderId(registerDTO.getProviderId());
+                user.setEmailVerified(true);
+            }
             Set<Role> defaultRoles = new HashSet<>();
-            defaultRoles.add(Role.USER);
-            user.setRoles(defaultRoles);
-            user.setProvider("LOCAL");
+            if(registerDTO.getRoles() != null) {
+                defaultRoles.addAll(registerDTO.getRoles());
+                user.setRoles(defaultRoles);
+            }else {
+                defaultRoles.add(Role.USER);
+                user.setRoles(defaultRoles);
+            }
 
             User userSaved = userRepository.save(user);
             log.info("Créé avec succès : {}", userSaved.getEmail());
 
-            return userMapper.userToRegisterDTO(userSaved);
+            return userMapper.userToUserDTO(userSaved);
         } catch (DuplicateResourceException e) {
             throw e;
         } catch (Exception e) {
@@ -85,7 +97,7 @@ public class UserServicesImpl implements UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(userMapper::userToRegisterDTO) // Convert each User to UserDTO
+                .map(userMapper::userToUserDTO) // Convert each User to UserDTO
                 .collect(Collectors.toList());
     }
     private UserDTO convertToUserDTO(User user) {
@@ -102,7 +114,7 @@ public class UserServicesImpl implements UserService {
     @Override
     public UserDTO updateUser(UserUpdateDTO userUpdateDTO) {
         log.debug("mise a jour de user {}", userUpdateDTO.getEmail());
-        String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());
+        //String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());
         User user = userRepository.findByEmail(userUpdateDTO.getEmail())
                 .orElseThrow(() ->{
                     log.warn("user n existe pas : {}", userUpdateDTO.getEmail());
@@ -113,14 +125,23 @@ public class UserServicesImpl implements UserService {
         try {
             if (userUpdateDTO.getName() != null) user.setName(userUpdateDTO.getName());
             if (userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
-            if (userUpdateDTO.getPassword() != null) user.setPassword(userUpdateDTO.getPassword());
-            if (userUpdateDTO.getProvider() != null) user.setProvider(userUpdateDTO.getProvider());
+
+            if (userUpdateDTO.getPassword() != null) {
+                String hashedPassword = passwordEncoder.encode(userUpdateDTO.getPassword());
+                user.setPassword(hashedPassword);
+            }
+
+            if (userUpdateDTO.getProvider() != null) {
+                // CORRECTION ICI : Pas besoin de toUpperCase() sur un enum
+                user.setProvider(userUpdateDTO.getProvider());
+            }
+
             if (userUpdateDTO.getRoles() != null) user.setRoles(userUpdateDTO.getRoles());
 
 
              User userUpdated = userRepository.save(user);
             log.info("le user a ete bien mise a jour : {}", userUpdated);
-            return userMapper.userToRegisterDTO(userUpdated);
+            return userMapper.userToUserDTO(userUpdated);
         }catch (Exception e) {
             log.error("Erreur lors de la mise a jour du user: {}", e.getMessage());
             throw e;
@@ -128,7 +149,7 @@ public class UserServicesImpl implements UserService {
     }
 
     @Override
-    public boolean deleteUser(int id) {
+    public boolean deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return true; // User was deleted
@@ -137,8 +158,8 @@ public class UserServicesImpl implements UserService {
     }
 
     @Override
-    public String deleteUsers( Map<String, Integer> request) {
-        int id = request.get("id");
+    public String deleteUsers( Map<String, Long> request) {
+        Long id = request.get("id");
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return "ok! "; // User was deleted

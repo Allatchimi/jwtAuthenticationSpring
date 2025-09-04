@@ -138,7 +138,7 @@ public class LessonServiceImpl implements LessonService {
         }
 
         Lesson savedLesson = lessonRepository.save(lesson);
-        log.info("Leçon mise à jour: {}", savedLesson.getName());
+        log.info("Leçon mise à jour : {}", savedLesson.getName());
         return lessonMapper.toDTO(savedLesson);
     }
 

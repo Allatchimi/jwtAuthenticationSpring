@@ -1,21 +1,24 @@
 package com.kidami.security.services;
+import com.kidami.security.dto.authDTO.*;
+import com.kidami.security.dto.authDTO.LoginDTO;
 
-import com.kidami.security.dto.AuthResponseDto;
-import com.kidami.security.dto.LoginDTO;
-import com.kidami.security.dto.RefreshTokenRequest;
-
-import com.kidami.security.dto.RegisterDTO;
 import com.kidami.security.models.RefreshToken;
 import com.kidami.security.models.User;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.Instant;
 
 public interface AuthService {
-    AuthResponseDto login(LoginDTO loginDTO);
+        // Connexion
+    AuthResponseDto firebaseLogin(String idToken, HttpServletRequest request);    // Firebase login
+    AuthResponseDto refreshToken(RefreshTokenRequest refreshTokenRequest); // Refresh token
+    AuthResponseDto login(LoginDTO loginDTO, HttpServletRequest request);
+    AuthResponseDto registerAndAuthenticate(RegisterDTO registerDTO,HttpServletRequest request);
 
-    AuthResponseDto refreshToken(RefreshTokenRequest refreshTokenRequest);
+    RefreshToken createOrUpdateRefreshToken(User user, String newToken, Instant newExpiryDate,
+                                            HttpServletRequest request);
+
     void deleteRefreshTokenForUser(User user);
-    RefreshToken createOrUpdateRefreshToken(User user, String newToken, Instant newExpiryDate);
+    void logout(User user);
 
-    // String register(RegisterDTO registerDTO);
 }

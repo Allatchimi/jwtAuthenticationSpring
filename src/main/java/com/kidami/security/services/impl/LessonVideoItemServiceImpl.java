@@ -6,17 +6,14 @@ import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemUpdateDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.LessonVideoItemMapper;
-import com.kidami.security.models.Lesson;
 import com.kidami.security.models.LessonVideoItem;
 import com.kidami.security.repository.LessonRepository;
 import com.kidami.security.repository.LessonVideoItemRepository;
-import com.kidami.security.responses.LessonVideoItemRep;
 import com.kidami.security.services.LessonVideoItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

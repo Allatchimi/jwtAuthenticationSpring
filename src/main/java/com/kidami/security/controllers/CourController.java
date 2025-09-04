@@ -26,7 +26,7 @@ public class CourController {
 
     @PostMapping("/creatCour")
     public ResponseEntity<ApiResponse<CourDTO>> saveCour(@Valid @RequestBody CourSaveDTO courSaveDTO){
-        CourDTO courDTO =courService.addCour(courSaveDTO);
+        CourDTO courDTO = courService.addCour(courSaveDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.success("Course added successfully",courDTO,null));
     }
 

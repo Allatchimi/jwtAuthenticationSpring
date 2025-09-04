@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,22 +13,66 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name= "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email"),
+        @UniqueConstraint(columnNames = "providerId")
+})
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="userID")
+    @Column(name = "userID")
     private Long id;
-    @Column(name="name", length =50 )
+
+    @Column(name = "name", length = 50)
     private String name;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
-    @Column(name="password", length =200)
+
+    @Column(name = "password", length = 200)
     private String password;
-    private String provider;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+
+    private String providerId;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String profileImageUrl;
+
+    private boolean emailVerified = false;
+
     @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING) // ou EnumType.ORDINAL si vous préférez
-    private Set<Role> roles = new HashSet<>(); // Utilisation d'un ensemble pour les rôles
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
+
+
+    // Ajouter un constructeur pratique
+    public User(String email, String password, AuthProvider provider) {
+        this.email = email;
+        this.password = password;
+        this.provider = provider;
+        this.roles = new HashSet<>();
+        this.roles.add(Role.USER); // Role par défaut
+    }
+
+    // Méthodes utilitaires
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    public void removeRole(Role role) {
+        this.roles.remove(role);
+    }
+
+    public boolean hasRole(Role role) {
+        return this.roles.contains(role);
+    }
+
 
 
     @Override
@@ -66,6 +108,7 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 
     @Override
     public String toString() {

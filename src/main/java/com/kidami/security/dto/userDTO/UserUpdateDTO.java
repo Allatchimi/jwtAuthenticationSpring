@@ -1,28 +1,28 @@
 package com.kidami.security.dto.userDTO;
 
+import com.kidami.security.models.AuthProvider;
 import com.kidami.security.models.Role;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
 import java.util.Set;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class UserUpdateDTO {
-
-    private Integer id;
+    @Size(min = 2, max = 50, message = "Le nom doit contenir entre 2 et 50 caractères")
     private String name;
-    @Column( unique = true)
+    @Size(min = 2, max = 30, message = "Le prénom doit contenir entre 2 et 30 caractères")
+    private String firstName;
+    @Size(min = 2, max = 30, message = "Le nom de famille doit contenir entre 2 et 30 caractères")
+    private String lastName;
+    @Email(message = "L'email doit être valide")
     private String email;
+    @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
     private String password;
-    private String provider;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING) // ou EnumType.ORDINAL si vous préférez
-    private Set<Role> roles = new HashSet<>();
-
-
+    private AuthProvider provider;
+    private String providerId;
+    private String profileImageUrl;
+    private Boolean emailVerified;
+    private Set<Role> roles;
 }

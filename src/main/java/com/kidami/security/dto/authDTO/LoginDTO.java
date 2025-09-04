@@ -1,4 +1,4 @@
-package com.kidami.security.dto;
+package com.kidami.security.dto.authDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

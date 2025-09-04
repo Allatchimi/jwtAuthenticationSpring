@@ -1,33 +1,32 @@
 package com.kidami.security.controllers;
 
 
-import com.kidami.security.dto.AuthResponseDto;
-import com.kidami.security.dto.LoginDTO;
-import com.kidami.security.dto.RegisterDTO;
+import com.kidami.security.dto.authDTO.RegisterDTO;
+import com.kidami.security.dto.authDTO.LoginDTO;
+import com.kidami.security.dto.userDTO.UserDTO;
 import com.kidami.security.models.User;
+import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.AuthService;
 import com.kidami.security.services.JwtService;
 import com.kidami.security.services.UserService;
+import com.kidami.security.utils.ResponseUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @Controller
 public class WebController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebController.class);
 
 
     private final AuthenticationManager authenticationManager;
@@ -42,35 +41,24 @@ public class WebController {
         this.userService = userService;
     }
 
-    @GetMapping("/register")
-    public String showRegistrationForm() {
-        logger.info("Accessing registration form");
-        return "register";
-    }
-
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@Valid @ModelAttribute RegisterDTO registerDTO) {
+    public ResponseEntity<ApiResponse<UserDTO>> registerUser(@Valid @ModelAttribute RegisterDTO registerDTO) {
         try {
            // logger.info("Registering user with email: {}", registerDTO);
-            userService.registerNewUser(registerDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+           UserDTO userDTO =  userService.registerNewUser(registerDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.success("registered succefully",userDTO,null));
 
         } catch (Exception e) {
             logger.error("Error registering user: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error registering user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseUtil.error("Error registering user",null,e.getMessage()));
         }
     }
 
-    @GetMapping("/login")
-    public String showLoginForm() {
-        return "login";
-    }
-
     @PostMapping("/login")
-    public String login(@RequestBody LoginDTO loginDTO,Model model) {
+    public String login(@RequestBody LoginDTO loginDTO,Model model, HttpServletRequest request) {
         try {
             // Authentifier l'utilisateur
-               authService.login(loginDTO);
+               authService.login(loginDTO, request);
 
             // Ajouter le token au modèle ou gérer la redirection comme nécessaire
             return "redirect:/home";
