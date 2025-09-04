@@ -35,5 +35,8 @@ build/
 .vscode/
 application.properties
 /log/
+application.yml
+application-dev.yml
+application-prod.yml
 
 
