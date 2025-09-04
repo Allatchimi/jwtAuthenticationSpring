@@ -19,7 +19,10 @@ import com.kidami.security.services.AuthService;
 import com.kidami.security.services.JwtService;
 import com.kidami.security.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +36,8 @@ import java.util.*;
 @Service
 public class AuthServiceImpl implements AuthService {
 
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
@@ -132,42 +137,23 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponseDto firebaseLogin(String idToken,HttpServletRequest request) {
+    public AuthResponseDto firebaseLogin(String idToken, HttpServletRequest request) {
+        logger.debug("Starting Firebase login process for token: {}",
+                safeTokenLog(idToken) + "...");
+
         try {
-            // Vérifier le token Firebase
+            // 1. Vérifier le token Firebase
             FirebaseToken decodedToken = firebaseService.verifyToken(idToken);
+            logger.debug("Firebase token verified for email: {}", decodedToken.getEmail());
+
             String email = decodedToken.getEmail();
             String uid = decodedToken.getUid();
 
-            // Vérifier si l'utilisateur existe
-            Optional<User> userOptional = userRepository.findByEmail(email);
-            User user;
+            // 2. Trouver ou créer l'utilisateur
+            User user = findOrCreateUserFromFirebase(decodedToken, uid, email);
+            logger.debug("User processed: {}", user.getEmail());
 
-            if (userOptional.isPresent()) {
-                user = userOptional.get();
-                // Mettre à jour le provider si nécessaire
-                if (!user.getProvider().equals(AuthProvider.FIREBASE)) {
-                    user.setProvider(AuthProvider.FIREBASE);
-                    user.setProviderId(uid);
-                    user = userRepository.save(user);
-                }
-            } else {
-                // Créer un nouvel utilisateur
-                user = new User();
-                user.setEmail(email);
-                user.setProvider(AuthProvider.FIREBASE);
-                user.setProviderId(uid);
-                // CORRECTION ICI : Utiliser getName() au lieu de getClaim()
-                user.setName(decodedToken.getName());
-                // Extraire le prénom et nom si possible
-                extractAndSetNamesFromFirebaseToken(decodedToken, user);
-                // Set default roles
-                Set<Role> defaultRoles = new HashSet<>();
-                defaultRoles.add(Role.USER);
-                user.setRoles(defaultRoles);
-                user = userRepository.save(user);
-            }
-            // Générer les tokens JWT
+            // 3. Générer les tokens JWT
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     user, null, user.getAuthorities());
 
@@ -175,19 +161,67 @@ public class AuthServiceImpl implements AuthService {
             String refreshToken = jwtService.generateRefreshToken(authentication);
             Instant expiryDate = Instant.now().plus(Duration.ofDays(30));
 
+            // 4. Gérer le refresh token
             createOrUpdateRefreshToken(user, refreshToken, expiryDate, request);
-            // Convertir User en UserResponseDTO pour la réponse
+
+            // 5. Préparer la réponse
             UserResponseDTO userResponse = convertUserToResponseDTO(user);
 
-            AuthResponseDto authResponseDto = new AuthResponseDto();
-            authResponseDto.setAccessToken(token);
-            authResponseDto.setRefreshToken(refreshToken);
-            authResponseDto.setUser(userResponse);
-
-            return authResponseDto;
+            return AuthResponseDto.fromTokens(
+                    token,
+                    refreshToken,
+                    userResponse,
+                    expiryDate
+            );
 
         } catch (FirebaseAuthException e) {
-            throw new RuntimeException("Firebase authentication failed", e);
+            logger.error("Firebase authentication failed for token: {}",
+                    safeTokenLog(idToken) + "...", e);
+            throw new AuthenticationServiceException("Firebase authentication failed", e);
+        } catch (Exception e) {
+            logger.error("Unexpected error during Firebase login for token: {}",
+                    safeTokenLog(idToken) + "...", e);
+            throw new AuthenticationServiceException("Login process failed", e);
+        }
+    }
+
+    private User findOrCreateUserFromFirebase(FirebaseToken decodedToken, String uid, String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            User existingUser = userOptional.get();
+
+            // Vérifier et mettre à jour le provider si nécessaire
+            if (!existingUser.getProvider().equals(AuthProvider.FIREBASE)) {
+                logger.info("Updating user {} provider from {} to FIREBASE",
+                        email, existingUser.getProvider());
+                existingUser.setProvider(AuthProvider.FIREBASE);
+                existingUser.setProviderId(uid);
+                return userRepository.save(existingUser);
+            }
+
+            // Mettre à jour les informations même si le provider est déjà FIREBASE
+            existingUser.setName(decodedToken.getName());
+            extractAndSetNamesFromFirebaseToken(decodedToken, existingUser);
+            return userRepository.save(existingUser);
+
+        } else {
+            // Créer un nouvel utilisateur
+            logger.info("Creating new Firebase user: {}", email);
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setProvider(AuthProvider.FIREBASE);
+            newUser.setProviderId(uid);
+            newUser.setName(decodedToken.getName());
+            newUser.setEmailVerified(true);
+
+            extractAndSetNamesFromFirebaseToken(decodedToken, newUser);
+
+            Set<Role> defaultRoles = new HashSet<>();
+            defaultRoles.add(Role.USER);
+            newUser.setRoles(defaultRoles);
+
+            return userRepository.save(newUser);
         }
     }
     // Méthode helper pour extraire les noms du token Firebase
@@ -348,5 +382,12 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw new RuntimeException("Refresh token failed: " + e.getMessage(), e);
         }
+    }
+
+    // Méthode safe pour logger les tokens
+    private String safeTokenLog(String token) {
+        if (token == null) return "null";
+        if (token.length() <= 10) return token;
+        return token.substring(0, 10) + "...";
     }
 }
