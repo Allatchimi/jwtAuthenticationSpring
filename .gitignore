@@ -35,9 +35,18 @@ build/
 .vscode/
 application.properties
 /log/
-src/main/resources/application.yml
-src/main/resources/application-dev.yml
-src/main/resources/application-prod.yml
+
+# Secrets
+application-dev.yml
+application-prod.yml
+*.key
+*.p12
+*.jks
+
+# Environnements
+.env
+.env.local
+.env.production
 
 
 
