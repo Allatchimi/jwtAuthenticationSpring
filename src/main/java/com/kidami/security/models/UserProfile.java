@@ -1,8 +1,8 @@
 package com.kidami.security.models;
 
-import jakarta.persistence.*;
 
-/*@Entity
+/*
+@Entity
 public class UserProfile {
 
     @Id

@@ -9,11 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -24,44 +22,39 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private final JwtService jwtService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService) {
+        this.jwtService = jwtService;
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
         final String requestURI = request.getRequestURI();
-
         // Ne pas filtrer les endpoints d'authentification et les endpoints publics
         if (shouldNotFilter(request)) {
             chain.doFilter(request, response);
             return;
         }
-
         final String authorizationHeader = request.getHeader("Authorization");
-
         // Vérifier la présence du header Authorization
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             logger.warn("JWT Token is missing for URI: {}", requestURI);
             chain.doFilter(request, response); // Laisser SecurityConfig gérer l'erreur
             return;
         }
-
         try {
             final String jwt = authorizationHeader.substring(7);
             final String email = jwtService.extractEmail(jwt);
-
             if (StringUtils.isEmpty(email)) {
                 logger.warn("JWT Token does not contain email");
                 chain.doFilter(request, response);
                 return;
             }
-
             // Vérifier si l'utilisateur n'est pas déjà authentifié
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
@@ -70,7 +63,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     logger.debug("Authenticated user: {}", email);
                 } else {
@@ -82,7 +74,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.error("JWT Authentication failed: {}", e.getMessage());
             // Ne pas throw d'exception, laisser le SecurityConfig gérer via Http403ForbiddenEntryPoint
         }
-
         chain.doFilter(request, response);
     }
 

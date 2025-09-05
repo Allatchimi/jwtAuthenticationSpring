@@ -26,7 +26,6 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -42,7 +41,6 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
     private final FirebaseService firebaseService;
     private final UserService userService;
     private final UserMapper userMapper;
@@ -51,7 +49,6 @@ public class AuthServiceImpl implements AuthService {
                            RefreshTokenRepository refreshTokenRepository,
                            UserRepository userRepository,
                            JwtService jwtService,
-                           PasswordEncoder passwordEncoder,
                            FirebaseService firebaseService,
                            UserService userService,
                            UserMapper userMapper) {
@@ -59,7 +56,6 @@ public class AuthServiceImpl implements AuthService {
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
-        this.passwordEncoder = passwordEncoder;
         this.firebaseService = firebaseService;
         this.userService = userService;
         this.userMapper = userMapper;

@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class CategorySaveDTO {
     private String categoryName;
     private  String description;

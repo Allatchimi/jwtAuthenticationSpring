@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class CourDTO {
-
     private Integer id;
     private Integer score;
     private Integer lessonNum;

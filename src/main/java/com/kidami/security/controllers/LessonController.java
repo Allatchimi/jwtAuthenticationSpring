@@ -3,13 +3,10 @@ import com.kidami.security.dto.lessonDTO.LessonDTO;
 import com.kidami.security.dto.lessonDTO.LessonDelete;
 import com.kidami.security.dto.lessonDTO.LessonSaveDTO;
 import com.kidami.security.dto.lessonDTO.LessonUpdateDTO;
-import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemSaveDTO;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.LessonService;
 import com.kidami.security.utils.ResponseUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +18,6 @@ import java.util.List;
 @RequestMapping("/api/lessons")
 public class LessonController {
 
-    private static final Logger log = LoggerFactory.getLogger(LessonController.class);
     private final LessonService lessonService;
 
     public LessonController(LessonService lessonService) {

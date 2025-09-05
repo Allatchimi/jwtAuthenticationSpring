@@ -1,15 +1,10 @@
 package com.kidami.security.controllers;
 
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.kidami.security.dto.authDTO.*;
 import com.kidami.security.models.*;
-import com.kidami.security.repository.RefreshTokenRepository;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.AuthService;
-import com.kidami.security.services.JwtService;
 import com.kidami.security.services.UserService;
-import com.kidami.security.services.impl.FirebaseService;
 import com.kidami.security.utils.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -33,25 +27,21 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    private final AuthenticationManager authenticationManager;
     private final AuthService authService;
-    private final JwtService jwtService;
     private final UserService userService;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final FirebaseService firebaseService;
 
-    public AuthController(AuthenticationManager authenticationManager, AuthService authService, JwtService jwtService, UserService userService, RefreshTokenRepository refreshTokenRepository, FirebaseService firebaseService) {
-        this.authenticationManager = authenticationManager;
+    public AuthController( AuthService authService, UserService userService) {
         this.authService = authService;
-        this.jwtService = jwtService;
         this.userService = userService;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.firebaseService = firebaseService;
+    }
+
+    @GetMapping("/google-login")
+    public String googleLogin() {
+        return "redirect:/oauth2/authorization/google";
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterDTO registerDTO, BindingResult bindingResult,HttpServletRequest request) {
-
         if (bindingResult.hasErrors()) {
             // Les méthodes @AssertTrue sont exécutées automatiquement !
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
@@ -96,30 +86,21 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseUtil.error("user not found",null,null));
     }
 
-
-    @PostMapping("/firebase")
+    @PostMapping("/firebase-login")
     @Operation(summary = "Login with Firebase")
-    public ResponseEntity<ApiResponse<?>> firebaseLogin(
-            @RequestBody FirebaseLoginRequest firebaseLoginRequest,
+    public ResponseEntity<ApiResponse<?>> firebaseLogin(@RequestBody FirebaseLoginRequest firebaseLoginRequest,
             HttpServletRequest request) {
-
-
         try {
-
-            logger.info("Firebase login attempt for token: {}",
-                    safeTokenLog(firebaseLoginRequest.getIdToken()) + "...");
-
+            logger.info("Firebase login attempt for token: {}", safeTokenLog(firebaseLoginRequest.getIdToken()) + "...");
             AuthResponseDto authResponse = authService.firebaseLogin(
                     firebaseLoginRequest.getIdToken(),
                     request
             );
-
             return ResponseEntity.ok(ResponseUtil.success(
                     "Logged with Firebase successfully",
                     authResponse,
                     null
             ));
-
         } catch (AuthenticationServiceException e) {
             logger.error("Firebase authentication failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -128,7 +109,6 @@ public class AuthController {
                             null,
                             e.getMessage()
                     ));
-
         } catch (Exception e) {
             logger.error("Unexpected error during Firebase login: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -162,6 +142,5 @@ public class AuthController {
 
         return "home"; // Retourne le nom de la vue Thymeleaf
     }
-
 
 }

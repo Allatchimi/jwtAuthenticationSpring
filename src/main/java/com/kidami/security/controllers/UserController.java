@@ -3,7 +3,6 @@ package com.kidami.security.controllers;
 import com.kidami.security.dto.AddRoleRequest;
 import com.kidami.security.dto.authDTO.RegisterDTO;
 import com.kidami.security.dto.userDTO.UserDTO;
-import com.kidami.security.dto.userDTO.UserSaveDTO;
 import com.kidami.security.dto.userDTO.UserUpdateDTO;
 import com.kidami.security.models.Role;
 import com.kidami.security.models.User;
@@ -13,7 +12,6 @@ import com.kidami.security.utils.ResponseUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,16 +23,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-
     private final  UserService userService;
-
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/addUser")
     public ResponseEntity<ApiResponse<UserDTO>> addUser(@Valid  @RequestBody RegisterDTO registerDTO){
-
         UserDTO userDTO = userService.registerNewUser(registerDTO);
         return ResponseEntity.ok(ResponseUtil.created("registered user",userDTO,null));
     }

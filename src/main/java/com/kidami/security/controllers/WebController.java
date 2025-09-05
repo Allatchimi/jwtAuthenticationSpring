@@ -7,7 +7,6 @@ import com.kidami.security.dto.userDTO.UserDTO;
 import com.kidami.security.models.User;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.AuthService;
-import com.kidami.security.services.JwtService;
 import com.kidami.security.services.UserService;
 import com.kidami.security.utils.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
@@ -27,16 +25,10 @@ import org.springframework.web.bind.annotation.*;
 public class WebController {
 
     private static final Logger logger = LoggerFactory.getLogger(WebController.class);
-
-
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
     private final AuthService authService;
     private final UserService userService;
 
-    public WebController(AuthenticationManager authenticationManager, JwtService jwtService, AuthService authService,UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
+    public WebController(AuthService authService,UserService userService) {
         this.authService = authService;
         this.userService = userService;
     }
@@ -57,10 +49,7 @@ public class WebController {
     @PostMapping("/login")
     public String login(@RequestBody LoginDTO loginDTO,Model model, HttpServletRequest request) {
         try {
-            // Authentifier l'utilisateur
                authService.login(loginDTO, request);
-
-            // Ajouter le token au modèle ou gérer la redirection comme nécessaire
             return "redirect:/home";
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDTO.getEmail());
@@ -70,33 +59,22 @@ public class WebController {
     }
 
     @GetMapping("/protected-endpoint")
-    @ResponseBody // Indique que la réponse est directement le corps
     public ResponseEntity<?> getUserInfo(Authentication authentication) {
-        // Récupérer l'utilisateur connecté
-        String email = authentication.getName(); // Le nom de l'utilisateur est l'email
-        // Récupérer les informations de l'utilisateur à partir du UserService
-        User user = userService.findByEmail(email); // Assurez-vous d'avoir une méthode pour récupérer l'utilisateur
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
         if (user != null) {
-            return ResponseEntity.ok(user); // Retourner les informations de l'utilisateur
+            return ResponseEntity.ok(user);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
-
     @GetMapping("/home")
     public String home(Model model, Authentication authentication) {
         logger.info("Accessing home page");
-
-        // Récupérer l'utilisateur connecté
-        String email = authentication.getName(); // Le nom de l'utilisateur est l'email
-
-        // Récupérer les informations de l'utilisateur à partir du UserService
-        User user = userService.findByEmail(email); // Assurez-vous d'avoir une méthode pour récupérer l'utilisateur
-
-        // Ajouter l'utilisateur au modèle pour qu'il soit accessible dans le template
+        String email = authentication.getName();
+        User user = userService.findByEmail(email);
         model.addAttribute("user", user);
-
-        return "home"; // Retourne le nom de la vue Thymeleaf
+        return "home";
     }
 
 

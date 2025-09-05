@@ -2,7 +2,6 @@ package com.kidami.security.dto.userDTO;
 
 import com.kidami.security.models.AuthProvider;
 import com.kidami.security.models.Role;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -17,28 +17,30 @@ import java.io.FileInputStream;
 @Service
 public class FirebaseService {
 
-    private  static Logger logger = LoggerFactory.getLogger(FirebaseService.class);
+    private  static final Logger logger = LoggerFactory.getLogger(FirebaseService.class);
     @PostConstruct
     public void initialize() {
         try {
+            logger.debug("Firebase initialize  tentative");
+            // Vérifier si Firebase est déjà initialisé
+            if (FirebaseApp.getApps().isEmpty()) {
+                ClassPathResource resource = new ClassPathResource("firebase-service-account-key.json");
+                FileInputStream serviceAccount = new FileInputStream(resource.getFile());
+                logger.debug("Initializing Firebase service avec configuration de fichier {}",resource);
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
 
-            ClassPathResource resource = new ClassPathResource("firebase-service-account-key.json");
-            logger.debug("Initializing Firebase service avec configuration de fichier {}",resource);
-            FileInputStream serviceAccount = new FileInputStream(resource.getFile());
-
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-
-            FirebaseApp.initializeApp(options);
-            logger.debug("Firebase initialized successfully!");
+                FirebaseApp.initializeApp(options);
+                logger.debug("Firebase initialized successfully!");
+            } else {
+                logger.debug("Firebase already initialized");
+            }
         } catch (Exception e) {
-
-            logger.error("Firebase initialization failed: " + e.getMessage());
+            logger.error("Firebase initialization failed: {}", e.getMessage());
             throw new RuntimeException("Firebase initialization failed", e);
         }
     }
-
 
     public FirebaseToken verifyToken(String idToken) throws FirebaseAuthException {
         return FirebaseAuth.getInstance().verifyIdToken(idToken);

@@ -20,7 +20,7 @@ public class SessionController {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-    @GetMapping
+    @GetMapping("/getUserSessions")
     public List<SessionInfo> getUserSessions(@AuthenticationPrincipal User user) {
         List<RefreshToken> tokens = refreshTokenRepository.findByUser(user);
 
@@ -38,12 +38,11 @@ public class SessionController {
     }
 
     @DeleteMapping("/{sessionId}")
-    public void revokeSession(@AuthenticationPrincipal User user,
-                              @PathVariable String sessionId) {
+    public void revokeSession(@AuthenticationPrincipal User user, @PathVariable String sessionId) {
         refreshTokenRepository.deleteByUserAndSessionId(user, sessionId);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/revokeAllSessions")
     public void revokeAllSessions(@AuthenticationPrincipal User user) {
         refreshTokenRepository.deleteByUser(user);
     }

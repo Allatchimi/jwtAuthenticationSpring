@@ -12,9 +12,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    // ❌ SUPPRIMEZ cette méthode - Elle est confuse et inutile
-    // UserDTO userToRegisterDTO(User user);
-
     // Mapping de RegisterDTO vers User
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "roles", ignore = true)

@@ -13,6 +13,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     Optional<Category> findByCategoryName(String categoryName);
     boolean existsByCategoryName(String categoryName);
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Category c WHERE c.categoryName = :name AND c.id != :id")
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Category c WHERE c.categoryName = :name AND c.categoryId != :id")
     boolean existsByCategoryNameAndIdNot(@Param("name") String name, @Param("id") Integer id);
 }
