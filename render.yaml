@@ -6,10 +6,11 @@ services:
     region: frankfurt
     branch: main
     rootDirectory: .
+
+    # Configuration Java explicite
     runtime: java
     javaVersion: 17
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/*.jar --spring.profiles.active=prod
+
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
@@ -25,3 +26,6 @@ services:
         fromSecret: GOOGLE_CLIENT_ID
       - key: GOOGLE_CLIENT_SECRET
         fromSecret: GOOGLE_CLIENT_SECRET
+
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar --spring.profiles.active=prod
