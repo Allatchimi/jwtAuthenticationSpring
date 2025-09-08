@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "Building Spring Boot application for production..."
+
+# Clean and build
+./mvnw clean package -DskipTests
+
+# Build Docker image
+docker build -t mdrassa-api .
+
+echo "Build completed! Ready for deployment."

@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +19,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/files")
 public class FileUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
+    private final StorageService storageService;
 
-    @Autowired
-    private StorageService storageService;
+    public FileUploadController(StorageService storageService) {
+        this.storageService = storageService;
+    }
 
     @Operation(summary = "Uploader un fichier", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping(value = "/upload", consumes = "multipart/form-data")
+    @PostMapping(consumes = "multipart/form-data")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<?> uploadFile(
             @RequestParam("file") MultipartFile file,
@@ -44,7 +45,7 @@ public class FileUploadController {
             response.put("status", "success");
             response.put("message", "Fichier uploadé avec succès");
             response.put("url", fileUrl);
-            response.put("filename", fileUrl.substring(fileUrl.lastIndexOf("/") + 1));
+            response.put("filename", extractFileNameFromUrl(fileUrl));
 
             logger.info("File uploaded successfully: {}", fileUrl);
             return ResponseEntity.ok(response);
@@ -54,18 +55,17 @@ public class FileUploadController {
 
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("status", "error");
-            errorResponse.put("message", e.getMessage());
+            errorResponse.put("message", "Échec de l'upload: " + e.getMessage());
 
             return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 
     @Operation(summary = "Télécharger un fichier")
-    @GetMapping("/videos/{filename:.+}")
-    public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+    @GetMapping("/{filename:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {
             Resource file = storageService.loadFile(filename);
-
             String contentType = determineContentType(filename);
 
             return ResponseEntity.ok()
@@ -80,14 +80,32 @@ public class FileUploadController {
         }
     }
 
-    @Operation(summary = "Lister les fichiers")
-    @GetMapping("/videos")
+    @Operation(summary = "Lister les fichiers", security = @SecurityRequirement(name = "bearerAuth"))
+    @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<?> listFiles() {
         try {
             return ResponseEntity.ok(storageService.listFiles());
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Erreur lors du listing des fichiers");
+            return ResponseEntity.internalServerError()
+                    .body("Erreur lors du listing des fichiers: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Supprimer un fichier", security = @SecurityRequirement(name = "bearerAuth"))
+    @DeleteMapping("/{filename:.+}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<?> deleteFile(@PathVariable String filename) {
+        try {
+            boolean deleted = storageService.deleteFile(filename);
+            if (deleted) {
+                return ResponseEntity.ok().body("Fichier supprimé avec succès");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError()
+                    .body("Erreur lors de la suppression: " + e.getMessage());
         }
     }
 
@@ -98,6 +116,11 @@ public class FileUploadController {
         if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) return "image/jpeg";
         if (filename.endsWith(".png")) return "image/png";
         if (filename.endsWith(".gif")) return "image/gif";
+        if (filename.endsWith(".pdf")) return "application/pdf";
         return "application/octet-stream";
+    }
+
+    private String extractFileNameFromUrl(String url) {
+        return url.substring(url.lastIndexOf("/") + 1);
     }
 }

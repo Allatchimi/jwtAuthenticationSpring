@@ -5,14 +5,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
@@ -30,11 +30,13 @@ public class SupabaseStorageService implements StorageService {
     @Value("${supabase.api.key}")
     private String apiKey;
 
-    private final HttpClient httpClient;
+    private final WebClient webClient;
 
-    public SupabaseStorageService() {
-        this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(30))
+    public SupabaseStorageService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder
+                .baseUrl(supabaseUrl)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .defaultHeader("apikey", apiKey)
                 .build();
     }
 
@@ -43,34 +45,20 @@ public class SupabaseStorageService implements StorageService {
         try {
             String fileName = generateSecureFileName(file.getOriginalFilename());
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(String.format("%s/storage/v1/object/%s/%s",
-                            supabaseUrl.trim(), bucket.trim(), fileName)))
-                    .header("Authorization", "Bearer " + apiKey.trim())
-                    .header("Content-Type", file.getContentType())
+            String respons = webClient.post()
+                    .uri("/storage/v1/object/{bucket}/{fileName}", bucket, fileName)
+                    .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
                     .header("Cache-Control", "max-age=31536000")
-                    .PUT(HttpRequest.BodyPublishers.ofByteArray(file.getBytes()))
+                    .bodyValue(file.getBytes())
+                    .retrieve()
+                    .onStatus(status -> status.isError(),
+                            response -> Mono.error(new IOException("Erreur Supabase: " + response.statusCode())))
+                    .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(45))
-                    .build();
+                    .block();
 
-            HttpResponse<String> response = httpClient.send(
-                    request, HttpResponse.BodyHandlers.ofString()
-            );
+            return getFileUrl(fileName);
 
-            if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                return String.format("%s/storage/v1/object/public/%s/%s",
-                        supabaseUrl.trim(), bucket.trim(), fileName);
-            } else {
-                throw new IOException(String.format(
-                        "Erreur Supabase [%d]: %s",
-                        response.statusCode(),
-                        response.body()
-                ));
-            }
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Upload interrompu", e);
         } catch (Exception e) {
             throw new IOException("Erreur lors de l'upload vers Supabase", e);
         }
@@ -79,11 +67,8 @@ public class SupabaseStorageService implements StorageService {
     @Override
     public Resource loadFile(String fileName) throws IOException {
         try {
-            String publicUrl = String.format("%s/storage/v1/object/public/%s/%s",
-                    supabaseUrl.trim(), bucket.trim(), fileName);
-
+            String publicUrl = getFileUrl(fileName);
             return new UrlResource(URI.create(publicUrl));
-
         } catch (Exception e) {
             throw new IOException("Erreur lors du chargement du fichier depuis Supabase", e);
         }
@@ -92,54 +77,41 @@ public class SupabaseStorageService implements StorageService {
     @Override
     public List<String> listFiles() throws IOException {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(String.format("%s/storage/v1/object/list/%s",
-                            supabaseUrl.trim(), bucket.trim())))
-                    .header("Authorization", "Bearer " + apiKey.trim())
-                    .header("Content-Type", "application/json")
-                    .GET()
+            return webClient.get()
+                    .uri("/storage/v1/object/list/{bucket}", bucket)
+                    .retrieve()
+                    .onStatus(status -> status.isError(),
+                            response -> Mono.error(new IOException("Erreur liste Supabase: " + response.statusCode())))
+                    .bodyToMono(List.class)
                     .timeout(Duration.ofSeconds(30))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(
-                    request, HttpResponse.BodyHandlers.ofString()
-            );
-
-            if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                // Parsez la réponse JSON pour extraire les noms de fichiers
-                // Exemple de réponse: [{"name":"file1.jpg"},{"name":"file2.mp4"}]
-                return parseFileNamesFromJson(response.body());
-            } else {
-                throw new IOException("Erreur liste Supabase: " + response.statusCode());
-            }
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Liste interrompue", e);
+                    .block();
+        } catch (Exception e) {
+            throw new IOException("Erreur lors du listing des fichiers", e);
         }
     }
 
     @Override
     public boolean deleteFile(String fileName) throws IOException {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(String.format("%s/storage/v1/object/%s/%s",
-                            supabaseUrl.trim(), bucket.trim(), fileName)))
-                    .header("Authorization", "Bearer " + apiKey.trim())
-                    .DELETE()
+            webClient.delete()
+                    .uri("/storage/v1/object/{bucket}/{fileName}", bucket, fileName)
+                    .retrieve()
+                    .onStatus(status -> status.isError(),
+                            response -> Mono.error(new IOException("Erreur suppression Supabase: " + response.statusCode())))
+                    .toBodilessEntity()
                     .timeout(Duration.ofSeconds(30))
-                    .build();
+                    .block();
 
-            HttpResponse<String> response = httpClient.send(
-                    request, HttpResponse.BodyHandlers.ofString()
-            );
-
-            return response.statusCode() >= 200 && response.statusCode() < 300;
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Suppression interrompue", e);
+            return true;
+        } catch (Exception e) {
+            throw new IOException("Erreur lors de la suppression du fichier", e);
         }
+    }
+
+    @Override
+    public String getFileUrl(String fileName) {
+        return String.format("%s/storage/v1/object/public/%s/%s",
+                supabaseUrl.trim(), bucket.trim(), fileName);
     }
 
     private String generateSecureFileName(String originalFileName) {
@@ -150,15 +122,5 @@ public class SupabaseStorageService implements StorageService {
                 UUID.randomUUID().toString().substring(0, 8),
                 System.currentTimeMillis(),
                 cleanName);
-    }
-
-    private List<String> parseFileNamesFromJson(String jsonResponse) {
-        // Implémentation basique - utilisez Jackson ou Gson pour du vrai parsing
-        return List.of(); // À implémenter selon le format de réponse Supabase
-    }
-
-    public String getFileUrl(String fileName) {
-        return String.format("%s/storage/v1/object/public/%s/%s",
-                supabaseUrl.trim(), bucket.trim(), fileName);
     }
 }

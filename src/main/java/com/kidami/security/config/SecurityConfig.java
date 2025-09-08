@@ -114,11 +114,11 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout=true")
                         .permitAll()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                )
+               // .oauth2Login(oauth2 -> oauth2
+              //          .loginPage("/login")
+               //         .defaultSuccessUrl("/home", true)
+              //          .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+              //  )
                 .userDetailsService(customUserDetailsService);
 
         return http.build();

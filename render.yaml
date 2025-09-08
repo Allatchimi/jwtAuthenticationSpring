@@ -1,28 +1,22 @@
 services:
   - type: web
-    name: madarassa
-    env: java
+    name: mdrassa-api
+    env: docker
+    dockerfilePath: Dockerfile
     plan: free
-    region: frankfurt
-    branch: main
-
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/*.jar --spring.profiles.active=prod
-
     envVars:
-      - key: JAVA_VERSION
-        value: 17
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      - key: DB_URL
+        fromSecret: DB_URL
       - key: DB_USERNAME
         fromSecret: DB_USERNAME
       - key: DB_PASSWORD
         fromSecret: DB_PASSWORD
-      - key: JWT_SECRET
-        fromSecret: JWT_SECRET
+      - key: SUPABASE_URL
+        fromSecret: SUPABASE_URL
+      - key: SUPABASE_BUCKET
+        fromSecret: SUPABASE_BUCKET
       - key: SUPABASE_API_KEY
         fromSecret: SUPABASE_API_KEY
-      - key: GOOGLE_CLIENT_ID
-        fromSecret: GOOGLE_CLIENT_ID
-      - key: GOOGLE_CLIENT_SECRET
-        fromSecret: GOOGLE_CLIENT_SECRET
+    healthCheckPath: /actuator/health

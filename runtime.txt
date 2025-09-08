@@ -1,1 +1,0 @@
-buildCommand: mvn clean package -DskipTests

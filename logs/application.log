@@ -30,3 +30,400 @@
 2025-09-08 04:12:55 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-09-08 04:12:55 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2025-09-08 04:12:55 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-08T17:46:55.919+01:00  INFO 13350 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Starting MdrassaApiApplication using Java 17.0.8 with PID 13350 (/Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api/target/classes started by mahamatallatchimi in /Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api)
+2025-09-08T17:46:55.920+01:00 DEBUG 13350 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Running with Spring Boot v3.1.6, Spring v6.0.14
+2025-09-08T17:46:55.921+01:00  INFO 13350 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : The following 1 profile is active: "dev"
+2025-09-08T17:46:55.942+01:00  INFO 13350 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-08T17:46:55.942+01:00  INFO 13350 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-08T17:46:56.459+01:00  INFO 13350 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-08T17:46:56.493+01:00  INFO 13350 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 31 ms. Found 6 JPA repository interfaces.
+2025-09-08T17:46:56.800+01:00  INFO 13350 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-09-08T17:46:56.807+01:00  INFO 13350 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-08T17:46:56.807+01:00  INFO 13350 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-09-08T17:46:56.842+01:00  INFO 13350 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-08T17:46:56.842+01:00  INFO 13350 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 900 ms
+2025-09-08T17:46:56.940+01:00  INFO 13350 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-08T17:46:56.966+01:00  INFO 13350 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.13.Final
+2025-09-08T17:46:56.968+01:00  INFO 13350 --- [restartedMain] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2025-09-08T17:46:57.082+01:00  INFO 13350 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-08T17:46:57.094+01:00  INFO 13350 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-08T17:46:57.291+01:00  INFO 13350 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3f93122b
+2025-09-08T17:46:57.292+01:00  INFO 13350 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-08T17:46:57.335+01:00  WARN 13350 --- [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-08T17:46:57.777+01:00  INFO 13350 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-08T17:46:57.865+01:00  INFO 13350 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T17:46:58.004+01:00  INFO 13350 --- [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-08T17:46:58.185+01:00 DEBUG 13350 --- [restartedMain] c.k.s.config.JwtAuthenticationFilter     : Filter 'jwtAuthenticationFilter' configured for use
+2025-09-08T17:46:58.286+01:00  WARN 13350 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-08T17:46:58.331+01:00 DEBUG 13350 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialize  tentative
+2025-09-08T17:46:58.336+01:00 DEBUG 13350 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Initializing Firebase service avec configuration de fichier class path resource [firebase-service-account-key.json]
+2025-09-08T17:46:58.380+01:00 DEBUG 13350 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialized successfully!
+2025-09-08T17:46:58.610+01:00  INFO 13350 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-09-08T17:46:58.631+01:00  INFO 13350 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure Or [Mvc [pattern='/api/**']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@6d6c1981, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5ea74f86, org.springframework.security.web.context.SecurityContextHolderFilter@18baec2d, org.springframework.security.web.header.HeaderWriterFilter@16f386de, org.springframework.security.web.authentication.logout.LogoutFilter@3304f696, com.kidami.security.config.JwtAuthenticationFilter@1cef8701, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@133ef2c9, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3d3dca1, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2fb6af38, org.springframework.security.web.session.SessionManagementFilter@5c949998, org.springframework.security.web.access.ExceptionTranslationFilter@455047af, org.springframework.security.web.access.intercept.AuthorizationFilter@34a0eb09]
+2025-09-08T17:46:58.638+01:00  WARN 13350 --- [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Unsatisfied dependency expressed through method 'setFilterChains' parameter 0: Error creating bean with name 'webSecurity' defined in class path resource [com/kidami/security/config/SecurityConfig.class]: Failed to instantiate [org.springframework.security.web.SecurityFilterChain]: Factory method 'webSecurity' threw exception with message: No qualifying bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' available
+2025-09-08T17:46:58.639+01:00  INFO 13350 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T17:46:58.640+01:00  INFO 13350 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-08T17:46:58.644+01:00  INFO 13350 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-09-08T17:46:58.646+01:00  INFO 13350 --- [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-09-08T17:46:58.657+01:00  INFO 13350 --- [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-09-08T17:46:58.667+01:00 ERROR 13350 --- [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of method setFilterChains in org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration required a bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' in your configuration.
+
+2025-09-08T17:47:44.324+01:00  INFO 13520 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Starting MdrassaApiApplication using Java 17.0.8 with PID 13520 (/Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api/target/classes started by mahamatallatchimi in /Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api)
+2025-09-08T17:47:44.326+01:00 DEBUG 13520 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Running with Spring Boot v3.1.6, Spring v6.0.14
+2025-09-08T17:47:44.327+01:00  INFO 13520 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : The following 1 profile is active: "dev"
+2025-09-08T17:47:44.351+01:00  INFO 13520 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-08T17:47:44.351+01:00  INFO 13520 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-08T17:47:44.847+01:00  INFO 13520 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-08T17:47:44.882+01:00  INFO 13520 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 31 ms. Found 6 JPA repository interfaces.
+2025-09-08T17:47:45.182+01:00  INFO 13520 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-09-08T17:47:45.187+01:00  INFO 13520 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-08T17:47:45.188+01:00  INFO 13520 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-09-08T17:47:45.219+01:00  INFO 13520 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-08T17:47:45.219+01:00  INFO 13520 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 868 ms
+2025-09-08T17:47:45.316+01:00  INFO 13520 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-08T17:47:45.346+01:00  INFO 13520 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.13.Final
+2025-09-08T17:47:45.347+01:00  INFO 13520 --- [restartedMain] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2025-09-08T17:47:45.463+01:00  INFO 13520 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-08T17:47:45.476+01:00  INFO 13520 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-08T17:47:45.640+01:00  INFO 13520 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3571d2b8
+2025-09-08T17:47:45.640+01:00  INFO 13520 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-08T17:47:45.672+01:00  WARN 13520 --- [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-08T17:47:46.109+01:00  INFO 13520 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-08T17:47:46.195+01:00  INFO 13520 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T17:47:46.332+01:00  INFO 13520 --- [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-08T17:47:46.514+01:00 DEBUG 13520 --- [restartedMain] c.k.s.config.JwtAuthenticationFilter     : Filter 'jwtAuthenticationFilter' configured for use
+2025-09-08T17:47:46.610+01:00  WARN 13520 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-08T17:47:46.648+01:00 DEBUG 13520 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialize  tentative
+2025-09-08T17:47:46.653+01:00 DEBUG 13520 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Initializing Firebase service avec configuration de fichier class path resource [firebase-service-account-key.json]
+2025-09-08T17:47:46.686+01:00 DEBUG 13520 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialized successfully!
+2025-09-08T17:47:46.908+01:00  INFO 13520 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-09-08T17:47:46.930+01:00  INFO 13520 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure Or [Mvc [pattern='/api/**']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@2a7a2df4, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1e837e5b, org.springframework.security.web.context.SecurityContextHolderFilter@1b4ff335, org.springframework.security.web.header.HeaderWriterFilter@4cd9185b, org.springframework.security.web.authentication.logout.LogoutFilter@85780bd, com.kidami.security.config.JwtAuthenticationFilter@5bb6baae, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@30f4b01e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@55734243, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@78989308, org.springframework.security.web.session.SessionManagementFilter@44c5bbad, org.springframework.security.web.access.ExceptionTranslationFilter@64c1a366, org.springframework.security.web.access.intercept.AuthorizationFilter@256d36b]
+2025-09-08T17:47:46.936+01:00  WARN 13520 --- [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Unsatisfied dependency expressed through method 'setFilterChains' parameter 0: Error creating bean with name 'webSecurity' defined in class path resource [com/kidami/security/config/SecurityConfig.class]: Failed to instantiate [org.springframework.security.web.SecurityFilterChain]: Factory method 'webSecurity' threw exception with message: No qualifying bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' available
+2025-09-08T17:47:46.937+01:00  INFO 13520 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T17:47:46.939+01:00  INFO 13520 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-08T17:47:46.942+01:00  INFO 13520 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-09-08T17:47:46.944+01:00  INFO 13520 --- [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-09-08T17:47:46.955+01:00  INFO 13520 --- [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-09-08T17:47:46.966+01:00 ERROR 13520 --- [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of method setFilterChains in org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration required a bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' in your configuration.
+
+2025-09-08T18:01:53.109+01:00  INFO 13850 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Starting MdrassaApiApplication using Java 17.0.8 with PID 13850 (/Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api/target/classes started by mahamatallatchimi in /Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api)
+2025-09-08T18:01:53.110+01:00 DEBUG 13850 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Running with Spring Boot v3.1.6, Spring v6.0.14
+2025-09-08T18:01:53.111+01:00  INFO 13850 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : The following 1 profile is active: "dev"
+2025-09-08T18:01:53.130+01:00  INFO 13850 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-08T18:01:53.130+01:00  INFO 13850 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-08T18:01:53.599+01:00  INFO 13850 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-08T18:01:53.636+01:00  INFO 13850 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 32 ms. Found 6 JPA repository interfaces.
+2025-09-08T18:01:53.964+01:00  INFO 13850 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-09-08T18:01:53.971+01:00  INFO 13850 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-08T18:01:53.971+01:00  INFO 13850 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-09-08T18:01:54.003+01:00  INFO 13850 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-08T18:01:54.003+01:00  INFO 13850 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 873 ms
+2025-09-08T18:01:54.102+01:00  INFO 13850 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-08T18:01:54.128+01:00  INFO 13850 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.13.Final
+2025-09-08T18:01:54.130+01:00  INFO 13850 --- [restartedMain] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2025-09-08T18:01:54.245+01:00  INFO 13850 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-08T18:01:54.261+01:00  INFO 13850 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-08T18:01:54.453+01:00  INFO 13850 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1d8fffc6
+2025-09-08T18:01:54.454+01:00  INFO 13850 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-08T18:01:54.500+01:00  WARN 13850 --- [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-08T18:01:54.936+01:00  INFO 13850 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-08T18:01:55.025+01:00  INFO 13850 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T18:01:55.160+01:00  INFO 13850 --- [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-08T18:01:55.343+01:00 DEBUG 13850 --- [restartedMain] c.k.s.config.JwtAuthenticationFilter     : Filter 'jwtAuthenticationFilter' configured for use
+2025-09-08T18:01:55.438+01:00  WARN 13850 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-08T18:01:55.477+01:00 DEBUG 13850 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialize  tentative
+2025-09-08T18:01:55.483+01:00 DEBUG 13850 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Initializing Firebase service avec configuration de fichier class path resource [firebase-service-account-key.json]
+2025-09-08T18:01:55.517+01:00 DEBUG 13850 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialized successfully!
+2025-09-08T18:01:55.738+01:00  INFO 13850 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-09-08T18:01:55.759+01:00  INFO 13850 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure Or [Mvc [pattern='/api/**']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@39402070, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@3d56ff36, org.springframework.security.web.context.SecurityContextHolderFilter@239b55d6, org.springframework.security.web.header.HeaderWriterFilter@17ad26d, org.springframework.security.web.authentication.logout.LogoutFilter@2b416e65, com.kidami.security.config.JwtAuthenticationFilter@25c3f326, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@364f5c56, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3a11e3ce, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@4818fb29, org.springframework.security.web.session.SessionManagementFilter@cac6d1e, org.springframework.security.web.access.ExceptionTranslationFilter@75aad2c4, org.springframework.security.web.access.intercept.AuthorizationFilter@3fc77ab4]
+2025-09-08T18:01:55.766+01:00  WARN 13850 --- [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Unsatisfied dependency expressed through method 'setFilterChains' parameter 0: Error creating bean with name 'webSecurity' defined in class path resource [com/kidami/security/config/SecurityConfig.class]: Failed to instantiate [org.springframework.security.web.SecurityFilterChain]: Factory method 'webSecurity' threw exception with message: No qualifying bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' available
+2025-09-08T18:01:55.767+01:00  INFO 13850 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T18:01:55.769+01:00  INFO 13850 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-08T18:01:55.772+01:00  INFO 13850 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-09-08T18:01:55.774+01:00  INFO 13850 --- [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-09-08T18:01:55.784+01:00  INFO 13850 --- [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-09-08T18:01:55.794+01:00 ERROR 13850 --- [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of method setFilterChains in org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration required a bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' in your configuration.
+
+2025-09-08T18:02:31.238+01:00  INFO 14007 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Starting MdrassaApiApplication using Java 17.0.8 with PID 14007 (/Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api/target/classes started by mahamatallatchimi in /Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api)
+2025-09-08T18:02:31.239+01:00 DEBUG 14007 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Running with Spring Boot v3.1.6, Spring v6.0.14
+2025-09-08T18:02:31.240+01:00  INFO 14007 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : The following 1 profile is active: "dev"
+2025-09-08T18:02:31.259+01:00  INFO 14007 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-08T18:02:31.259+01:00  INFO 14007 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-08T18:02:31.729+01:00  INFO 14007 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-08T18:02:31.764+01:00  INFO 14007 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 31 ms. Found 6 JPA repository interfaces.
+2025-09-08T18:02:32.070+01:00  INFO 14007 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-09-08T18:02:32.075+01:00  INFO 14007 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-08T18:02:32.075+01:00  INFO 14007 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-09-08T18:02:32.108+01:00  INFO 14007 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-08T18:02:32.108+01:00  INFO 14007 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 849 ms
+2025-09-08T18:02:32.200+01:00  INFO 14007 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-08T18:02:32.232+01:00  INFO 14007 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.13.Final
+2025-09-08T18:02:32.234+01:00  INFO 14007 --- [restartedMain] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2025-09-08T18:02:32.345+01:00  INFO 14007 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-08T18:02:32.357+01:00  INFO 14007 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-08T18:02:32.517+01:00  INFO 14007 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2cc307b6
+2025-09-08T18:02:32.517+01:00  INFO 14007 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-08T18:02:32.548+01:00  WARN 14007 --- [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-08T18:02:32.983+01:00  INFO 14007 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-08T18:02:33.067+01:00  INFO 14007 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T18:02:33.203+01:00  INFO 14007 --- [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-08T18:02:33.383+01:00 DEBUG 14007 --- [restartedMain] c.k.s.config.JwtAuthenticationFilter     : Filter 'jwtAuthenticationFilter' configured for use
+2025-09-08T18:02:33.479+01:00  WARN 14007 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-08T18:02:33.519+01:00 DEBUG 14007 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialize  tentative
+2025-09-08T18:02:33.523+01:00 DEBUG 14007 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Initializing Firebase service avec configuration de fichier class path resource [firebase-service-account-key.json]
+2025-09-08T18:02:33.560+01:00 DEBUG 14007 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialized successfully!
+2025-09-08T18:02:33.780+01:00  INFO 14007 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-09-08T18:02:33.802+01:00  INFO 14007 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure Or [Mvc [pattern='/api/**']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@4705b17e, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@104f273, org.springframework.security.web.context.SecurityContextHolderFilter@1ada4fce, org.springframework.security.web.header.HeaderWriterFilter@a6d80f4, org.springframework.security.web.authentication.logout.LogoutFilter@4a4e131e, com.kidami.security.config.JwtAuthenticationFilter@6bbdffa4, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1d08026e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@c7241f4, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@4169c66c, org.springframework.security.web.session.SessionManagementFilter@73c77832, org.springframework.security.web.access.ExceptionTranslationFilter@60d30550, org.springframework.security.web.access.intercept.AuthorizationFilter@466004e1]
+2025-09-08T18:02:33.808+01:00  WARN 14007 --- [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Unsatisfied dependency expressed through method 'setFilterChains' parameter 0: Error creating bean with name 'webSecurity' defined in class path resource [com/kidami/security/config/SecurityConfig.class]: Failed to instantiate [org.springframework.security.web.SecurityFilterChain]: Factory method 'webSecurity' threw exception with message: No qualifying bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' available
+2025-09-08T18:02:33.809+01:00  INFO 14007 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T18:02:33.811+01:00  INFO 14007 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-08T18:02:33.814+01:00  INFO 14007 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-09-08T18:02:33.815+01:00  INFO 14007 --- [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-09-08T18:02:33.827+01:00  INFO 14007 --- [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-09-08T18:02:33.838+01:00 ERROR 14007 --- [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of method setFilterChains in org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration required a bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.security.oauth2.client.registration.ClientRegistrationRepository' in your configuration.
+
+2025-09-08T18:06:49.228+01:00  INFO 14305 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Starting MdrassaApiApplication using Java 17.0.8 with PID 14305 (/Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api/target/classes started by mahamatallatchimi in /Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api)
+2025-09-08T18:06:49.229+01:00 DEBUG 14305 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Running with Spring Boot v3.1.6, Spring v6.0.14
+2025-09-08T18:06:49.229+01:00  INFO 14305 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : The following 1 profile is active: "dev"
+2025-09-08T18:06:49.248+01:00  INFO 14305 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-08T18:06:49.248+01:00  INFO 14305 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-08T18:06:49.722+01:00  INFO 14305 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-08T18:06:49.757+01:00  INFO 14305 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 31 ms. Found 6 JPA repository interfaces.
+2025-09-08T18:06:50.068+01:00  INFO 14305 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-09-08T18:06:50.073+01:00  INFO 14305 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-08T18:06:50.074+01:00  INFO 14305 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-09-08T18:06:50.109+01:00  INFO 14305 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-08T18:06:50.109+01:00  INFO 14305 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 861 ms
+2025-09-08T18:06:50.206+01:00  INFO 14305 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-08T18:06:50.233+01:00  INFO 14305 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.13.Final
+2025-09-08T18:06:50.235+01:00  INFO 14305 --- [restartedMain] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2025-09-08T18:06:50.347+01:00  INFO 14305 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-08T18:06:50.359+01:00  INFO 14305 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-08T18:06:50.514+01:00  INFO 14305 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2a0e4a81
+2025-09-08T18:06:50.514+01:00  INFO 14305 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-08T18:06:50.543+01:00  WARN 14305 --- [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-08T18:06:50.987+01:00  INFO 14305 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-08T18:06:51.073+01:00  INFO 14305 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T18:06:51.212+01:00  INFO 14305 --- [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-08T18:06:51.408+01:00 DEBUG 14305 --- [restartedMain] c.k.s.config.JwtAuthenticationFilter     : Filter 'jwtAuthenticationFilter' configured for use
+2025-09-08T18:06:51.506+01:00  WARN 14305 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-08T18:06:51.547+01:00 DEBUG 14305 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialize  tentative
+2025-09-08T18:06:51.553+01:00 DEBUG 14305 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Initializing Firebase service avec configuration de fichier class path resource [firebase-service-account-key.json]
+2025-09-08T18:06:51.587+01:00 DEBUG 14305 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialized successfully!
+2025-09-08T18:06:51.806+01:00  INFO 14305 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-09-08T18:06:51.827+01:00  INFO 14305 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure Or [Mvc [pattern='/api/**']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@61df7bbc, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5f10416d, org.springframework.security.web.context.SecurityContextHolderFilter@5b244d2d, org.springframework.security.web.header.HeaderWriterFilter@ea5c5de, org.springframework.security.web.authentication.logout.LogoutFilter@3ec3a2b6, com.kidami.security.config.JwtAuthenticationFilter@2539d13a, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@72d5a7b8, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@5f91093d, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@734085ce, org.springframework.security.web.session.SessionManagementFilter@5ca547b5, org.springframework.security.web.access.ExceptionTranslationFilter@15ac3921, org.springframework.security.web.access.intercept.AuthorizationFilter@5b8cbfbd]
+2025-09-08T18:06:51.833+01:00  INFO 14305 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@510836ef, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@881f48a, org.springframework.security.web.context.SecurityContextHolderFilter@19420233, org.springframework.security.web.header.HeaderWriterFilter@24dfe310, org.springframework.security.web.authentication.logout.LogoutFilter@39371854, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@50fc611c, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@cbb69af, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6bf17efd, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@5d773a2, org.springframework.security.web.access.ExceptionTranslationFilter@55f64b7e, org.springframework.security.web.access.intercept.AuthorizationFilter@e707565]
+2025-09-08T18:06:51.986+01:00  INFO 14305 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-09-08T18:06:52.018+01:00  INFO 14305 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2025-09-08T18:06:52.029+01:00  INFO 14305 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Started MdrassaApiApplication in 2.979 seconds (process running for 3.177)
+2025-09-08T18:07:24.324+01:00  INFO 14305 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-08T18:07:24.325+01:00  INFO 14305 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-09-08T18:07:24.334+01:00  INFO 14305 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 9 ms
+2025-09-08T18:07:24.347+01:00  WARN 14305 --- [http-nio-8080-exec-1] o.s.w.s.h.HandlerMappingIntrospector     : Cache miss for REQUEST dispatch to '/swagger-ui/index.html' (previous null). Performing MatchableHandlerMapping lookup. This is logged once only at WARN level, and every time at TRACE.
+2025-09-08T18:07:24.353+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/index.html
+2025-09-08T18:07:24.391+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/index.html
+2025-09-08T18:07:24.420+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.465+01:00 DEBUG 14305 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui-standalone-preset.js
+2025-09-08T18:07:24.466+01:00 DEBUG 14305 --- [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-initializer.js
+2025-09-08T18:07:24.465+01:00 DEBUG 14305 --- [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/index.css
+2025-09-08T18:07:24.471+01:00 DEBUG 14305 --- [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/index.css
+2025-09-08T18:07:24.472+01:00 DEBUG 14305 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui-bundle.js
+2025-09-08T18:07:24.465+01:00 DEBUG 14305 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui.css
+2025-09-08T18:07:24.472+01:00 DEBUG 14305 --- [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-initializer.js
+2025-09-08T18:07:24.472+01:00 DEBUG 14305 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui-standalone-preset.js
+2025-09-08T18:07:24.475+01:00 DEBUG 14305 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui-bundle.js
+2025-09-08T18:07:24.477+01:00 DEBUG 14305 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui.css
+2025-09-08T18:07:24.479+01:00 DEBUG 14305 --- [http-nio-8080-exec-3] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.487+01:00 DEBUG 14305 --- [http-nio-8080-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.493+01:00 DEBUG 14305 --- [http-nio-8080-exec-6] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.507+01:00 DEBUG 14305 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui-standalone-preset.js
+2025-09-08T18:07:24.525+01:00 DEBUG 14305 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui-standalone-preset.js
+2025-09-08T18:07:24.531+01:00 DEBUG 14305 --- [http-nio-8080-exec-4] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.535+01:00 DEBUG 14305 --- [http-nio-8080-exec-7] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.554+01:00 DEBUG 14305 --- [http-nio-8080-exec-5] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.693+01:00 DEBUG 14305 --- [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /v3/api-docs/swagger-config
+2025-09-08T18:07:24.696+01:00 DEBUG 14305 --- [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /v3/api-docs/swagger-config
+2025-09-08T18:07:24.711+01:00 DEBUG 14305 --- [http-nio-8080-exec-8] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.724+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /v3/api-docs
+2025-09-08T18:07:24.724+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /v3/api-docs
+2025-09-08T18:07:24.724+01:00  WARN 14305 --- [http-nio-8080-exec-9] c.k.s.config.JwtAuthenticationFilter     : JWT Token is missing for URI: /v3/api-docs
+2025-09-08T18:07:24.939+01:00 DEBUG 14305 --- [http-nio-8080-exec-10] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui-bundle.js
+2025-09-08T18:07:24.942+01:00 DEBUG 14305 --- [http-nio-8080-exec-10] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui-bundle.js
+2025-09-08T18:07:24.942+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-initializer.js
+2025-09-08T18:07:24.944+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-initializer.js
+2025-09-08T18:07:24.947+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.956+01:00 DEBUG 14305 --- [http-nio-8080-exec-10] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:07:24.999+01:00  INFO 14305 --- [http-nio-8080-exec-9] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 266 ms
+2025-09-08T18:07:25.011+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:23:45.751+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/cours/getAllCours
+2025-09-08T18:23:45.970+01:00 ERROR 14305 --- [http-nio-8080-exec-1] c.k.s.config.JwtAuthenticationFilter     : JWT Authentication failed: JWT expired 150962967 milliseconds ago at 2025-09-06T23:27:43.000Z. Current time: 2025-09-08T17:23:45.967Z. Allowed clock skew: 0 milliseconds.
+2025-09-08T18:23:45.988+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:27:01.027+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/login
+2025-09-08T18:27:01.041+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T18:27:01.048+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/login
+2025-09-08T18:27:01.823+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2025-09-08T18:29:03.680+01:00 DEBUG 14305 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /api/cours/getAllCours
+2025-09-08T18:29:03.868+01:00 DEBUG 14305 --- [http-nio-8080-exec-7] c.k.s.config.JwtAuthenticationFilter     : Authenticated user: lamine@gmail.com
+2025-09-08T18:29:03.870+01:00 DEBUG 14305 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /api/cours/getAllCours
+2025-09-08T18:29:03.873+01:00 DEBUG 14305 --- [http-nio-8080-exec-7] c.k.s.services.impl.CourServiceImpl      : Tentative de récupération de tous les cours
+2025-09-08T18:29:03.892+01:00  INFO 14305 --- [http-nio-8080-exec-7] c.k.s.services.impl.CourServiceImpl      : 2 cours récupérés avec succès
+2025-09-08T18:29:36.729+01:00 DEBUG 14305 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /api/cours/courtDetails/1
+2025-09-08T18:29:36.839+01:00 DEBUG 14305 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/lessons/byCourse/1
+2025-09-08T18:29:36.949+01:00 DEBUG 14305 --- [http-nio-8080-exec-2] c.k.s.config.JwtAuthenticationFilter     : Authenticated user: lamine@gmail.com
+2025-09-08T18:29:36.950+01:00 DEBUG 14305 --- [http-nio-8080-exec-6] c.k.s.config.JwtAuthenticationFilter     : Authenticated user: lamine@gmail.com
+2025-09-08T18:29:36.951+01:00 DEBUG 14305 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /api/lessons/byCourse/1
+2025-09-08T18:29:36.951+01:00 DEBUG 14305 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /api/cours/courtDetails/1
+2025-09-08T18:29:36.958+01:00 DEBUG 14305 --- [http-nio-8080-exec-6] c.k.s.services.impl.CourServiceImpl      : Tentative de récupération du cours avec ID: 1
+2025-09-08T18:29:36.959+01:00 DEBUG 14305 --- [http-nio-8080-exec-2] c.k.s.services.impl.LessonServiceImpl    : Tentative de récupération des Lesçons  de cour ID: 1
+2025-09-08T18:29:36.980+01:00  INFO 14305 --- [http-nio-8080-exec-2] c.k.s.services.impl.LessonServiceImpl    : 1 Tous les lessons récupérés de cours sont 
+2025-09-08T18:29:36.992+01:00  INFO 14305 --- [http-nio-8080-exec-6] c.k.s.services.impl.CourServiceImpl      : Cours récupéré avec succès: Formation en flutter
+2025-09-08T18:30:03.764+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/LessonVideoItem/byLesson/1
+2025-09-08T18:30:03.817+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] c.k.s.config.JwtAuthenticationFilter     : Authenticated user: lamine@gmail.com
+2025-09-08T18:30:03.820+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /api/LessonVideoItem/byLesson/1
+2025-09-08T18:30:03.830+01:00 DEBUG 14305 --- [http-nio-8080-exec-1] c.k.s.s.impl.LessonVideoItemServiceImpl  : Tentative de recuperation de la  liste des video items par leçon  ID: 1
+2025-09-08T18:30:03.896+01:00  INFO 14305 --- [http-nio-8080-exec-1] c.k.s.s.impl.LessonVideoItemServiceImpl  : Video items  recuprer par lesçon sont au nombre de : 6
+2025-09-08T18:30:08.752+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /api/LessonVideoItem/byLesson/1
+2025-09-08T18:30:08.787+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] c.k.s.config.JwtAuthenticationFilter     : Authenticated user: lamine@gmail.com
+2025-09-08T18:30:08.791+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /api/LessonVideoItem/byLesson/1
+2025-09-08T18:30:08.793+01:00 DEBUG 14305 --- [http-nio-8080-exec-9] c.k.s.s.impl.LessonVideoItemServiceImpl  : Tentative de recuperation de la  liste des video items par leçon  ID: 1
+2025-09-08T18:30:08.798+01:00  INFO 14305 --- [http-nio-8080-exec-9] c.k.s.s.impl.LessonVideoItemServiceImpl  : Video items  recuprer par lesçon sont au nombre de : 6
+2025-09-08T18:41:53.347+01:00  WARN 14305 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m32s306ms).
+2025-09-08T18:54:10.173+01:00  INFO 14305 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T18:54:10.210+01:00  INFO 14305 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-08T18:54:10.259+01:00  INFO 14305 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-09-08T21:28:42.273+01:00  INFO 37540 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Starting MdrassaApiApplication using Java 17.0.8 with PID 37540 (/Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api/target/classes started by mahamatallatchimi in /Users/mahamatallatchimi/Documents/WorkSpaces/spring/mdrassa/api)
+2025-09-08T21:28:42.274+01:00 DEBUG 37540 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Running with Spring Boot v3.1.6, Spring v6.0.14
+2025-09-08T21:28:42.275+01:00  INFO 37540 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : The following 1 profile is active: "dev"
+2025-09-08T21:28:42.298+01:00  INFO 37540 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-08T21:28:42.298+01:00  INFO 37540 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-08T21:28:42.802+01:00  INFO 37540 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-08T21:28:42.839+01:00  INFO 37540 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 33 ms. Found 6 JPA repository interfaces.
+2025-09-08T21:28:43.139+01:00  INFO 37540 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-09-08T21:28:43.151+01:00  INFO 37540 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-09-08T21:28:43.152+01:00  INFO 37540 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-09-08T21:28:43.187+01:00  INFO 37540 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-09-08T21:28:43.187+01:00  INFO 37540 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 889 ms
+2025-09-08T21:28:43.291+01:00  INFO 37540 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-08T21:28:43.320+01:00  INFO 37540 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.13.Final
+2025-09-08T21:28:43.322+01:00  INFO 37540 --- [restartedMain] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2025-09-08T21:28:43.437+01:00  INFO 37540 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-08T21:28:43.450+01:00  INFO 37540 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-09-08T21:28:43.674+01:00  INFO 37540 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5fecfb12
+2025-09-08T21:28:43.675+01:00  INFO 37540 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-09-08T21:28:43.735+01:00  WARN 37540 --- [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-08T21:28:44.178+01:00  INFO 37540 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-08T21:28:44.308+01:00  INFO 37540 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T21:28:44.451+01:00  INFO 37540 --- [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-08T21:28:44.642+01:00 DEBUG 37540 --- [restartedMain] c.k.s.config.JwtAuthenticationFilter     : Filter 'jwtAuthenticationFilter' configured for use
+2025-09-08T21:28:44.740+01:00  WARN 37540 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-08T21:28:44.781+01:00 DEBUG 37540 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialize  tentative
+2025-09-08T21:28:44.786+01:00 DEBUG 37540 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Initializing Firebase service avec configuration de fichier class path resource [firebase-service-account-key.json]
+2025-09-08T21:28:44.819+01:00 DEBUG 37540 --- [restartedMain] c.k.s.services.impl.FirebaseService      : Firebase initialized successfully!
+2025-09-08T21:28:45.041+01:00  INFO 37540 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-09-08T21:28:45.062+01:00  INFO 37540 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure Or [Mvc [pattern='/api/**']] with [org.springframework.security.web.session.DisableEncodeUrlFilter@60fe9bcd, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@101fa9ef, org.springframework.security.web.context.SecurityContextHolderFilter@7252ba46, org.springframework.security.web.header.HeaderWriterFilter@8996eb8, org.springframework.security.web.authentication.logout.LogoutFilter@25ecf595, com.kidami.security.config.JwtAuthenticationFilter@1cf9fff1, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7919aaba, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@40a8889, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@8a38800, org.springframework.security.web.session.SessionManagementFilter@4f01c48e, org.springframework.security.web.access.ExceptionTranslationFilter@640ab863, org.springframework.security.web.access.intercept.AuthorizationFilter@39692f02]
+2025-09-08T21:28:45.067+01:00  INFO 37540 --- [restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1b709422, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7997daa, org.springframework.security.web.context.SecurityContextHolderFilter@2c4b6b58, org.springframework.security.web.header.HeaderWriterFilter@43b69117, org.springframework.security.web.authentication.logout.LogoutFilter@58224827, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@51d99d4e, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@412efe84, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@580deb03, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@39e94f65, org.springframework.security.web.access.ExceptionTranslationFilter@dc28f05, org.springframework.security.web.access.intercept.AuthorizationFilter@592cec50]
+2025-09-08T21:28:45.225+01:00  INFO 37540 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-09-08T21:28:45.261+01:00  INFO 37540 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2025-09-08T21:28:45.272+01:00  INFO 37540 --- [restartedMain] c.kidami.security.MdrassaApiApplication  : Started MdrassaApiApplication in 3.178 seconds (process running for 3.415)
+2025-09-08T21:29:11.141+01:00  INFO 37540 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-08T21:29:11.141+01:00  INFO 37540 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-09-08T21:29:11.150+01:00  INFO 37540 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 9 ms
+2025-09-08T21:29:11.192+01:00  WARN 37540 --- [http-nio-8080-exec-1] o.s.w.s.h.HandlerMappingIntrospector     : Cache miss for REQUEST dispatch to '/swagger-ui/index.html' (previous null). Performing MatchableHandlerMapping lookup. This is logged once only at WARN level, and every time at TRACE.
+2025-09-08T21:29:11.222+01:00 DEBUG 37540 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/index.html
+2025-09-08T21:29:11.245+01:00 DEBUG 37540 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/index.html
+2025-09-08T21:29:11.276+01:00 DEBUG 37540 --- [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.329+01:00 DEBUG 37540 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui.css
+2025-09-08T21:29:11.329+01:00 DEBUG 37540 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui-bundle.js
+2025-09-08T21:29:11.335+01:00 DEBUG 37540 --- [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/index.css
+2025-09-08T21:29:11.335+01:00 DEBUG 37540 --- [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui.css
+2025-09-08T21:29:11.336+01:00 DEBUG 37540 --- [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui-standalone-preset.js
+2025-09-08T21:29:11.336+01:00 DEBUG 37540 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-initializer.js
+2025-09-08T21:29:11.337+01:00 DEBUG 37540 --- [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/index.css
+2025-09-08T21:29:11.338+01:00 DEBUG 37540 --- [http-nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui-bundle.js
+2025-09-08T21:29:11.342+01:00 DEBUG 37540 --- [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui-standalone-preset.js
+2025-09-08T21:29:11.341+01:00 DEBUG 37540 --- [http-nio-8080-exec-3] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.343+01:00 DEBUG 37540 --- [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-initializer.js
+2025-09-08T21:29:11.344+01:00 DEBUG 37540 --- [http-nio-8080-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.382+01:00 DEBUG 37540 --- [http-nio-8080-exec-5] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.410+01:00 DEBUG 37540 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui-standalone-preset.js
+2025-09-08T21:29:11.414+01:00 DEBUG 37540 --- [http-nio-8080-exec-4] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.419+01:00 DEBUG 37540 --- [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-ui-bundle.js
+2025-09-08T21:29:11.419+01:00 DEBUG 37540 --- [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui-standalone-preset.js
+2025-09-08T21:29:11.423+01:00 DEBUG 37540 --- [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-ui-bundle.js
+2025-09-08T21:29:11.429+01:00 DEBUG 37540 --- [http-nio-8080-exec-7] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.445+01:00 DEBUG 37540 --- [http-nio-8080-exec-6] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.450+01:00 DEBUG 37540 --- [http-nio-8080-exec-8] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.577+01:00 DEBUG 37540 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /v3/api-docs/swagger-config
+2025-09-08T21:29:11.580+01:00 DEBUG 37540 --- [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /v3/api-docs/swagger-config
+2025-09-08T21:29:11.600+01:00 DEBUG 37540 --- [http-nio-8080-exec-9] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:11.614+01:00 DEBUG 37540 --- [http-nio-8080-exec-10] o.s.security.web.FilterChainProxy        : Securing GET /v3/api-docs
+2025-09-08T21:29:11.615+01:00 DEBUG 37540 --- [http-nio-8080-exec-10] o.s.security.web.FilterChainProxy        : Secured GET /v3/api-docs
+2025-09-08T21:29:11.615+01:00  WARN 37540 --- [http-nio-8080-exec-10] c.k.s.config.JwtAuthenticationFilter     : JWT Token is missing for URI: /v3/api-docs
+2025-09-08T21:29:11.904+01:00  INFO 37540 --- [http-nio-8080-exec-10] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 270 ms
+2025-09-08T21:29:11.918+01:00 DEBUG 37540 --- [http-nio-8080-exec-10] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:29:13.641+01:00 DEBUG 37540 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /swagger-ui/swagger-initializer.js
+2025-09-08T21:29:13.645+01:00 DEBUG 37540 --- [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /swagger-ui/swagger-initializer.js
+2025-09-08T21:29:13.649+01:00 DEBUG 37540 --- [http-nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2025-09-08T21:30:21.073+01:00  INFO 37540 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-08T21:30:21.079+01:00  INFO 37540 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-09-08T21:30:21.093+01:00  INFO 37540 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
