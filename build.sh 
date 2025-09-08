@@ -2,10 +2,19 @@
 
 echo "Building Spring Boot application for production..."
 
-# Clean and build
+# Clean et build du projet Maven
 ./mvnw clean package -DskipTests
 
-# Build Docker image
+# Vérifier si le jar existe
+JAR_FILE=$(ls target/*.jar | head -n 1)
+if [ ! -f "$JAR_FILE" ]; then
+    echo "Erreur: Le fichier JAR n'a pas été généré."
+    exit 1
+fi
+
+echo "Jar trouvé: $JAR_FILE"
+
+# Build de l'image Docker
 docker build -t mdrassa-api .
 
-echo "Build completed! Ready for deployment."
+echo "Build Docker terminé !"
