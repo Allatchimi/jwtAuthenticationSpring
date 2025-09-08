@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: madarassa
+    env: java
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDirectory: .
+    runtime: java
+    javaVersion: 17
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar --spring.profiles.active=prod
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_USERNAME
+        fromSecret: DB_USERNAME
+      - key: DB_PASSWORD
+        fromSecret: DB_PASSWORD
+      - key: JWT_SECRET
+        fromSecret: JWT_SECRET
+      - key: SUPABASE_API_KEY
+        fromSecret: SUPABASE_API_KEY
+      - key: GOOGLE_CLIENT_ID
+        fromSecret: GOOGLE_CLIENT_ID
+      - key: GOOGLE_CLIENT_SECRET
+        fromSecret: GOOGLE_CLIENT_SECRET

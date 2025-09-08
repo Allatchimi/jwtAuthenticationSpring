@@ -1,0 +1,103 @@
+package com.kidami.security.controllers;
+
+import com.kidami.security.services.StorageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api")
+public class FileUploadController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
+
+    @Autowired
+    private StorageService storageService;
+
+    @Operation(summary = "Uploader un fichier", security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<?> uploadFile(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        logger.info("Upload attempt by user: {}", userDetails.getUsername());
+
+        try {
+            String fileUrl = storageService.saveFile(file);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Fichier uploadé avec succès");
+            response.put("url", fileUrl);
+            response.put("filename", fileUrl.substring(fileUrl.lastIndexOf("/") + 1));
+
+            logger.info("File uploaded successfully: {}", fileUrl);
+            return ResponseEntity.ok(response);
+
+        } catch (IOException e) {
+            logger.error("Upload error: {}", e.getMessage());
+
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @Operation(summary = "Télécharger un fichier")
+    @GetMapping("/videos/{filename:.+}")
+    public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+        try {
+            Resource file = storageService.loadFile(filename);
+
+            String contentType = determineContentType(filename);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, contentType)
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "inline; filename=\"" + filename + "\"")
+                    .body(file);
+
+        } catch (IOException e) {
+            logger.error("File not found: {}", filename);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Lister les fichiers")
+    @GetMapping("/videos")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<?> listFiles() {
+        try {
+            return ResponseEntity.ok(storageService.listFiles());
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Erreur lors du listing des fichiers");
+        }
+    }
+
+    private String determineContentType(String filename) {
+        if (filename.endsWith(".mp4")) return "video/mp4";
+        if (filename.endsWith(".mov")) return "video/quicktime";
+        if (filename.endsWith(".avi")) return "video/x-msvideo";
+        if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) return "image/jpeg";
+        if (filename.endsWith(".png")) return "image/png";
+        if (filename.endsWith(".gif")) return "image/gif";
+        return "application/octet-stream";
+    }
+}

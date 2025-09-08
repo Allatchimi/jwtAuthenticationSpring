@@ -59,7 +59,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<?>> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
         try {
             AuthResponseDto authResponseDto = authService.login(loginDTO,request);
             // logger.info("User authenticated successfully: {}", loginDTO.getEmail());

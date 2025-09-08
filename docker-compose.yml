@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  app:
+    image: kidami-app
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://db:5432/madarassa
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=supabase_password
+      - JWT_SECRET=your-jwt-secret
+      - SUPABASE_API_KEY=your-supabase-key
+    ports:
+      - "8080:8080"

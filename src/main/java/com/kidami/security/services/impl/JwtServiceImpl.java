@@ -91,8 +91,6 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-
-
     @Override
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
