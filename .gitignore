@@ -42,7 +42,6 @@ application.properties
 # Secrets
 application-dev.yml
 application.yml
-application-prod.yml
 *.key
 *.p12
 *.jks
