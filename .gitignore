@@ -46,6 +46,8 @@ application.yml
 *.p12
 *.jks
 
+logback-spring.xml
+
 # Environnements
 .env
 .env.local
