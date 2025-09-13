@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class LessonDelete {
     private String message;
     private String deletedLessonName;
-    private Integer deletedLessonId;
+    private Long deletedLessonId;
 }

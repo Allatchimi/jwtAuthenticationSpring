@@ -1,4 +1,5 @@
 package com.kidami.security.controllers;
+import com.kidami.security.dto.courDTO.CourSaveDTO;
 import com.kidami.security.dto.lessonDTO.LessonDTO;
 import com.kidami.security.dto.lessonDTO.LessonDelete;
 import com.kidami.security.dto.lessonDTO.LessonSaveDTO;
@@ -7,13 +8,21 @@ import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.LessonService;
 import com.kidami.security.utils.ResponseUtil;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/lessons")
 public class LessonController {
@@ -24,10 +33,20 @@ public class LessonController {
         this.lessonService = lessonService;
     }
 
-    @PostMapping("/addLesson")
-    public ResponseEntity<ApiResponse<LessonDTO>> addLesson(@RequestBody LessonSaveDTO lessonSaveDTO){
-
-         LessonDTO lessonDTO = lessonService.addLesson(lessonSaveDTO);
+    @PostMapping(value = "/addLesson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
+    public ResponseEntity<ApiResponse<LessonDTO>> addLesson(
+            @Parameter(
+                    description = "Données du Lesson",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LessonSaveDTO.class))
+            )
+            @RequestPart("lessonSaveDTO") LessonSaveDTO lessonSaveDTO,
+            @Parameter(description = "Fichier thumbnail du Lesson",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
+    ){
+        log.info("addLesson a add lesson");
+         LessonDTO lessonDTO = lessonService.addLesson(lessonSaveDTO, imageFile);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.created("created lesson succes", lessonDTO,null));
     }
 
@@ -43,7 +62,7 @@ public class LessonController {
     }
 
     @GetMapping("/byCourse/{courId}")
-    public ResponseEntity<ApiResponse<List<LessonDTO>>> getLessonsByCourseId(@PathVariable Integer courId) {
+    public ResponseEntity<ApiResponse<List<LessonDTO>>> getLessonsByCourseId(@PathVariable Long courId) {
        List<LessonDTO>  lessonDTOList = lessonService.getLessonsByCourId(courId);
         return ResponseEntity.ok(ResponseUtil.success("retrived lesson",lessonDTOList,null));
     }
@@ -61,7 +80,7 @@ public class LessonController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<LessonDelete>> deleteLesson(@PathVariable(value="id") Integer id){
+    public ResponseEntity<ApiResponse<LessonDelete>> deleteLesson(@PathVariable(value="id") Long id){
         try {
             LessonDelete deleteResponse = lessonService.deleteLesson(id);
             return ResponseEntity.ok(ResponseUtil.success("Lesson deleted successfully", deleteResponse, null));

@@ -1,6 +1,7 @@
 package com.kidami.security.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -19,7 +20,7 @@ import java.util.Objects;
 public class LessonVideoItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @NotBlank(message = "Le nom est obligatoire")
     @Size(min = 2, max = 255, message = "Le nom doit contenir entre 2 et 255 caractères")
     @Column(nullable = false, length = 255)
@@ -32,6 +33,7 @@ public class LessonVideoItem {
     // Ajouter la durée et l'ordre
     private Integer duration; // en secondes
     private Integer orderIndex; // ordre d'affichage
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id", nullable = false)
     @JsonBackReference // ← Évite les boucles JSON

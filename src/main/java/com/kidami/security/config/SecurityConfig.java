@@ -65,7 +65,8 @@ public class SecurityConfig {
                                 "/scalar/**",
                                 "/scalar-ui/**",
                                 "/docs/**",
-                                "/favicon.ico"
+                                "/favicon.ico",
+                                "/error"
                         ).permitAll()
                         .requestMatchers("/api/images/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -89,7 +90,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
     @Bean
     @Order(2)
     public SecurityFilterChain webSecurity(HttpSecurity http) throws Exception {
@@ -108,7 +108,9 @@ public class SecurityConfig {
                                 "/configuration/**",
                                 "/webjars/**",
                                 "/docs/**",
-                                "/scalar/**"
+                                "/favicon.ico",
+                                "/error",
+                                "/scalar", "/scalar/**"
                         ).permitAll()
                        // .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/docs/**", "/scalar/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

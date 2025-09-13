@@ -4,13 +4,10 @@ import com.kidami.security.dto.courDTO.CourDTO;
 import com.kidami.security.dto.courDTO.CourDeteailDTO;
 import com.kidami.security.dto.courDTO.CourSaveDTO;
 import com.kidami.security.dto.courDTO.CourUpdateDTO;
-import com.kidami.security.models.Cour;
+import com.kidami.security.dto.enrollementDTO.EnrollementDTO;
 import com.kidami.security.models.Enrollment;
-import com.kidami.security.models.User;
-import com.kidami.security.repository.UserRepository;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.CourService;
-import com.kidami.security.services.StorageService;
 import com.kidami.security.utils.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,31 +21,25 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/cours")
 public class CourController {
 
     private final CourService courService;
-    private final StorageService storageService;
-    private final UserRepository userRepository;
 
-    public CourController(CourService courService, StorageService storageService, UserRepository userRepository) {
+    public CourController(CourService courService) {
         this.courService = courService;
-        this.storageService = storageService;
-        this.userRepository = userRepository;
     }
 
-
     @Operation(summary = "Uploader cour avec un fichier", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/creatCour", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public ResponseEntity<ApiResponse<CourDTO>> saveCour(
             @Parameter(
@@ -60,13 +51,9 @@ public class CourController {
                     content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
             @RequestPart("file") MultipartFile file,
             Authentication authentication){
-        log.info("Content-Type de la requête: {}", courSaveDTO);
-        log.info("Fichier reçu: name={}, size={}, content-type={}",
-                file.getName(), file.getSize(), file.getContentType());
         String teacherName = authentication.getName();
-        log.info("user added teacher name: " + teacherName);
+        log.info("user added teacher name: {}", teacherName);
         CourDTO courDTO = courService.addCour(courSaveDTO,teacherName ,file);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.success("Course added successfully",courDTO,null));
     }
 
@@ -82,7 +69,7 @@ public class CourController {
     }
 
     @GetMapping("/courtDetails/{id}")
-    ResponseEntity<ApiResponse<CourDeteailDTO>> getCour(@PathVariable(value="id") Integer courId) {
+    ResponseEntity<ApiResponse<CourDeteailDTO>> getCour(@PathVariable(value="id") Long courId) {
         CourDeteailDTO cour = courService.courtDetails(courId);
         return ResponseEntity.ok(ResponseUtil.success("Course retrieved successfully",cour,null));
     }
@@ -105,22 +92,30 @@ public class CourController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<Cour>> getPopularCourses() {
-        return ResponseEntity.ok(courService.getPopularCourses());
+    public ResponseEntity<ApiResponse<List<CourDTO>>> getPopularCourses() {
+        List<CourDTO> courDTOS = courService.getPopularCourses();
+        return ResponseEntity.ok(ResponseUtil.success("Popular courses retrieved successfully", courDTOS, null));
     }
+
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/{courseId}/enroll")
-    public ResponseEntity<Enrollment> enrollToCourse(@PathVariable Long courseId,
-                                                     Principal principal) {
+    public ResponseEntity<ApiResponse<Enrollment>> enrollToCourse(@PathVariable Long courseId,
+                                                     Authentication principal) {
         Enrollment enrollment = courService.enrollToCourse(courseId, principal.getName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(enrollment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.success("Course enrolled successfully", enrollment, null));
     }
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/my-courses")
-    public ResponseEntity<List<Cour>> getMyCourses(Principal principal) {
-        return ResponseEntity.ok(courService.getUserCourses(principal.getName()));
+    public ResponseEntity<ApiResponse<List<EnrollementDTO>>> getMyCourses(Authentication principal) {
+        List<EnrollementDTO> enrollementDTOS = courService.getUserCourses(principal.getName());
+        return ResponseEntity.ok(ResponseUtil.success("My courses retrieved successfully", enrollementDTOS, null));
     }
 
-
+    @PreAuthorize("hasRole('TEACHER')")
+    @GetMapping("/teacher-courses")
+    public ResponseEntity<ApiResponse<List<CourDTO>>> getTeacherCourse(Authentication principal) {
+        List<CourDTO> courDTOS = courService.getTeacherCourses(principal.getName());
+        return ResponseEntity.ok(ResponseUtil.success("Teacher courses retrieved successfully", courDTOS, null));
+    }
 }

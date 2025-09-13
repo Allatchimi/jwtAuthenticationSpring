@@ -4,12 +4,11 @@ import lombok.Data;
 
 @Data
 public class LessonVideoItemDTO {
-    private Integer id;
+    private Long id;
     private String name;
     private String url;
     private String thumbnail;
     private Integer duration;
     private Integer orderIndex;
-    private Integer lessonId;
-
+    private Long lessonId;
 }

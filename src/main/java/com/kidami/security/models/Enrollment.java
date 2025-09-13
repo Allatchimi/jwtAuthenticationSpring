@@ -19,15 +19,12 @@ public class Enrollment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
     @JoinColumn(name = "student_id")
     private User student;
-
     @ManyToOne
     @JoinColumn(name = "cour_id")
     private Cour cour;
-
     private LocalDateTime enrollmentDate;
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus; // PENDING, COMPLETED, FAILED

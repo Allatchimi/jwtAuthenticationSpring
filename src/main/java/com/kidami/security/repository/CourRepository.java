@@ -10,12 +10,11 @@ import java.util.Optional;
 
 public interface CourRepository extends JpaRepository<Cour, Long> {
 
-    Optional<Cour> findById(Integer id);
-    boolean existsById(Integer id);
+    Optional<Cour> findById(Long id);
+    boolean existsById(Long id);
     boolean existsByName(String name);
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Cour c WHERE c.name = :name AND c.id != :id")
-    boolean existsByNameAndIdNot(@Param("name") String name, @Param("id") Integer id);
-
+    boolean existsByNameAndIdNot(@Param("name") String name, @Param("id") Long id);
     List<Cour> findByTeacher(User teacher);
     List<Cour> findTop10ByOrderByEnrollmentCountDesc();
 

@@ -17,7 +17,6 @@ public interface LessonMapper {
     @Mapping(source = "videos", target = "videos")
     LessonDTO toDTO(Lesson lesson);
 
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "cour", ignore = true)
     @Mapping(target = "videos", ignore = true)

@@ -17,7 +17,7 @@ public class CourSaveDTO {
     private Integer downNum;
     private Integer follow;
     @NotNull(message = "L'ID de catégorie est obligatoire")
-    private Integer categorieId; // ID de la catégorie, pas l'objet complet
+    private Long categorieId; // ID de la catégorie, pas l'objet complet
     private String userToken;
     @NotBlank(message = "Le nom est obligatoire")
     @Size(max = 100, message = "Le nom ne doit pas dépasser 100 caractères")

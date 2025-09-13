@@ -38,6 +38,7 @@ build/
 application.properties
 /log/
 /scripts/
+uploads/**
 
 # Secrets
 application-dev.yml

@@ -11,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LessonDTO {
-    private Integer id;
+    private Long id;
     private String name;
-    private Integer courId;
+    private Long courId;
     private String courName; // ← Ajouter le nom du cours pour l'affichage
     private String thumbnail;
     private String description;

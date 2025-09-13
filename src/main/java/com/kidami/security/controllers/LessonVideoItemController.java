@@ -23,7 +23,7 @@ public class LessonVideoItemController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<LessonVideoItemDTO>> addLessonVideoItem(
-            @RequestParam Integer lessonId,
+            @RequestParam Long lessonId,
             @RequestBody LessonVideoItemSaveDTO lessonVideoItemSaveDTO) {
         LessonVideoItemDTO response = lessonVideoItemService.addLessonVideoItem(lessonId, lessonVideoItemSaveDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.created("Video succes added",response,null)); // Retourne l'objet avec un statut 201
@@ -43,14 +43,14 @@ public class LessonVideoItemController {
     }
 
     @GetMapping("/byLesson/{lessonId}")
-    public  ResponseEntity<ApiResponse<List<LessonVideoItemDTO>>> getLessonVideoItemByLessonId(@PathVariable Integer lessonId){
+    public  ResponseEntity<ApiResponse<List<LessonVideoItemDTO>>> getLessonVideoItemByLessonId(@PathVariable Long lessonId){
     List<LessonVideoItemDTO> lessonVideoItemRepList = lessonVideoItemService.getVideoItemByLessonId(lessonId);
     return ResponseEntity.ok(ResponseUtil.success("Retrived video succefully",lessonVideoItemRepList,null));
     }
 
     // Méthode pour supprimer un cours par son ID
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteLessonVideoItem(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse<Void>> deleteLessonVideoItem(@PathVariable Long id) {
         boolean isDeleted = lessonVideoItemService.deleteLessonVideoItem(id);
         if (isDeleted) {
             return ResponseEntity.ok(ResponseUtil.success("lessonVideoItem supprimé avec succès",null,null));

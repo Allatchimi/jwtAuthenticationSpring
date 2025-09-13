@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface LessonVideoItemService {
 
-    LessonVideoItemDTO addLessonVideoItem(Integer lessonId, LessonVideoItemSaveDTO lessonVideoItemSaveDTO);
+    LessonVideoItemDTO addLessonVideoItem(Long lessonId, LessonVideoItemSaveDTO lessonVideoItemSaveDTO);
     List<LessonVideoItemDTO> getAllLessonVideoItem();
     LessonVideoItemDTO updateLessonVideoItem(LessonVideoItemUpdateDTO lessonVideoItemReq);
     // Méthode pour supprimer un cours par son ID
-    boolean deleteLessonVideoItem(Integer id);
-    List<LessonVideoItemDTO> getVideoItemByLessonId(Integer lessonId);
+    boolean deleteLessonVideoItem(Long id);
+    List<LessonVideoItemDTO> getVideoItemByLessonId(Long lessonId);
 }

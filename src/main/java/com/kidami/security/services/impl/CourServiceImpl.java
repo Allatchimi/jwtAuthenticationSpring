@@ -4,9 +4,11 @@ import com.kidami.security.dto.courDTO.CourDTO;
 import com.kidami.security.dto.courDTO.CourDeteailDTO;
 import com.kidami.security.dto.courDTO.CourSaveDTO;
 import com.kidami.security.dto.courDTO.CourUpdateDTO;
+import com.kidami.security.dto.enrollementDTO.EnrollementDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.CourMapper;
+import com.kidami.security.mappers.EnrollementMapper;
 import com.kidami.security.models.*;
 import com.kidami.security.repository.CategoryRepository;
 import com.kidami.security.repository.CourRepository;
@@ -24,39 +26,39 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 public class CourServiceImpl implements CourService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CourServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(CourServiceImpl.class);
     private final UserRepository userRepository;
     private final CourRepository courRepository;
     private final CategoryRepository categoryRepository;
     private final CourMapper courMapper;
     private final EnrollmentRepository enrollmentRepository;
     private final StorageService storageService;
+    private final EnrollementMapper enrollementMapper;
 
 
-    public CourServiceImpl(CourMapper courMapper, CourRepository courRepository, CategoryRepository categoryRepository, EnrollmentRepository enrollmentRepository, UserRepository userRepository , StorageService storageService) {
+    public CourServiceImpl(CourMapper courMapper, CourRepository courRepository, CategoryRepository categoryRepository, EnrollmentRepository enrollmentRepository, UserRepository userRepository , StorageService storageService, EnrollementMapper enrollementMapper) {
         this.courMapper = courMapper;
         this.courRepository = courRepository;
         this.categoryRepository = categoryRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.userRepository = userRepository;
         this.storageService = storageService;
+        this.enrollementMapper = enrollementMapper;
     }
 
     @Override
     public CourDTO addCour(CourSaveDTO courSaveDTO, String teacherUsername, MultipartFile file) {
-        logger.debug("Tentative de création d'un cours: {} par {}", courSaveDTO.getName(), teacherUsername);
-
+        log.debug("Tentative de création d'un cours: {} par {}", courSaveDTO.getName(), teacherUsername);
         User teacher = userRepository.findByEmail(teacherUsername)
                 .orElseThrow(() -> new RuntimeException("Teacher non Trouvé"));
 
         validateCourSaveDTO(courSaveDTO);
 
         if (courRepository.existsByName(courSaveDTO.getName())) {
-            logger.warn("Tentative de création d'un cours en double: {}", courSaveDTO.getName());
+            log.warn("Tentative de création d'un cours en double: {}", courSaveDTO.getName());
             throw new DuplicateResourceException("Course", "name", courSaveDTO.getName());
         }
         try {
@@ -73,16 +75,16 @@ public class CourServiceImpl implements CourService {
                 cour.setThumbnail(thumbnailUrl);
             }
             Cour savedCour = courRepository.save(cour);
-            logger.info("Cours créé avec succès: {} (par : {})", savedCour.getName(), savedCour.getTeacher().getName());
+            log.info("Cours créé avec succès: {} (par : {})", savedCour.getName(), savedCour.getTeacher().getName());
             return courMapper.toDTO(savedCour);
 
         } catch (ResourceNotFoundException | DuplicateResourceException e) {
             throw e;
         } catch (DataAccessException e) {
-            logger.error("Erreur d'accès aux données lors de la création du cours: {}", e.getMessage(), e);
+            log.error("Erreur d'accès aux données lors de la création du cours: {}", e.getMessage(), e);
             throw new RuntimeException("Erreur technique lors de la création du cours", e);
         } catch (Exception e) {
-            logger.error("Erreur inattendue lors de la création du cours: {}", e.getMessage(), e);
+            log.error("Erreur inattendue lors de la création du cours: {}", e.getMessage(), e);
             throw new RuntimeException("Erreur lors de la création du cours", e);
         }
     }
@@ -98,9 +100,9 @@ public class CourServiceImpl implements CourService {
 
     @Override
     public List<CourDTO> getAllCours() {
-        logger.debug("Tentative de récupération de tous les cours");
+        log.debug("Tentative de récupération de tous les cours");
         List<Cour> cours = courRepository.findAll();
-        logger.info("{} cours récupérés avec succès", cours.size());
+        log.info("{} cours récupérés avec succès, tout les cours", cours.size());
         return cours.stream()
                 .map(courMapper::toDTO)
                 .collect(Collectors.toList());
@@ -109,23 +111,23 @@ public class CourServiceImpl implements CourService {
     @Override
     public CourDTO updateCour(CourUpdateDTO courUpdateDTO) {
 
-        logger.debug("Mise à jour du cours ID: {}", courUpdateDTO.getId());
+        log.debug("Mise à jour du cours ID: {}", courUpdateDTO.getId());
         // Vérifier si le cours existe
         Cour cour = courRepository.findById(courUpdateDTO.getId())
                 .orElseThrow(() ->{
-                    logger.warn("le cours n existe pas: {}", courUpdateDTO.getName());
+                    log.warn("le cours n existe pas: {}", courUpdateDTO.getName());
                     return  new ResourceNotFoundException("Course", "id", courUpdateDTO.getId());
                 });
 
         // Vérifier si le nouveau nom existe déjà (pour un autre cours)
         if (courUpdateDTO.getName() != null &&
                 !cour.getName().equals(courUpdateDTO.getName()) &&
-                courRepository.existsByNameAndIdNot(courUpdateDTO.getName(), courUpdateDTO.getId())) {
-            logger.warn("le nouveau nom existe déjà pour un autre cours: {}", cour.getName());
+                courRepository.existsByNameAndIdNot(courUpdateDTO.getName(), courUpdateDTO.getCategorieId())) {
+            log.warn("le nouveau nom existe déjà pour un autre cours: {}", cour.getName());
             throw new DuplicateResourceException("Course", "name", courUpdateDTO.getName());
         }
 
-        logger.trace("Données de mise à jour valides: {}", courUpdateDTO);
+        log.trace("Données de mise à jour valides: {}", courUpdateDTO);
         try {
             // Mettre à jour les champs
             if (courUpdateDTO.getName() != null) cour.setName(courUpdateDTO.getName());
@@ -144,18 +146,18 @@ public class CourServiceImpl implements CourService {
             if (courUpdateDTO.getCategorieId() != null) {
                 Category categorie = categoryRepository.findById(courUpdateDTO.getCategorieId())
                         .orElseThrow(() -> {
-                            logger.warn("Categorie n existe pas: {}", courUpdateDTO.getCategorieId());
+                            log.warn("Categorie n existe pas: {}", courUpdateDTO.getCategorieId());
                            return  new ResourceNotFoundException("Category", "id", courUpdateDTO.getCategorieId());
                         });
                 cour.setCategorie(categorie);
             }
 
             Cour updatedCour = courRepository.save(cour);
-            logger.info("le cour a ete bien mise a jour : {}", updatedCour);
+            log.info("le cour a ete bien mise a jour : {}", updatedCour);
             return courMapper.toDTO(updatedCour);
 
         }catch (Exception e) {
-            logger.error("Erreur lors de la mise a jour du cour: {}", e.getMessage());
+            log.error("Erreur lors de la mise a jour du cour: {}", e.getMessage());
             throw e;
 
         }
@@ -163,44 +165,43 @@ public class CourServiceImpl implements CourService {
 
     @Override
     public boolean deleteCour(Long id) {
-        logger.debug("Tentative de suppression du cours ID: {}", id);
+        log.debug("Tentative de suppression du cours ID: {}", id);
         // Vérifier si le cours existe
         if (!courRepository.existsById(id)) {
-            logger.warn("Tentative de suppression d'un cours inexistant ID: {}", id);
+            log.warn("Tentative de suppression d'un cours inexistant ID: {}", id);
             throw new ResourceNotFoundException("Course", "id", id);
         }
         try {
             courRepository.deleteById(id);
-            logger.info("Cours supprimé avec succès ID: {}", id);
+            log.info("Cours supprimé avec succès ID: {}", id);
             return true;
         } catch (Exception e) {
-            logger.error("Erreur lors de la suppression du cours ID: {} - {}", id, e.getMessage(), e);
+            log.error("Erreur lors de la suppression du cours ID: {} - {}", id, e.getMessage(), e);
             throw new RuntimeException("Erreur lors de la suppression du cours", e);
         }
     }
 
     @Override
-    public CourDeteailDTO courtDetails(Integer courId) {
-        logger.debug("Tentative de récupération du cours avec ID: {}", courId);
-
-        try {
-            Cour cour = courRepository.findById(courId)
-                    .orElseThrow(() -> {
-                        logger.warn("Cours non trouvé avec ID: {}", courId);
-                        return new ResourceNotFoundException("Course", "id", courId);
-                    });
-
-            logger.info("Cours récupéré avec succès: {}", cour.getName());
-            return courMapper.toDetailDTO(cour);
-
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        }
+    public CourDeteailDTO courtDetails(Long courId) {
+        log.debug("Tentative de récupération du cours avec ID: {}", courId);
+        Cour cour = courRepository.findById(courId)
+                .orElseThrow(() -> {
+                    log.warn("Cours non trouvé avec ID: {}", courId);
+                    return new ResourceNotFoundException("Course", "id", courId);
+                });
+        log.info("Cours récupéré avec succès: {}", cour.getName());
+        return courMapper.toDetailDTO(cour);
     }
 
     @Override
-    public List<Cour> getPopularCourses() {
-        return courRepository.findTop10ByOrderByEnrollmentCountDesc();
+    public List<CourDTO> getPopularCourses() {
+        log.debug("Tentative de la liste des courses populaire");
+         List<Cour> cours = courRepository.findTop10ByOrderByEnrollmentCountDesc();
+        log.info("{} cours récupérés avec succès", cours.size());
+        return cours.stream()
+                .map(courMapper::toDTO)
+                .collect(Collectors.toList()
+                );
     }
 
     @Override
@@ -209,12 +210,10 @@ public class CourServiceImpl implements CourService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Cour course = courRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
-
         // Vérifier si déjà inscrit
         if (enrollmentRepository.existsByStudentAndCour(student, course)) {
             throw new RuntimeException("Already enrolled in this course");
         }
-
         Enrollment enrollment = new Enrollment();
         enrollment.setStudent(student);
         enrollment.setCour(course);
@@ -224,21 +223,26 @@ public class CourServiceImpl implements CourService {
 
         return enrollmentRepository.save(enrollment);
     }
+
     @Override
-    public List<Cour> getUserCourses(String username) {
+    public List<EnrollementDTO> getUserCourses(String username) {
+        log.debug("Tentative de reuperation  de la liste des courses de: {}", username);
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return enrollmentRepository.findByStudent(user)
-                .stream()
-                .map(Enrollment::getCour)
+        List<Enrollment> enrollments = enrollmentRepository.findByStudent(user);
+        log.info("les nombre de cours suivie par {} est : {}", user.getName(),enrollments.size());
+        return enrollments.stream()
+                .map(enrollementMapper::toDTO)
                 .collect(Collectors.toList());
+
     }
     @Override
-    public List<Cour> getTeacherCourses(String username) {
+    public List<CourDTO> getTeacherCourses(String username) {
+        log.debug("Tentative de la liste des courses de: {}", username);
         User teacher = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
-        return courRepository.findByTeacher(teacher);
+        List<Cour> cours =  courRepository.findByTeacher(teacher);
+        log.info("les nombres de {} est : {}", username, cours.size());
+        return cours.stream().map(courMapper::toDTO).collect(Collectors.toList()) ;
     }
-
 }

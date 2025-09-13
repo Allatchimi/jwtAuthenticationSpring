@@ -14,6 +14,7 @@ public interface CourMapper {
     @Mapping(source = "teacher.name", target = "teacherName")
     @Mapping(source = "categorie.categoryName", target = "categoryName")
     CourDTO toDTO(Cour cour);
+    @Mapping(source = "categorie.categoryName", target = "categorie")
     CourDeteailDTO toDetailDTO(Cour cour);
     Cour fromSaveDTO(CourSaveDTO dto);
     // Méthode default pour gérer le cas spécial

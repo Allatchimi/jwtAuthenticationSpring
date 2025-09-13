@@ -17,6 +17,7 @@ import com.kidami.security.repository.CourRepository;
 import com.kidami.security.repository.LessonRepository;
 import com.kidami.security.repository.LessonVideoItemRepository;
 import com.kidami.security.services.LessonService;
+import com.kidami.security.services.StorageService;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.stream.Collectors;
 @Service
@@ -35,23 +37,25 @@ public class LessonServiceImpl implements LessonService {
     private final LessonMapper lessonMapper;
     private final LessonVideoItemMapper lessonVideoItemMapper;
     private final LessonVideoItemRepository lessonVideoItemRepository;
+    private final StorageService storageService;
 
     public LessonServiceImpl(
             LessonRepository lessonRepository ,
             CourRepository courRepository,
             LessonMapper lessonMapper,
             LessonVideoItemMapper lessonVideoItemMapper,
-            LessonVideoItemRepository lessonVideoItemRepository
-        ) {
+            LessonVideoItemRepository lessonVideoItemRepository,
+            StorageService storageService) {
         this.lessonRepository = lessonRepository;
         this.courRepository = courRepository;
         this.lessonMapper = lessonMapper;
         this.lessonVideoItemMapper = lessonVideoItemMapper;
         this.lessonVideoItemRepository = lessonVideoItemRepository;
+        this.storageService = storageService;
     }
 
     @Override
-    public LessonDTO addLesson(LessonSaveDTO lessonSaveDTO) {
+    public LessonDTO addLesson(LessonSaveDTO lessonSaveDTO, MultipartFile imageFile) {
         log.debug("Tantative de  créer  d un  lesson {}", lessonSaveDTO.getName());
         validateLessonSaveDTO(lessonSaveDTO);
         if(lessonRepository.existsByName(lessonSaveDTO.getName())) {
@@ -64,6 +68,11 @@ public class LessonServiceImpl implements LessonService {
             // Convertir DTO -> Entity avec MapStruct
             Lesson lesson = lessonMapper.fromSaveDTO(lessonSaveDTO);
             lesson.setCour(cour);
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String imageName  = storageService.saveImage(imageFile, "lessons");
+                String thumbnailUrl = "api/"+imageName;
+                lesson.setThumbnail(thumbnailUrl);
+            }
             List<LessonVideoItem> videoItems = lessonSaveDTO.getVideo().stream()
                     .map(videoSaveDTO -> {
                         LessonVideoItem videoItem = lessonVideoItemMapper.fromSaveDTO(videoSaveDTO);
@@ -163,7 +172,7 @@ public class LessonServiceImpl implements LessonService {
         lessonVideoItemMapper.updateFromDTO(videoDTO, existingVideo);
     }
 
-    private void deleteVideosExplicit(Lesson lesson, List<Integer> videoIdsToDelete) {
+    private void deleteVideosExplicit(Lesson lesson, List<Long> videoIdsToDelete) {
         // Filtrer les vidéos à supprimer
         List<LessonVideoItem> videosToRemove = lesson.getVideos().stream()
                 .filter(video -> videoIdsToDelete.contains(video.getId()))
@@ -186,7 +195,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public LessonDTO getLessonById(Integer id) {
+    public LessonDTO getLessonById(Long id) {
         log.debug("Tentative de récupération de Lesçon ID: {}", id);
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson", "id", id));
@@ -195,7 +204,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
    @Override
-    public List<LessonDTO> getLessonsByCourId(Integer courId) {
+    public List<LessonDTO> getLessonsByCourId(Long courId) {
        log.debug("Tentative de récupération des Lesçons  de cour ID: {}", courId);
         List<Lesson> lessons = lessonRepository.findByCourId(courId);
        log.info("{} Tous les lessons récupérés de cours sont ", lessons.size());
@@ -215,7 +224,7 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public LessonDelete deleteLesson(Integer id) {
+    public LessonDelete deleteLesson(Long id) {
         log.debug("Tentative de suppression du leçon ID: {}", id);
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> {

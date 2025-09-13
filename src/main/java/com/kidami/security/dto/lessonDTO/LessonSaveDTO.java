@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class LessonSaveDTO {
     private String name;
-    private Integer courId;
+    private Long courId;
     private String thumbnail;
     private String description;
     private List<LessonVideoItemSaveDTO> video; // ← DTO spécifique pour la sauvegarde

@@ -1,6 +1,5 @@
 package com.kidami.security.dto.courDTO;
 
-import com.kidami.security.models.Category;
 import lombok.Data;
 
 
@@ -13,7 +12,7 @@ public class CourDeteailDTO {
     private Integer videoLen;
     private Integer downNum;
     private Integer follow;
-    private Category categorie;
+    private String categorie;
     private String userToken;
     private String name;
     private String description;

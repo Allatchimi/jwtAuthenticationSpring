@@ -104,7 +104,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean deleteCategory(Integer id) {
+    public boolean deleteCategory(Long id) {
         log.debug("Tentative de suppression du Categorie ID: {}", id);
 
         if (!categoryRepository.existsById(id)) {

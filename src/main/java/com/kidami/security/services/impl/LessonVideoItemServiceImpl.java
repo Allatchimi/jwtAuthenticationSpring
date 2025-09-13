@@ -10,6 +10,7 @@ import com.kidami.security.models.LessonVideoItem;
 import com.kidami.security.repository.LessonRepository;
 import com.kidami.security.repository.LessonVideoItemRepository;
 import com.kidami.security.services.LessonVideoItemService;
+import com.kidami.security.services.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,15 +24,17 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
     private final LessonVideoItemRepository lessonVideoItemRepository;
     private final LessonRepository lessonRepository;
     private final LessonVideoItemMapper lessonVideoItemMapper;
+    private final StorageService storageService;
 
-    public LessonVideoItemServiceImpl(LessonVideoItemRepository lessonVideoItemRepository, LessonRepository lessonRepository, LessonVideoItemMapper lessonVideoItemMapper) {
+    public LessonVideoItemServiceImpl(LessonVideoItemRepository lessonVideoItemRepository, LessonRepository lessonRepository, LessonVideoItemMapper lessonVideoItemMapper, StorageService storageService) {
         this.lessonVideoItemRepository = lessonVideoItemRepository;
         this.lessonRepository = lessonRepository;
         this.lessonVideoItemMapper = lessonVideoItemMapper;
+        this.storageService = storageService;
     }
 
     @Override
-    public LessonVideoItemDTO addLessonVideoItem(Integer lessonId, LessonVideoItemSaveDTO lessonVideoItemSaveDTO) {
+    public LessonVideoItemDTO addLessonVideoItem(Long lessonId, LessonVideoItemSaveDTO lessonVideoItemSaveDTO) {
         log.debug("Tantative de recuperation de laçon {} ", lessonId);
         if (lessonVideoItemRepository.existsByName(lessonVideoItemSaveDTO.getName())) {
             log.warn("IL y a un video avec ce nom {}", lessonVideoItemSaveDTO.getName());
@@ -92,7 +95,7 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
     }
 
     @Override
-    public boolean deleteLessonVideoItem(Integer id) {
+    public boolean deleteLessonVideoItem(Long id) {
         log.debug("Tentative de suppression du LessonVideoItem ID: {}", id);
         // Vérifiez si le cours existe
         if (!lessonVideoItemRepository.existsById(id)) {
@@ -110,7 +113,7 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
     }
 
     @Override
-    public List<LessonVideoItemDTO> getVideoItemByLessonId(Integer lessonId) {
+    public List<LessonVideoItemDTO> getVideoItemByLessonId(Long lessonId) {
         log.debug("Tentative de recuperation de la  liste des video items par leçon  ID: {}", lessonId);
         List<LessonVideoItem> lessonVideoItems= lessonVideoItemRepository.findByLessonId(lessonId);
         log.info("Video items  recuprer par lesçon sont au nombre de : {}", lessonVideoItems.size());

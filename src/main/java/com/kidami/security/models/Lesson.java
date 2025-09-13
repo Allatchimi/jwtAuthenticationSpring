@@ -22,11 +22,13 @@ import java.util.Objects;
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "lesson_id")
+    private Long id;
     @Column(nullable = false)
     @NotBlank(message = "Le nom est obligatoire")
     @Size(min = 2, max = 255, message = "Le nom doit contenir entre 2 et 255 caractères")
     private  String name;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cour_id")
     @ToString.Exclude
@@ -35,7 +37,7 @@ public class Lesson {
     private String thumbnail;
     @Column(columnDefinition = "TEXT")
     private String description;
-    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
     private List<LessonVideoItem> videos = new ArrayList<>();
@@ -69,6 +71,6 @@ public class Lesson {
 
     @Override
     public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+        return getId() != null ? getId().hashCode() : super.hashCode();
     }
 }

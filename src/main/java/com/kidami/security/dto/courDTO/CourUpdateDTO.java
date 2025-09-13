@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourUpdateDTO {
-    private Integer id;
+    private Long id;
     private Integer score;
     private Integer lessonNum;
     private Integer videoLen;
     private Integer downNum;
     private Integer follow;
-    private Integer categorieId; // Changé de Category à Integer pour l'ID
+    private Long categorieId; // Changé de Category à Integer pour l'ID
     private String userToken;
     private String name;
     private String description;

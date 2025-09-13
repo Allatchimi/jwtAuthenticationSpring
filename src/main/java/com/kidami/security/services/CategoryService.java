@@ -11,5 +11,5 @@ public interface CategoryService {
     CategoryDTO addCategory(CategorySaveDTO categorySaveDTO);
     List<CategoryDTO> getAllCategory();
     CategoryDTO updateCategory(CategoryUpdateDTO categoryUpdateDTO);
-    boolean deleteCategory(Integer id);
+    boolean deleteCategory(Long id);
 }
