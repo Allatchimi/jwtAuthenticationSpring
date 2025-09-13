@@ -1,7 +1,8 @@
 package com.kidami.security.models;
 
 public enum Role {
-    USER,
+    STUDENT,
+    TEACHER,
     ADMIN,
-    MODERATOR
+    //MODERATOR
 }

@@ -18,8 +18,7 @@ public class CourDeteailDTO {
     private String name;
     private String description;
     private String thumbnail;
-    private String video;
-    private String price;
+    private Double price;
     private String amountTotal;
 
 }

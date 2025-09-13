@@ -25,7 +25,7 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userID")
+    @Column(name = "user_id")
     private Long id;
     @Column(name = "name", length = 50)
     private String name;
@@ -40,18 +40,23 @@ public class User implements UserDetails {
     private String lastName;
     private String profileImageUrl;
     private boolean emailVerified = false;
-    @ElementCollection(fetch = FetchType.EAGER)
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private Set<Enrollment> enrollments = new HashSet<>();
 
-    // Ajouter un constructeur pratique
+
     public User(String email, String password, AuthProvider provider) {
         this.email = email;
         this.password = password;
         this.provider = provider;
         this.roles = new HashSet<>();
-        this.roles.add(Role.USER); // Role par défaut
+        this.roles.add(Role.STUDENT); // Role par défaut
     }
 
     // Méthodes utilitaires
@@ -66,7 +71,6 @@ public class User implements UserDetails {
     public boolean hasRole(Role role) {
         return this.roles.contains(role);
     }
-
 
 
     @Override
@@ -102,7 +106,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
     @Override
     public String toString() {

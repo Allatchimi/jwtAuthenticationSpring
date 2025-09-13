@@ -25,6 +25,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.crypto.spec.SecretKeySpec;
 
+import static org.yaml.snakeyaml.nodes.NodeId.scalar;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -59,11 +61,18 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
                                 "/configuration/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/scalar/**",
+                                "/scalar-ui/**",
+                                "/docs/**",
+                                "/favicon.ico"
                         ).permitAll()
+                        .requestMatchers("/api/images/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/moderator/**").hasAnyRole("MODERATOR", "ADMIN")
-                        .requestMatchers("/api/users/**").hasAnyRole("USER", "MODERATOR", "ADMIN")
+                        .requestMatchers("/api/teacher/**").hasRole("TEACHER")
+                        .requestMatchers("/api/moderator/**").hasAnyRole("MODERATOR", "ADMIN","TEACHER")
+                        .requestMatchers("/api/users/**").hasAnyRole("STUDENT", "MODERATOR","TEACHER","ADMIN")
+                       // .requestMatchers("/api/file/**").hasAnyRole("STUDENT", "MODERATOR","TEACHER","ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -92,14 +101,21 @@ public class SecurityConfig {
                                 "/oauth2/**",
                                 "/login/oauth2/**",
                                 "/v3/api-docs/**",
+                                "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
                                 "/configuration/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/docs/**",
+                                "/scalar/**"
                         ).permitAll()
+                       // .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/docs/**", "/scalar/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/moderator/**").hasAnyRole("MODERATOR", "ADMIN")
+                        .requestMatchers("/teacher/**").hasRole("TEACHER")
+                        .requestMatchers("/moderator/**").hasAnyRole("MODERATOR", "ADMIN","TEACHER")
+                        .requestMatchers("/users/**").hasAnyRole("STUDENT", "MODERATOR","TEACHER","ADMIN")
+                        .requestMatchers("/file/**").hasAnyRole("STUDENT", "MODERATOR","TEACHER","ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

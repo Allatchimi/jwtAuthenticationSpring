@@ -1,12 +1,14 @@
 package com.kidami.security.repository;
 import com.kidami.security.models.Cour;
+import com.kidami.security.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface CourRepository extends JpaRepository<Cour, Integer> {
+public interface CourRepository extends JpaRepository<Cour, Long> {
 
     Optional<Cour> findById(Integer id);
     boolean existsById(Integer id);
@@ -14,5 +16,7 @@ public interface CourRepository extends JpaRepository<Cour, Integer> {
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Cour c WHERE c.name = :name AND c.id != :id")
     boolean existsByNameAndIdNot(@Param("name") String name, @Param("id") Integer id);
 
+    List<Cour> findByTeacher(User teacher);
+    List<Cour> findTop10ByOrderByEnrollmentCountDesc();
 
 }

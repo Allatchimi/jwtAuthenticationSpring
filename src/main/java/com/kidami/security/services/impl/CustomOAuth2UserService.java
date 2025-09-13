@@ -104,7 +104,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setEmailVerified(true);
 
         Set<Role> defaultRoles = new HashSet<>();
-        defaultRoles.add(Role.USER);
+        defaultRoles.add(Role.STUDENT);
         user.setRoles(defaultRoles);
 
         return userRepository.save(user);

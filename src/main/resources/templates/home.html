@@ -1,27 +1,17 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
-    <title>Home</title>
+    <meta charset="UTF-8">
+    <title>API Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 50px; text-align: center; }
+        a { display: block; margin: 20px; padding: 20px; background: #007bff; color: white; text-decoration: none; border-radius: 8px; width: 200px; margin-left: auto; margin-right: auto; }
+        a:hover { background: #0056b3; }
+    </style>
 </head>
 <body>
-<h2>Welcome to the Home Page</h2>
-
-<!-- Afficher les informations de l'utilisateur -->
-<div th:if="${user != null}">
-    <h3>Welcome, <span th:text="${user.email}">User Email</span>!</h3>
-    <p>Your role is: <span th:each="role : ${user.roles}" th:text="${role}">Role</span>
-    </p>
-    <p>Your roles:</p>
-    <ul>
-        <li th:each="role : ${user.roles}" th:text="${role}">Role</li>
-    </ul>
-
-</div>
-
-<!-- Si l'utilisateur n'est pas trouvé, afficher un message -->
-<div th:if="${user == null}">
-    <p>User not found!</p>
-</div>
-
+<h1>Choisissez votre documentation API</h1>
+<a href="/swagger-ui.html" target="_blank">Swagger UI</a>
+<a href="/docs" target="_blank">Scalar UI</a>
 </body>
 </html>

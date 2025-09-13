@@ -7,16 +7,20 @@ import com.kidami.security.dto.courDTO.CourUpdateDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.CourMapper;
-import com.kidami.security.models.Category;
-import com.kidami.security.models.Cour;
+import com.kidami.security.models.*;
 import com.kidami.security.repository.CategoryRepository;
 import com.kidami.security.repository.CourRepository;
+import com.kidami.security.repository.EnrollmentRepository;
+import com.kidami.security.repository.UserRepository;
 import com.kidami.security.services.CourService;
+import com.kidami.security.services.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,20 +29,32 @@ import java.util.stream.Collectors;
 public class CourServiceImpl implements CourService {
 
     private static final Logger logger = LoggerFactory.getLogger(CourServiceImpl.class);
+    private final UserRepository userRepository;
     private final CourRepository courRepository;
     private final CategoryRepository categoryRepository;
     private final CourMapper courMapper;
+    private final EnrollmentRepository enrollmentRepository;
+    private final StorageService storageService;
 
-    public CourServiceImpl(CourMapper courMapper, CourRepository courRepository, CategoryRepository categoryRepository) {
+
+    public CourServiceImpl(CourMapper courMapper, CourRepository courRepository, CategoryRepository categoryRepository, EnrollmentRepository enrollmentRepository, UserRepository userRepository , StorageService storageService) {
         this.courMapper = courMapper;
         this.courRepository = courRepository;
         this.categoryRepository = categoryRepository;
+        this.enrollmentRepository = enrollmentRepository;
+        this.userRepository = userRepository;
+        this.storageService = storageService;
     }
 
     @Override
-    public CourDTO addCour(CourSaveDTO courSaveDTO) {
-        logger.debug("Tentative de création d'un cours: {}", courSaveDTO.getName());
+    public CourDTO addCour(CourSaveDTO courSaveDTO, String teacherUsername, MultipartFile file) {
+        logger.debug("Tentative de création d'un cours: {} par {}", courSaveDTO.getName(), teacherUsername);
+
+        User teacher = userRepository.findByEmail(teacherUsername)
+                .orElseThrow(() -> new RuntimeException("Teacher non Trouvé"));
+
         validateCourSaveDTO(courSaveDTO);
+
         if (courRepository.existsByName(courSaveDTO.getName())) {
             logger.warn("Tentative de création d'un cours en double: {}", courSaveDTO.getName());
             throw new DuplicateResourceException("Course", "name", courSaveDTO.getName());
@@ -49,9 +65,15 @@ public class CourServiceImpl implements CourService {
                     );
 
             Cour cour = courMapper.createCourFromDTO(courSaveDTO, categorie);
+            cour.setTeacher(teacher);
+            // Gestion du fichier
+            if (file != null && !file.isEmpty()) {
+                String imageName = storageService.saveImage(file, "cours");
+               String thumbnailUrl = "api/"+imageName;
+                cour.setThumbnail(thumbnailUrl);
+            }
             Cour savedCour = courRepository.save(cour);
-
-            logger.info("Cours créé avec succès: {} (ID: {})", savedCour.getName(), savedCour.getId());
+            logger.info("Cours créé avec succès: {} (par : {})", savedCour.getName(), savedCour.getTeacher().getName());
             return courMapper.toDTO(savedCour);
 
         } catch (ResourceNotFoundException | DuplicateResourceException e) {
@@ -109,7 +131,6 @@ public class CourServiceImpl implements CourService {
             if (courUpdateDTO.getName() != null) cour.setName(courUpdateDTO.getName());
             if (courUpdateDTO.getDescription() != null) cour.setDescription(courUpdateDTO.getDescription());
             if (courUpdateDTO.getThumbnail() != null) cour.setThumbnail(courUpdateDTO.getThumbnail());
-            if (courUpdateDTO.getVideo() != null) cour.setVideo(courUpdateDTO.getVideo());
             if (courUpdateDTO.getPrice() != null) cour.setPrice(courUpdateDTO.getPrice());
             if (courUpdateDTO.getAmountTotal() != null) cour.setAmountTotal(courUpdateDTO.getAmountTotal());
             if (courUpdateDTO.getLessonNum() != null) cour.setLessonNum(courUpdateDTO.getLessonNum());
@@ -141,7 +162,7 @@ public class CourServiceImpl implements CourService {
     }
 
     @Override
-    public boolean deleteCour(Integer id) {
+    public boolean deleteCour(Long id) {
         logger.debug("Tentative de suppression du cours ID: {}", id);
         // Vérifier si le cours existe
         if (!courRepository.existsById(id)) {
@@ -175,6 +196,49 @@ public class CourServiceImpl implements CourService {
         } catch (ResourceNotFoundException e) {
             throw e;
         }
+    }
+
+    @Override
+    public List<Cour> getPopularCourses() {
+        return courRepository.findTop10ByOrderByEnrollmentCountDesc();
+    }
+
+    @Override
+    public Enrollment enrollToCourse(Long courseId, String username) {
+        User student = userRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Cour course = courRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        // Vérifier si déjà inscrit
+        if (enrollmentRepository.existsByStudentAndCour(student, course)) {
+            throw new RuntimeException("Already enrolled in this course");
+        }
+
+        Enrollment enrollment = new Enrollment();
+        enrollment.setStudent(student);
+        enrollment.setCour(course);
+        enrollment.setEnrollmentDate(LocalDateTime.now());
+        enrollment.setPaymentStatus(PaymentStatus.PENDING);
+        enrollment.setAmountPaid(course.getPrice());
+
+        return enrollmentRepository.save(enrollment);
+    }
+    @Override
+    public List<Cour> getUserCourses(String username) {
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return enrollmentRepository.findByStudent(user)
+                .stream()
+                .map(Enrollment::getCour)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<Cour> getTeacherCourses(String username) {
+        User teacher = userRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+        return courRepository.findByTeacher(teacher);
     }
 
 }

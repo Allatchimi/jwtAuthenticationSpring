@@ -60,7 +60,7 @@ public class UserServicesImpl implements UserService {
                 defaultRoles.addAll(registerDTO.getRoles());
                 user.setRoles(defaultRoles);
             }else {
-                defaultRoles.add(Role.USER);
+                defaultRoles.add(Role.STUDENT);
                 user.setRoles(defaultRoles);
             }
 

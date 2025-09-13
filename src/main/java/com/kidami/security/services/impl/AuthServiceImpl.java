@@ -214,8 +214,10 @@ public class AuthServiceImpl implements AuthService {
             extractAndSetNamesFromFirebaseToken(decodedToken, newUser);
 
             Set<Role> defaultRoles = new HashSet<>();
-            defaultRoles.add(Role.USER);
+            defaultRoles.add(Role.STUDENT);
             newUser.setRoles(defaultRoles);
+
+
 
             return userRepository.save(newUser);
         }

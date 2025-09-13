@@ -6,10 +6,13 @@ import com.kidami.security.dto.courDTO.CourSaveDTO;
 import com.kidami.security.models.Category;
 import com.kidami.security.models.Cour;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CourMapper {
     // Mapping de base
+    @Mapping(source = "teacher.name", target = "teacherName")
+    @Mapping(source = "categorie.categoryName", target = "categoryName")
     CourDTO toDTO(Cour cour);
     CourDeteailDTO toDetailDTO(Cour cour);
     Cour fromSaveDTO(CourSaveDTO dto);

@@ -33,6 +33,6 @@ public interface LessonMapper {
     // Méthode utilitaire pour extraire l'ID du cours
     @Named("courToCourId")
     static Integer courToCourId(com.kidami.security.models.Cour cour) {
-        return cour != null ? cour.getId() : null;
+        return Math.toIntExact(cour != null ? cour.getId() : null);
     }
 }
