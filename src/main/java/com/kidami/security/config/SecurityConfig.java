@@ -69,6 +69,7 @@ public class SecurityConfig {
                                 "/error"
                         ).permitAll()
                         .requestMatchers("/api/images/**").permitAll()
+                        .requestMatchers("/api/videos/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/teacher/**").hasRole("TEACHER")
                         .requestMatchers("/api/moderator/**").hasAnyRole("MODERATOR", "ADMIN","TEACHER")

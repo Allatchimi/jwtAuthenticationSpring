@@ -15,7 +15,7 @@ public interface LessonVideoItemMapper {
     void updateFromDTO(LessonVideoItemUpdateDTO dto, @MappingTarget LessonVideoItem entity);
 
     // Méthodes existantes
-    @Mapping(source = "lesson.id", target = "lessonId")
+    @Mapping(source = "lesson.name", target = "lessonName")
     LessonVideoItemDTO toDTO(LessonVideoItem entity);
 
     @Mapping(target = "id", ignore = true)
@@ -29,6 +29,6 @@ public interface LessonVideoItemMapper {
     @Mapping(target = "lesson", ignore = true)
     LessonVideoItem fromDTO(LessonVideoItemDTO dto);
 
-    @Mapping(source ="lessonId", target = "lesson.id")
+    @Mapping(source ="lessonName", target = "lesson.name")
     LessonVideoItem toEntity(LessonVideoItemDTO lessonVideoItemDTO);
 }

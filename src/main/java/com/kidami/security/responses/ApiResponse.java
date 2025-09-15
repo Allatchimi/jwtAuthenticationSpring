@@ -1,16 +1,19 @@
 package com.kidami.security.responses;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor // Ajoutez ceci si nécessaire
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse <T>{
+public class ApiResponse<T> {
     private String status;
     private String message;
     private T data;
     private Object metaData;
 
-    public  ApiResponse(String status,String message,T data,Object metaData){
+    public ApiResponse(String status, String message, T data, Object metaData) {
         this.status = status;
         this.message = message;
         this.data = data;

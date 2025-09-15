@@ -17,9 +17,20 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Méthode utilitaire pour vérifier si c'est une requête média
+    private boolean isMediaRequest(WebRequest request) {
+        String path = request.getDescription(false);
+        return path != null && (path.contains("/api/images/") || path.contains("/api/videos/"));
+    }
+
     // Gestion des ressources non trouvées
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Object>> handleResourceNotFound(ResourceNotFoundException e, WebRequest request) {
+        // Ignorer les requêtes média
+        if (isMediaRequest(request)) {
+            return null;
+        }
+
         ApiResponse<Object> response = new ApiResponse<>(
                 "error",
                 e.getMessage(),
@@ -33,6 +44,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidationExceptions(
             MethodArgumentNotValidException ex, WebRequest request) {
+
+        // Ignorer les requêtes média
+        if (isMediaRequest(request)) {
+            return null;
+        }
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -56,6 +72,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleGlobalException(
             Exception ex, WebRequest request) {
 
+        // Ignorer les requêtes média - IMPORTANT pour résoudre le problème
+        if (isMediaRequest(request)) {
+            return null;
+        }
+
         ApiResponse<Object> response = new ApiResponse<>(
                 "error",
                 ex.getMessage(),
@@ -71,6 +92,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleDuplicateResource(
             DuplicateResourceException ex, WebRequest request) {
 
+        // Ignorer les requêtes média
+        if (isMediaRequest(request)) {
+            return null;
+        }
+
         ApiResponse<Object> response = new ApiResponse<>(
                 "error",
                 ex.getMessage(),
@@ -81,11 +107,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
-
-    // 2. NOUVEAU : Validation JPA des entités (ConstraintViolationException)
+    // Validation JPA des entités (ConstraintViolationException)
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiResponse<Object>> handleConstraintViolationException(
             ConstraintViolationException ex, WebRequest request) {
+
+        // Ignorer les requêtes média
+        if (isMediaRequest(request)) {
+            return null;
+        }
 
         Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
         List<String> errors = violations.stream()
@@ -104,7 +134,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
-
 
     // Méthode utilitaire pour créer les détails d'erreur
     private Map<String, Object> createErrorDetails(WebRequest request, HttpStatus status) {

@@ -30,17 +30,17 @@ public class LessonVideoItem {
     private String url;
     @Column(columnDefinition = "TEXT")
     private String thumbnail;
-    // Ajouter la durée et l'ordre
-    private Integer duration; // en secondes
-    private Integer orderIndex; // ordre d'affichage
+    @Column(nullable = false)
+    private Integer duration = 0;
+    @Column(nullable = false)
+    private Integer orderIndex = 0;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id", nullable = false)
-    @JsonBackReference // ← Évite les boucles JSON
+    @JsonBackReference
     @Setter(AccessLevel.NONE)
     @ToString.Exclude
     private Lesson lesson;
-
     // Méthode utilitaire pour la relation
     public void setLesson(Lesson lesson) {
         this.lesson = lesson;
@@ -48,7 +48,6 @@ public class LessonVideoItem {
             lesson.getVideos().add(this);
         }
     }
-
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

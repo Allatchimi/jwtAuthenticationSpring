@@ -40,6 +40,7 @@ public class Lesson {
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
+    @OrderBy("orderIndex ASC")
     private List<LessonVideoItem> videos = new ArrayList<>();
 
 

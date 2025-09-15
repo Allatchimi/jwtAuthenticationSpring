@@ -10,5 +10,5 @@ public class LessonVideoItemDTO {
     private String thumbnail;
     private Integer duration;
     private Integer orderIndex;
-    private Long lessonId;
+    private String lessonName;
 }

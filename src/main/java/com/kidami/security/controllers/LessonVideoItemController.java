@@ -1,14 +1,22 @@
 package com.kidami.security.controllers;
 
+import com.kidami.security.dto.lessonDTO.LessonSaveDTO;
 import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemDTO;
 import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemSaveDTO;
 import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemUpdateDTO;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.LessonVideoItemService;
 import com.kidami.security.utils.ResponseUtil;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,11 +29,24 @@ public class LessonVideoItemController {
         this.lessonVideoItemService = lessonVideoItemService;
     }
 
-    @PostMapping("/add")
+    @PostMapping(value = "/add", consumes = {"multipart/form-data","application/json","application/octet-stream"} )
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public ResponseEntity<ApiResponse<LessonVideoItemDTO>> addLessonVideoItem(
+            @Parameter(description = "ID de la leçon", required = true)
             @RequestParam Long lessonId,
-            @RequestBody LessonVideoItemSaveDTO lessonVideoItemSaveDTO) {
-        LessonVideoItemDTO response = lessonVideoItemService.addLessonVideoItem(lessonId, lessonVideoItemSaveDTO);
+            @Parameter(description = "Données de l'élément vidéo",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LessonVideoItemSaveDTO.class)))
+            @Valid
+            @RequestPart("lessonVideoItemSaveDTO") LessonVideoItemSaveDTO lessonVideoItemSaveDTO,
+            @Parameter(description = "Fichier vidéo (obligatoire)",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+            @RequestPart("videoFile") MultipartFile videoFile,
+            @Parameter(description = "Image miniature (optionnelle)",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+
+        LessonVideoItemDTO response = lessonVideoItemService.addLessonVideoItem(lessonId, lessonVideoItemSaveDTO,videoFile, imageFile);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.created("Video succes added",response,null)); // Retourne l'objet avec un statut 201
     }
 

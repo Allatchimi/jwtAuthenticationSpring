@@ -6,6 +6,7 @@ import com.kidami.security.dto.lessonVideoItemDTO.LessonVideoItemUpdateDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.LessonVideoItemMapper;
+import com.kidami.security.models.Lesson;
 import com.kidami.security.models.LessonVideoItem;
 import com.kidami.security.repository.LessonRepository;
 import com.kidami.security.repository.LessonVideoItemRepository;
@@ -14,6 +15,7 @@ import com.kidami.security.services.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,16 +36,37 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
     }
 
     @Override
-    public LessonVideoItemDTO addLessonVideoItem(Long lessonId, LessonVideoItemSaveDTO lessonVideoItemSaveDTO) {
+    public LessonVideoItemDTO addLessonVideoItem(Long lessonId, LessonVideoItemSaveDTO lessonVideoItemSaveDTO, MultipartFile videoFile,MultipartFile imageFile) {
         log.debug("Tantative de recuperation de laçon {} ", lessonId);
+
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson", "id", lessonId.toString()));
         if (lessonVideoItemRepository.existsByName(lessonVideoItemSaveDTO.getName())) {
             log.warn("IL y a un video avec ce nom {}", lessonVideoItemSaveDTO.getName());
             throw new DuplicateResourceException("LessonVideoItem", "name", lessonVideoItemSaveDTO.getName());
         }
+        try {
+            LessonVideoItem lessonVideoItem = lessonVideoItemMapper.fromSaveDTO(lessonVideoItemSaveDTO);
+            lessonVideoItem.setLesson(lesson);
+            if(imageFile != null && !imageFile.isEmpty()) {
+                String imageName = storageService.saveImage(imageFile,"videoItems");
+                String thumbnailUrl = "api/"+imageName;
+                lessonVideoItem.setThumbnail(thumbnailUrl);
+            }
+            if(videoFile != null && !videoFile.isEmpty() ) {
+                String videoName = storageService.saveVideo(videoFile,"lessons");
+                String videoUrl = "api/"+videoName;
+                lessonVideoItem.setUrl(videoUrl);
+            } else {
+                throw new IllegalArgumentException("Le fichier vidéo est obligatoire");
+            }
+            LessonVideoItem savedItem = lessonVideoItemRepository.save(lessonVideoItem);
+            log.info("Video item {} : ajouter avec succés ", lessonVideoItem.getName());
+            return lessonVideoItemMapper.toDTO(savedItem);
 
-        LessonVideoItem lessonVideoItem = lessonVideoItemMapper.fromSaveDTO(lessonVideoItemSaveDTO);
-        log.info("Video item {} : ajouter avec succés ", lessonVideoItem.getName());
-        return lessonVideoItemMapper.toDTO(lessonVideoItem);
+        }catch (Exception e) {
+            throw new RuntimeException("Erreur lors de l'ajout du video item", e);
+        }
     }
 
     @Override
