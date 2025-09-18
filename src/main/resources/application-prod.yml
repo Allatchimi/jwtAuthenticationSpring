@@ -4,7 +4,7 @@ spring:
       on-profile: prod
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://aws-1-eu-west-3.pooler.supabase.com:5432/postgres}
+    url: ${DB_URL:jdbc:postgresql://aws-1-eu-west-3.pooler.supabase.com:6543/postgres}
     username: ${DB_USERNAME:postgres.icgyxciqajkwsyjtoiib}
     password: ${DB_PASSWORD:Allatchimimht}
     driver-class-name: org.postgresql.Driver
@@ -22,6 +22,8 @@ supabase:
   bucket: ${SUPABASE_BUCKET:videos}
   api:
     key: ${SUPABASE_API_KEY}
+
+
 
 app:
   storage:

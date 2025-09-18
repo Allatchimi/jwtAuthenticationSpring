@@ -1,6 +1,8 @@
 package com.kidami.security.services.impl;
 
 import com.kidami.security.services.StorageService;
+import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -23,18 +25,18 @@ import java.util.stream.Collectors;
 @Profile("prod")
 public class SupabaseStorageService implements StorageService {
 
-    @Value("${supabase.url}")
-    private String supabaseUrl;
-
-    @Value("${supabase.bucket}")
-    private String bucket;
-
-    @Value("${supabase.api.key}")
-    private String apiKey;
-
+    private final String supabaseUrl;
+    private final String bucket;
+    private final String apiKey;
+    private final WebClient.Builder webClientBuilder;
     private final WebClient webClient;
 
     public SupabaseStorageService(WebClient.Builder webClientBuilder) {
+        Dotenv dotenv = Dotenv.load();
+        this.supabaseUrl = dotenv.get("SUPABASE_URL");
+        this.bucket = dotenv.get("SUPABASE_BUCKET");
+        this.apiKey = dotenv.get("SUPABASE_API_KEY");
+        this.webClientBuilder = webClientBuilder;
         this.webClient = webClientBuilder
                 .baseUrl(supabaseUrl)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
