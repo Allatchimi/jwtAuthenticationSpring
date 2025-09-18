@@ -1,32 +1,28 @@
-  # voici le nouveau  et mon application.yml
-  spring:
-    config:
-      activate:
-        on-profile: prod
+spring:
+  config:
+    activate:
+      on-profile: prod
 
-    # Base de données PostgreSQL
-    datasource:
-      url: ${DB_URL:jdbc:postgresql://aws-1-eu-west-3.pooler.supabase.com:5432/postgres?user=postgres.icgyxciqajkwsyjtoiib&password=[${DB_PASSWORD}]}
-      username: ${DB_USERNAME}
-      password: ${DB_PASSWORD}
-      driver-class-name: org.postgresql.Driver
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://aws-1-eu-west-3.pooler.supabase.com:5432/postgres}
+    username: ${DB_USERNAME:postgres.icgyxciqajkwsyjtoiib}
+    password: ${DB_PASSWORD:Allatchimimht}
+    driver-class-name: org.postgresql.Driver
 
-    # JPA
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    properties:
       hibernate:
-        ddl-auto: create
-      show-sql: false
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  # Supabase configuration
-  supabase:
-    url: ${SUPABASE_URL:https://icgyxciqajkwsyjtoiib.supabase.co}
-    bucket: ${SUPABASE_BUCKET:videos}
-    api:
-      key: ${SUPABASE_API_KEY}
+supabase:
+  url: ${SUPABASE_URL:https://icgyxciqajkwsyjtoiib.supabase.co}
+  bucket: ${SUPABASE_BUCKET:videos}
+  api:
+    key: ${SUPABASE_API_KEY}
 
-  app:
-    storage:
-      type: supabase
+app:
+  storage:
+    type: supabase
