@@ -10,15 +10,15 @@ import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.CourMapper;
 import com.kidami.security.mappers.EnrollementMapper;
 import com.kidami.security.models.*;
-import com.kidami.security.repository.CategoryRepository;
-import com.kidami.security.repository.CourRepository;
-import com.kidami.security.repository.EnrollmentRepository;
-import com.kidami.security.repository.UserRepository;
+import com.kidami.security.repository.*;
 import com.kidami.security.services.CourService;
 import com.kidami.security.services.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -244,5 +244,29 @@ public class CourServiceImpl implements CourService {
         List<Cour> cours =  courRepository.findByTeacher(teacher);
         log.info("les nombres de {} est : {}", username, cours.size());
         return cours.stream().map(courMapper::toDTO).collect(Collectors.toList()) ;
+    }
+    /*
+    @Override
+    public List<CourDTO> searchCour(String keyword) {
+        List<Cour> cours =  courRepository.searchCour(keyword);
+        return cours.stream()
+                .map(courMapper::toDTO)
+                .collect(Collectors.toList());
+
+    }*/
+    @Override
+    public Page<CourDTO> searchCour(String kw, Double minPrice, Double maxPrice,
+                                    Integer score, String categoryName, String teacherName, Pageable pageable) {
+
+        Specification<Cour> spec = Specification
+                .where(CourSpecification.hasKeyword(kw))
+                .and(CourSpecification.hasPriceBetween(minPrice, maxPrice))
+                .and(CourSpecification.hasScore(score))
+                .and(CourSpecification.hasCategory(categoryName))
+                .and(CourSpecification.hasTeacher(teacherName));
+        Page<Cour> cours = courRepository.findAll(spec, pageable);
+
+        return cours.map(courMapper::toDTO);
+
     }
 }

@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -118,4 +120,24 @@ public class CourController {
         List<CourDTO> courDTOS = courService.getTeacherCourses(principal.getName());
         return ResponseEntity.ok(ResponseUtil.success("Teacher courses retrieved successfully", courDTOS, null));
     }
+    /*
+    @GetMapping("/searchCour")
+    public ResponseEntity<ApiResponse<List<CourDTO>>> searchCour(@RequestParam(name = "keyword",defaultValue = "") String keyword) {
+        List<CourDTO> serchCour = courService.searchCour("%"+keyword+"%");
+        return ResponseEntity.ok(ResponseUtil.success("Cour searched successfully", serchCour, null));
+    }*/
+    @GetMapping("/searchCour")
+    public ResponseEntity<ApiResponse<Page<CourDTO>>> searchCour(
+            @RequestParam(required = false) String kw,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Integer score,
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String teacherName,
+            Pageable pageable
+    ) {
+        Page<CourDTO> serchCour =  courService.searchCour(kw, minPrice, maxPrice, score, categoryName, teacherName, pageable);
+        return ResponseEntity.ok(ResponseUtil.success("Cour searched successfully", serchCour, null));
+    }
+
 }

@@ -2,7 +2,6 @@ package com.kidami.security.controllers;
 
 import com.kidami.security.services.StorageService;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,17 +10,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/videos")
+@CrossOrigin("*")
 public class VideoController {
 
-    @Autowired
-    private StorageService storageService;
+    private final StorageService storageService;
+
+    public VideoController(StorageService storageService) {
+        this.storageService = storageService;
+    }
 
     // Upload d'une vidéo
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
