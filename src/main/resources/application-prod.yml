@@ -1,25 +1,26 @@
+# application-prod.yml
 spring:
   config:
     activate:
       on-profile: prod
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://aws-1-eu-west-3.pooler.supabase.com:6543/postgres}
-    username: ${DB_USERNAME:postgres.icgyxciqajkwsyjtoiib}
-    password: ${DB_PASSWORD:Allatchimimht}
+    url: ${SUPABASE_DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 supabase:
-  url: ${SUPABASE_URL:https://icgyxciqajkwsyjtoiib.supabase.co}
-  bucket: ${SUPABASE_BUCKET:videos}
+  url: ${SUPABASE_URL}
+  bucket: ${SUPABASE_BUCKET:folders}
   api:
     key: ${SUPABASE_API_KEY}
 

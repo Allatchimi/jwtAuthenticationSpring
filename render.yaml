@@ -1,22 +1,27 @@
 services:
   - type: web
-    name: mdrassa-api
+    name: mdarassa-api
     env: docker
-    dockerfilePath: Dockerfile
     plan: free
+    docker:
+      dockerfile: Dockerfile
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: DB_URL
-        fromSecret: DB_URL
+      - key: SPRING_DATASOURCE_URL
+        fromSecret: SUPABASE_DB_URL
       - key: DB_USERNAME
         fromSecret: DB_USERNAME
       - key: DB_PASSWORD
         fromSecret: DB_PASSWORD
       - key: SUPABASE_URL
         fromSecret: SUPABASE_URL
-      - key: SUPABASE_BUCKET
-        fromSecret: SUPABASE_BUCKET
       - key: SUPABASE_API_KEY
         fromSecret: SUPABASE_API_KEY
+      - key: SUPABASE_BUCKET
+        value: folders
+      - key: JWT_SECRET
+        fromSecret: JWT_SECRET
+    numInstances: 1
     healthCheckPath: /actuator/health
+    autoDeploy: true
