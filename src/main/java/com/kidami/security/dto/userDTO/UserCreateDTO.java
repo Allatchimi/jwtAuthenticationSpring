@@ -1,7 +1,7 @@
-package com.kidami.security.dto.authDTO;
+package com.kidami.security.dto.userDTO;
 
-import com.kidami.security.models.AuthProvider;
-import com.kidami.security.models.Role;
+import com.kidami.security.enums.AuthProvider;
+import com.kidami.security.enums.Role;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RegisterDTO {
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class UserCreateDTO {
     @NotBlank(message = "Le nom complet est obligatoire")
     @Size(min = 2, max = 50, message = "Le nom doit contenir entre 2 et 50 caractères")
     private String name;
@@ -30,9 +30,9 @@ public class RegisterDTO {
     private String password;
     @NotNull(message = "Le provider est obligatoire")
     private AuthProvider provider;
-    private String providerId;
-    private String profileImageUrl;
-    private boolean emailVerified = false;
+    private String providerId; // Pour les utilisateurs OAuth2
+    private String profileImageUrl; // URL de l'avatar
+    private boolean emailVerified = false; // Vérification d'email
     private Set<Role> roles = new HashSet<>();
 
     // Validation conditionnelle selon le provider
@@ -51,4 +51,5 @@ public class RegisterDTO {
         }
         return true; // Pas de providerId requis pour LOCAL
     }
+
 }

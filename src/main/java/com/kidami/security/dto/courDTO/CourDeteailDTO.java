@@ -2,6 +2,8 @@ package com.kidami.security.dto.courDTO;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 
 @Data
 public class CourDeteailDTO {
@@ -17,7 +19,7 @@ public class CourDeteailDTO {
     private String name;
     private String description;
     private String thumbnail;
-    private Double price;
+    private BigDecimal price;
     private String amountTotal;
 
 }

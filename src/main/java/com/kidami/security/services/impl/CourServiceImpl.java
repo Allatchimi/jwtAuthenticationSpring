@@ -5,25 +5,32 @@ import com.kidami.security.dto.courDTO.CourDeteailDTO;
 import com.kidami.security.dto.courDTO.CourSaveDTO;
 import com.kidami.security.dto.courDTO.CourUpdateDTO;
 import com.kidami.security.dto.enrollementDTO.EnrollementDTO;
+import com.kidami.security.dto.purchaseDTO.PurchaseDTO;
+import com.kidami.security.enums.PurchaseStatus;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.CourMapper;
 import com.kidami.security.mappers.EnrollementMapper;
+import com.kidami.security.mappers.PurchaseMapper;
 import com.kidami.security.models.*;
 import com.kidami.security.repository.*;
 import com.kidami.security.services.CourService;
 import com.kidami.security.services.StorageService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,9 +44,16 @@ public class CourServiceImpl implements CourService {
     private final EnrollmentRepository enrollmentRepository;
     private final StorageService storageService;
     private final EnrollementMapper enrollementMapper;
+    private final FavoriteRepository favoriteRepository;
+    private final PurchaseRepository purchaseRepository;
+    private final PurchaseMapper purchaseMapper;
 
 
-    public CourServiceImpl(CourMapper courMapper, CourRepository courRepository, CategoryRepository categoryRepository, EnrollmentRepository enrollmentRepository, UserRepository userRepository , StorageService storageService, EnrollementMapper enrollementMapper) {
+    public CourServiceImpl(CourMapper courMapper, CourRepository courRepository, CategoryRepository categoryRepository,
+                           EnrollmentRepository enrollmentRepository,
+                           UserRepository userRepository , StorageService storageService,
+                           EnrollementMapper enrollementMapper, FavoriteRepository favoriteRepository,
+                           PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper) {
         this.courMapper = courMapper;
         this.courRepository = courRepository;
         this.categoryRepository = categoryRepository;
@@ -47,6 +61,9 @@ public class CourServiceImpl implements CourService {
         this.userRepository = userRepository;
         this.storageService = storageService;
         this.enrollementMapper = enrollementMapper;
+        this.favoriteRepository = favoriteRepository;
+        this.purchaseRepository = purchaseRepository;
+        this.purchaseMapper = purchaseMapper;
     }
 
     @Override
@@ -134,7 +151,7 @@ public class CourServiceImpl implements CourService {
             if (courUpdateDTO.getDescription() != null) cour.setDescription(courUpdateDTO.getDescription());
             if (courUpdateDTO.getThumbnail() != null) cour.setThumbnail(courUpdateDTO.getThumbnail());
             if (courUpdateDTO.getPrice() != null) cour.setPrice(courUpdateDTO.getPrice());
-            if (courUpdateDTO.getAmountTotal() != null) cour.setAmountTotal(courUpdateDTO.getAmountTotal());
+           // if (courUpdateDTO.getAmountTotal() != null) cour.setAmountTotal(courUpdateDTO.getAmountTotal());
             if (courUpdateDTO.getLessonNum() != null) cour.setLessonNum(courUpdateDTO.getLessonNum());
             if (courUpdateDTO.getVideoLen() != null) cour.setVideoLen(courUpdateDTO.getVideoLen());
             if (courUpdateDTO.getFollow() != null) cour.setFollow(courUpdateDTO.getFollow());
@@ -151,6 +168,7 @@ public class CourServiceImpl implements CourService {
                         });
                 cour.setCategorie(categorie);
             }
+            cour.setUpdatedAt(Instant.now());
 
             Cour updatedCour = courRepository.save(cour);
             log.info("le cour a ete bien mise a jour : {}", updatedCour);
@@ -217,9 +235,8 @@ public class CourServiceImpl implements CourService {
         Enrollment enrollment = new Enrollment();
         enrollment.setStudent(student);
         enrollment.setCour(course);
-        enrollment.setEnrollmentDate(LocalDateTime.now());
-        enrollment.setPaymentStatus(PaymentStatus.PENDING);
-        enrollment.setAmountPaid(course.getPrice());
+        enrollment.setEnrolledAt(LocalDateTime.now());
+
 
         return enrollmentRepository.save(enrollment);
     }
@@ -229,7 +246,7 @@ public class CourServiceImpl implements CourService {
         log.debug("Tentative de reuperation  de la liste des courses de: {}", username);
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        List<Enrollment> enrollments = enrollmentRepository.findByStudent(user);
+        List<Enrollment> enrollments = enrollmentRepository.findByStudentId(user.getId());
         log.info("les nombre de cours suivie par {} est : {}", user.getName(),enrollments.size());
         return enrollments.stream()
                 .map(enrollementMapper::toDTO)
@@ -269,4 +286,49 @@ public class CourServiceImpl implements CourService {
         return cours.map(courMapper::toDTO);
 
     }
+
+
+    public Page<Cour> getTopCourses(int page, int size){
+        return courRepository.findTopCourses(PageRequest.of(page, size));
+    }
+
+    public Page<Cour> getRecentCourses(int page, int size){
+        return courRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page,size));
+    }
+
+    @Transactional
+    public void toggleFavorite(Long userId, Long courseId){
+        var existing = favoriteRepository.findByUserIdAndCourseId(userId, courseId);
+        if(existing.isPresent()){
+            favoriteRepository.delete(existing.get());
+        } else {
+            var fav = new Favorite();
+            fav.setUser(userRepository.findById(userId).orElseThrow());
+            fav.setCourse(courRepository.findById(courseId).orElseThrow());
+            favoriteRepository.save(fav);
+        }
+    }
+
+    public List<Cour> getFavorites(Long userId, int page, int size){
+        return favoriteRepository.findByUserId(userId, PageRequest.of(page,size))
+                .stream().map(Favorite::getCourse).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PurchaseDTO initiatePurchase(Long userId, Long courseId, String currency){
+        User user = userRepository.findById(userId).orElseThrow();
+        Cour course = courRepository.findById(courseId).orElseThrow();
+
+        Purchase p = new Purchase();
+        p.setBuyer(user);
+        p.setCourses(Set.of(course)); // ✅ ici la correction
+        p.setAmountTotal(course.getPrice());
+        p.setCurrency(currency);
+        p.setStatus(PurchaseStatus.PENDING);
+
+        Purchase purchase = purchaseRepository.save(p);
+
+        return purchaseMapper.toDTO(purchase); // vérifie bien que c'est toDTO() et pas toDto()
+    }
+
 }

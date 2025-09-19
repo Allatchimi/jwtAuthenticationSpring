@@ -1,5 +1,7 @@
 package com.kidami.security.services.impl;
 
+import com.kidami.security.enums.AuthProvider;
+import com.kidami.security.enums.Role;
 import com.kidami.security.models.*;
 import com.kidami.security.repository.RefreshTokenRepository;
 import com.kidami.security.repository.UserRepository;

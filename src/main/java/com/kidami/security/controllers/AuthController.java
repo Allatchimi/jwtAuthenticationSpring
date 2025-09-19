@@ -1,6 +1,7 @@
 package com.kidami.security.controllers;
 
 import com.kidami.security.dto.authDTO.*;
+import com.kidami.security.dto.userDTO.UserCreateDTO;
 import com.kidami.security.models.*;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.AuthService;
@@ -41,14 +42,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterDTO registerDTO, BindingResult bindingResult,HttpServletRequest request) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserCreateDTO userCreateDTO, BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             // Les méthodes @AssertTrue sont exécutées automatiquement !
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
         try {
-            logger.info("Registering user with registerDTO: {}", registerDTO.getName());
-            AuthResponseDto newUserDTO = authService.registerAndAuthenticate(registerDTO, request);
+            logger.info("Registering user with registerDTO: {}", userCreateDTO.getName());
+            AuthResponseDto newUserDTO = authService.registerAndAuthenticate(userCreateDTO, request);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ResponseUtil.created("User registered successfully", newUserDTO, null));
         } catch (Exception e) {

@@ -1,13 +1,12 @@
 package com.kidami.security.dto.enrollementDTO;
 
-import com.kidami.security.models.Cour;
-import com.kidami.security.models.PaymentStatus;
-import com.kidami.security.models.User;
+import com.kidami.security.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
@@ -20,5 +19,5 @@ public class EnrollementDTO {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus; // PENDING, COMPLETED, FAILED
     private String transactionId;
-    private Double amountPaid;
+    private BigDecimal amountPaid;
 }

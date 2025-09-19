@@ -1,5 +1,6 @@
 package com.kidami.security.models;
 
+import com.kidami.security.enums.AuthProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;

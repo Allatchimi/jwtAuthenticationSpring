@@ -1,13 +1,13 @@
 package com.kidami.security.services.impl;
 
-import com.kidami.security.dto.authDTO.RegisterDTO;
+import com.kidami.security.dto.userDTO.UserCreateDTO;
 import com.kidami.security.dto.userDTO.UserDTO;
 import com.kidami.security.dto.userDTO.UserUpdateDTO;
 import com.kidami.security.exceptions.DuplicateResourceException;
 import com.kidami.security.exceptions.ResourceNotFoundException;
 import com.kidami.security.mappers.UserMapper;
-import com.kidami.security.models.AuthProvider;
-import com.kidami.security.models.Role;
+import com.kidami.security.enums.AuthProvider;
+import com.kidami.security.enums.Role;
 import com.kidami.security.models.User;
 import com.kidami.security.repository.UserRepository;
 import com.kidami.security.services.UserService;
@@ -34,30 +34,30 @@ public class UserServicesImpl implements UserService {
     }
 
     @Override
-    public UserDTO registerNewUser(RegisterDTO registerDTO) {
-        log.debug("Tentative de creation de user {}", registerDTO);
-        if(registerDTO.getEmail() == null || registerDTO.getEmail().trim().isEmpty()) {
+    public UserDTO registerNewUser(UserCreateDTO userCreateDTO) {
+        log.debug("Tentative de creation de user {}", userCreateDTO);
+        if(userCreateDTO.getEmail() == null || userCreateDTO.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("L'Email du user est obligatoire");
         }
-        if (userRepository.existsByEmail(registerDTO.getEmail())) {
-            log.warn("Tentative de création d'un user en double: {}", registerDTO.getEmail());
-            throw new DuplicateResourceException("User", "email", registerDTO.getEmail());
+        if (userRepository.existsByEmail(userCreateDTO.getEmail())) {
+            log.warn("Tentative de création d'un user en double: {}", userCreateDTO.getEmail());
+            throw new DuplicateResourceException("User", "email", userCreateDTO.getEmail());
         }
         try {
-            User user = userMapper.registerDTOToUser(registerDTO);
-            String hashedPassword = passwordEncoder.encode(registerDTO.getPassword());
+            User user = userMapper.registerDTOToUser(userCreateDTO);
+            String hashedPassword = passwordEncoder.encode(userCreateDTO.getPassword());
             user.setPassword(hashedPassword);
-            user.setProvider(registerDTO.getProvider());
-            if (registerDTO.getProvider() == AuthProvider.LOCAL) {
+            user.setProvider(userCreateDTO.getProvider());
+            if (userCreateDTO.getProvider() == AuthProvider.LOCAL) {
                 user.setProviderId(null);
                 user.setEmailVerified(false);
             } else {
-                user.setProviderId(registerDTO.getProviderId());
+                user.setProviderId(userCreateDTO.getProviderId());
                 user.setEmailVerified(true);
             }
             Set<Role> defaultRoles = new HashSet<>();
-            if(registerDTO.getRoles() != null) {
-                defaultRoles.addAll(registerDTO.getRoles());
+            if(userCreateDTO.getRoles() != null) {
+                defaultRoles.addAll(userCreateDTO.getRoles());
                 user.setRoles(defaultRoles);
             }else {
                 defaultRoles.add(Role.STUDENT);
@@ -105,7 +105,6 @@ public class UserServicesImpl implements UserService {
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());
-        userDTO.setPassword(user.getPassword());
         userDTO.setRoles(user.getRoles());
         // Set other properties as needed
         return userDTO;
@@ -131,10 +130,6 @@ public class UserServicesImpl implements UserService {
                 user.setPassword(hashedPassword);
             }
 
-            if (userUpdateDTO.getProvider() != null) {
-                // CORRECTION ICI : Pas besoin de toUpperCase() sur un enum
-                user.setProvider(userUpdateDTO.getProvider());
-            }
 
             if (userUpdateDTO.getRoles() != null) user.setRoles(userUpdateDTO.getRoles());
 

@@ -1,8 +1,8 @@
 package com.kidami.security.controllers;
 
 
-import com.kidami.security.dto.authDTO.RegisterDTO;
 import com.kidami.security.dto.authDTO.LoginDTO;
+import com.kidami.security.dto.userDTO.UserCreateDTO;
 import com.kidami.security.dto.userDTO.UserDTO;
 import com.kidami.security.models.User;
 import com.kidami.security.responses.ApiResponse;
@@ -34,10 +34,10 @@ public class WebController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserDTO>> registerUser(@Valid @ModelAttribute RegisterDTO registerDTO) {
+    public ResponseEntity<ApiResponse<UserDTO>> registerUser(@Valid @ModelAttribute UserCreateDTO userCreateDTO) {
         try {
            // logger.info("Registering user with email: {}", registerDTO);
-           UserDTO userDTO =  userService.registerNewUser(registerDTO);
+           UserDTO userDTO =  userService.registerNewUser(userCreateDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtil.success("registered succefully",userDTO,null));
 
         } catch (Exception e) {

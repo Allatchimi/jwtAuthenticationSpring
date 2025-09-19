@@ -1,7 +1,6 @@
 package com.kidami.security.dto.userDTO;
 
-import com.kidami.security.models.AuthProvider;
-import com.kidami.security.models.Role;
+import com.kidami.security.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -20,8 +19,6 @@ public class UserUpdateDTO {
     private String email;
     @Size(min = 6, message = "Le mot de passe doit contenir au moins 6 caractères")
     private String password;
-    private AuthProvider provider;
-    private String providerId;
     private String profileImageUrl;
     private Boolean emailVerified;
     private Set<Role> roles;

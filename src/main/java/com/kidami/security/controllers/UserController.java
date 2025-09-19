@@ -1,10 +1,10 @@
 package com.kidami.security.controllers;
 
 import com.kidami.security.dto.AddRoleRequest;
-import com.kidami.security.dto.authDTO.RegisterDTO;
+import com.kidami.security.dto.userDTO.UserCreateDTO;
 import com.kidami.security.dto.userDTO.UserDTO;
 import com.kidami.security.dto.userDTO.UserUpdateDTO;
-import com.kidami.security.models.Role;
+import com.kidami.security.enums.Role;
 import com.kidami.security.models.User;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.UserService;
@@ -29,8 +29,8 @@ public class UserController {
     }
 
     @PostMapping("/addUser")
-    public ResponseEntity<ApiResponse<UserDTO>> addUser(@Valid  @RequestBody RegisterDTO registerDTO){
-        UserDTO userDTO = userService.registerNewUser(registerDTO);
+    public ResponseEntity<ApiResponse<UserDTO>> addUser(@Valid  @RequestBody UserCreateDTO userCreateDTO){
+        UserDTO userDTO = userService.registerNewUser(userCreateDTO);
         return ResponseEntity.ok(ResponseUtil.created("registered user",userDTO,null));
     }
 

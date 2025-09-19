@@ -1,7 +1,6 @@
 package com.kidami.security.repository;
 
-import com.kidami.security.models.AuthProvider;
-import com.kidami.security.models.Cour;
+import com.kidami.security.enums.AuthProvider;
 import com.kidami.security.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @EnableJpaRepositories

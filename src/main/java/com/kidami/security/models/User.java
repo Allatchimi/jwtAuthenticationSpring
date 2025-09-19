@@ -1,11 +1,14 @@
 package com.kidami.security.models;
 
+import com.kidami.security.enums.AuthProvider;
+import com.kidami.security.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -22,7 +25,6 @@ import java.util.stream.Collectors;
         @UniqueConstraint(columnNames = "providerId")
 })
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -40,6 +42,8 @@ public class User implements UserDetails {
     private String lastName;
     private String profileImageUrl;
     private boolean emailVerified = false;
+    private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))

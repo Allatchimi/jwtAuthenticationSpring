@@ -1,4 +1,4 @@
-package com.kidami.security.models;
+package com.kidami.security.enums;
 
 public enum Role {
     STUDENT,

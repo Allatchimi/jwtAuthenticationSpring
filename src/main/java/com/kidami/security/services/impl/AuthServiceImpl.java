@@ -5,13 +5,12 @@ import com.google.firebase.auth.FirebaseToken;
 import com.kidami.security.dto.authDTO.AuthResponseDto;
 import com.kidami.security.dto.authDTO.LoginDTO;
 import com.kidami.security.dto.authDTO.RefreshTokenRequest;
-import com.kidami.security.dto.authDTO.RegisterDTO;
+import com.kidami.security.dto.userDTO.UserCreateDTO;
 import com.kidami.security.dto.userDTO.UserDTO;
-import com.kidami.security.dto.authDTO.UserResponseDTO;
 import com.kidami.security.mappers.UserMapper;
-import com.kidami.security.models.AuthProvider;
+import com.kidami.security.enums.AuthProvider;
 import com.kidami.security.models.RefreshToken;
-import com.kidami.security.models.Role;
+import com.kidami.security.enums.Role;
 import com.kidami.security.models.User;
 import com.kidami.security.repository.RefreshTokenRepository;
 import com.kidami.security.repository.UserRepository;
@@ -83,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
         // Crée ou met à jour le refresh token
         createOrUpdateRefreshToken(user, refreshToken, expiryDate, request);
 
-        UserResponseDTO userResponse = userMapper.userToUserResponseDTO(user);
+        UserDTO userResponse = userMapper.userToUserDTO(user);
 
         return AuthResponseDto.fromTokens(
                 token,
@@ -95,10 +94,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponseDto registerAndAuthenticate(RegisterDTO registerDTO, HttpServletRequest request) {
+    public AuthResponseDto registerAndAuthenticate(UserCreateDTO userCreateDTO, HttpServletRequest request) {
         try {
             // 1. Créer l'utilisateur via UserService
-            UserDTO userDTO = userService.registerNewUser(registerDTO);
+            UserDTO userDTO = userService.registerNewUser(userCreateDTO);
 
             // 2. Charger l'user COMPLET depuis la base avec les rôles
             User user = userRepository.findById(userDTO.getId())
@@ -117,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
 
             createOrUpdateRefreshToken(user, refreshToken, expiryDate, request);
             // 5. Conversion MANUELLE pour tester
-            UserResponseDTO userResponse = userMapper.userToUserResponseDTO(user);
+            UserDTO userResponse = userMapper.userToUserDTO(user);
 
             return AuthResponseDto.fromTokens(
                     token,
@@ -161,7 +160,7 @@ public class AuthServiceImpl implements AuthService {
             createOrUpdateRefreshToken(user, refreshToken, expiryDate, request);
 
             // 5. Préparer la réponse
-            UserResponseDTO userResponse = convertUserToResponseDTO(user);
+            UserDTO userResponse = convertUserToUserDTO(user);
 
             return AuthResponseDto.fromTokens(
                     token,
@@ -254,8 +253,8 @@ public class AuthServiceImpl implements AuthService {
         }
     }
     // Méthode pour convertir User en UserResponseDTO
-    private UserResponseDTO convertUserToResponseDTO(User user) {
-        UserResponseDTO response = new UserResponseDTO();
+    private UserDTO convertUserToUserDTO(User user) {
+        UserDTO response = new UserDTO();
         response.setId(user.getId());
         response.setName(user.getName());
         response.setEmail(user.getEmail());
@@ -263,7 +262,6 @@ public class AuthServiceImpl implements AuthService {
         response.setLastName(user.getLastName());
         response.setProfileImageUrl(user.getProfileImageUrl());
         response.setProvider(user.getProvider());
-       // response.setProviderId(user.getProviderId());
         response.setEmailVerified(user.isEmailVerified());
         response.setRoles(user.getRoles());
         return response;
@@ -368,7 +366,7 @@ public class AuthServiceImpl implements AuthService {
             refreshToken.setExpiryDate(Instant.now().plusSeconds(86400)); // 24h
             refreshTokenRepository.save(refreshToken);
 
-            UserResponseDTO userResponse = convertUserToResponseDTO(user);
+            UserDTO userResponse = convertUserToUserDTO(user);
 
             return AuthResponseDto.fromTokens(
                     newAccessToken,
