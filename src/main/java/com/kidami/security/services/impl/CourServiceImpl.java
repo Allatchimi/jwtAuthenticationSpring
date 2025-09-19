@@ -237,7 +237,6 @@ public class CourServiceImpl implements CourService {
         enrollment.setCour(course);
         enrollment.setEnrolledAt(LocalDateTime.now());
 
-
         return enrollmentRepository.save(enrollment);
     }
 
@@ -287,16 +286,20 @@ public class CourServiceImpl implements CourService {
 
     }
 
-
-    public Page<Cour> getTopCourses(int page, int size){
-        return courRepository.findTopCourses(PageRequest.of(page, size));
+   @Override
+   public Page<CourDTO> getTopCourses(int page, int size){
+       Page<Cour> cours  = courRepository.findTopCourses(PageRequest.of(page, size));
+        return cours.map(courMapper::toDTO);
     }
 
-    public Page<Cour> getRecentCourses(int page, int size){
-        return courRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page,size));
+    @Override
+    public Page<CourDTO> getRecentCourses(int page, int size){
+        Page<Cour> cours = courRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page,size));
+        return cours.map(courMapper::toDTO);
     }
 
     @Transactional
+    @Override
     public void toggleFavorite(Long userId, Long courseId){
         var existing = favoriteRepository.findByUserIdAndCourseId(userId, courseId);
         if(existing.isPresent()){
@@ -309,12 +312,14 @@ public class CourServiceImpl implements CourService {
         }
     }
 
+    @Override
     public List<Cour> getFavorites(Long userId, int page, int size){
         return favoriteRepository.findByUserId(userId, PageRequest.of(page,size))
                 .stream().map(Favorite::getCourse).collect(Collectors.toList());
     }
 
     @Transactional
+    @Override
     public PurchaseDTO initiatePurchase(Long userId, Long courseId, String currency){
         User user = userRepository.findById(userId).orElseThrow();
         Cour course = courRepository.findById(courseId).orElseThrow();

@@ -49,4 +49,16 @@ public class PaymentController {
         List<PaymentDTO> payments = paymentService.getPaymentsByPurchase(purchaseId);
         return ResponseEntity.ok(ResponseUtil.success("Liste des paiements récupérée", payments, null));
     }
+    @PostMapping("/checkout")
+    public ResponseEntity<ApiResponse<String>> checkout(
+            @RequestParam Long purchaseId,
+            @RequestParam String successUrl,
+            @RequestParam String cancelUrl) {
+        try {
+            String checkoutUrl = paymentService.createCheckoutSession(purchaseId, successUrl, cancelUrl);
+            return ResponseEntity.ok(ResponseUtil.success("Session Stripe créée", checkoutUrl, null));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ResponseUtil.error("Erreur création session Stripe", e.getMessage(),null));
+        }
+    }
 }

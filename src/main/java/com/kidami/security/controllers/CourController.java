@@ -5,6 +5,7 @@ import com.kidami.security.dto.courDTO.CourDeteailDTO;
 import com.kidami.security.dto.courDTO.CourSaveDTO;
 import com.kidami.security.dto.courDTO.CourUpdateDTO;
 import com.kidami.security.dto.enrollementDTO.EnrollementDTO;
+import com.kidami.security.mappers.CourMapper;
 import com.kidami.security.models.Enrollment;
 import com.kidami.security.responses.ApiResponse;
 import com.kidami.security.services.CourService;
@@ -35,9 +36,11 @@ import java.util.List;
 public class CourController {
 
     private final CourService courService;
+    private final CourMapper courMapper;
 
-    public CourController(CourService courService) {
+    public CourController(CourService courService, CourMapper courMapper) {
         this.courService = courService;
+        this.courMapper = courMapper;
     }
 
     @Operation(summary = "Uploader cour avec un fichier", security = @SecurityRequirement(name = "bearerAuth"))
@@ -139,5 +142,47 @@ public class CourController {
         Page<CourDTO> serchCour =  courService.searchCour(kw, minPrice, maxPrice, score, categoryName, teacherName, pageable);
         return ResponseEntity.ok(ResponseUtil.success("Cour searched successfully", serchCour, null));
     }
+
+
+    @GetMapping("/top")
+    public ResponseEntity<ApiResponse<Page<CourDTO>>> top(@RequestParam(defaultValue="0") int page,
+                               @RequestParam(defaultValue="10") int size){
+            Page<CourDTO> courDTOPage = courService.getTopCourses(page,size);
+        return ResponseEntity.ok(ResponseUtil.success("Top courses retrieved successfully", courDTOPage, null));
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<ApiResponse<Page<CourDTO>>> recent(@RequestParam(defaultValue="0") int page,
+                                  @RequestParam(defaultValue="10") int size) {
+
+        Page<CourDTO> courDTOPage = courService.getRecentCourses(page, size);
+        return ResponseEntity.ok(ResponseUtil.success("Recent courses retrieved successfully", courDTOPage, null));
+    }
+    @PostMapping("/{id}/favorite")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> toggleFavorite(@PathVariable Long id, Authentication principal){
+        Long userId = Long.valueOf(principal.getName()); // supposer userId est dans principal.name
+        courService.toggleFavorite(userId, id);
+        return ResponseEntity.ok().build();
+    }
+
+    /*
+    @GetMapping("/teacher/{teacherId}")
+    public Page<CourDTO> byTeacher(@PathVariable Long teacherId,
+                                     @RequestParam(defaultValue="0") int page,
+                                     @RequestParam(defaultValue="10") int size){
+        return courService.getCourByTeacher(teacherId, page, size).map(CourMapper::toDto);
+    }*/
+
+        /*
+    @PostMapping("/{id}/purchase")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<PurchaseDTO> purchase(@PathVariable Long id, Authentication principal){
+        Long userId = Long.valueOf(principal.getName());
+        PurchaseDTO p = courService.initiatePurchase(userId, id, "USD");
+        // appeler service paiement: retourner client secret / checkout url
+        return ResponseEntity.ok(new InitiatePaymentResponse(p.getId(), "checkout_url_placeholder"));
+    }
+*/
 
 }

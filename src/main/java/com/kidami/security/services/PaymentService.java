@@ -5,6 +5,8 @@ import com.kidami.security.enums.PaymentMethod;
 import com.kidami.security.enums.PaymentStatus;
 import com.kidami.security.models.Payment;
 import com.kidami.security.models.Purchase;
+
+import com.stripe.model.checkout.Session;
 import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
@@ -25,4 +27,10 @@ public interface PaymentService {
 
     @Transactional
     PaymentDTO validatePayment(Long paymentId);
+
+    String createCheckoutSession(Long purchaseId, String successUrl, String cancelUrl) throws Exception;
+
+    @Transactional
+    Payment registerStripePayment(Session session, Long purchaseId);
+
 }
