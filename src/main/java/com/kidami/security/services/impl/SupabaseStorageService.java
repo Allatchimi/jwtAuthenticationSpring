@@ -1,30 +1,33 @@
 package com.kidami.security.services.impl;
 
 import com.kidami.security.services.StorageService;
-import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.core.ParameterizedTypeReference;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Profile("prod")
+@Transactional
 public class SupabaseStorageService implements StorageService {
+
+    private final WebClient.Builder webClientBuilder;
 
     @Value("${supabase.url}")
     private String supabaseUrl;
@@ -35,9 +38,14 @@ public class SupabaseStorageService implements StorageService {
     @Value("${supabase.api.key}")
     private String apiKey;
 
-    private final WebClient webClient;
+    private WebClient webClient;
 
     public SupabaseStorageService(WebClient.Builder webClientBuilder) {
+        this.webClientBuilder = webClientBuilder;
+    }
+
+    @PostConstruct
+    public void init() {
         this.webClient = webClientBuilder
                 .baseUrl(supabaseUrl)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
@@ -45,10 +53,7 @@ public class SupabaseStorageService implements StorageService {
                 .build();
     }
 
-
-
-
-    // Méthode générique pour factoriser les appels WebClient
+    // Méthode générique pour gérer les appels
     private <T> T handleRequest(Mono<T> requestMono, int timeoutSeconds) throws IOException {
         try {
             return requestMono.timeout(Duration.ofSeconds(timeoutSeconds)).block();
@@ -61,6 +66,10 @@ public class SupabaseStorageService implements StorageService {
     public String saveFile(MultipartFile file, String fileType, String subfolder) throws IOException {
         String fileName = generateSupabaseFilePath(fileType, subfolder, file.getOriginalFilename());
 
+        // Log avant upload
+        System.out.println("[SupabaseStorageService] Upload start: " + fileName);
+
+        // Upload
         handleRequest(webClient.post()
                 .uri("/storage/v1/object/{bucket}/{fileName}", bucket, fileName)
                 .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
@@ -71,13 +80,22 @@ public class SupabaseStorageService implements StorageService {
                         response -> Mono.error(new IOException("Erreur Supabase: " + response.statusCode())))
                 .bodyToMono(String.class), 45);
 
+        // Log après upload réussi
+        String publicUrl = getFileUrl(fileName);
+        System.out.println("[SupabaseStorageService] Upload success: " + fileName);
+        System.out.println("[SupabaseStorageService] Public URL: " + publicUrl);
+
         return fileName;
     }
 
     @Override
     public String saveImage(MultipartFile file, String subfolder) throws IOException {
-        return saveFile(file, "image", subfolder);
+        String fileName = saveFile(file, "image", subfolder);
+        System.out.println("[SupabaseStorageService] Image saved: " + fileName);
+        System.out.println("[SupabaseStorageService] Accessible at: " + getFileUrl(fileName));
+        return fileName;
     }
+
 
     @Override
     public String saveVideo(MultipartFile file, String subfolder) throws IOException {
@@ -94,11 +112,13 @@ public class SupabaseStorageService implements StorageService {
         String prefix = getSupabasePrefix(fileType, subfolder);
 
         List<Map<String, Object>> objects = handleRequest(
-                webClient.get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("/storage/v1/object/list/{bucket}")
-                                .queryParam("prefix", prefix)
-                                .build(bucket))
+                webClient.post()
+                        .uri("/storage/v1/object/list/{bucket}", bucket)
+                        .bodyValue(Map.of(
+                                "prefix", prefix,
+                                "limit", 100,
+                                "offset", 0
+                        ))
                         .retrieve()
                         .onStatus(status -> status.isError(),
                                 response -> Mono.error(new IOException("Erreur liste Supabase: " + response.statusCode())))
@@ -138,12 +158,15 @@ public class SupabaseStorageService implements StorageService {
 
     @Override
     public boolean deleteFile(String fileName) throws IOException {
-        handleRequest(webClient.delete()
-                .uri("/storage/v1/object/{bucket}/{fileName}", bucket, fileName)
+        handleRequest(webClient.post()
+                .uri("/storage/v1/object/delete/{bucket}", bucket)
+                .bodyValue(List.of(fileName))
                 .retrieve()
                 .onStatus(status -> status.isError(),
-                        response -> Mono.error(new IOException("Erreur suppression Supabase: " + response.statusCode())))
+                        response -> response.bodyToMono(String.class)
+                                .map(body -> new IOException("Erreur suppression Supabase: " + response.statusCode() + " " + body)))
                 .toBodilessEntity(), 30);
+
         return true;
     }
 
@@ -155,8 +178,9 @@ public class SupabaseStorageService implements StorageService {
 
     // Méthodes utilitaires
     private String generateSupabaseFilePath(String fileType, String subfolder, String originalFileName) {
-        String cleanName = originalFileName != null ?
-                originalFileName.replaceAll("[^a-zA-Z0-9._-]", "_") : "file";
+        String cleanName = originalFileName != null
+                ? originalFileName.replaceAll("[^a-zA-Z0-9._-]", "_")
+                : "file";
 
         String fileName = String.format("%s_%d_%s",
                 UUID.randomUUID().toString().substring(0, 8),

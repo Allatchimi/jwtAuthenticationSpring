@@ -1,6 +1,7 @@
 package com.kidami.security.services.impl;
 
 import com.kidami.security.services.StorageService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 
 @Service
 @Profile("dev")
+@Transactional
 public class LocalStorageService implements StorageService {
 
     @Value("${app.upload.dir:uploads}")

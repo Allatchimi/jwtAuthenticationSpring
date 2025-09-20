@@ -1,8 +1,9 @@
 package com.kidami.security.controllers;
 
 import com.kidami.security.services.StorageService;
+import com.kidami.security.utils.MultipartInputStreamFileResource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,12 +17,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/images")
+
 public class ImageController {
 
-    @Autowired
-    private StorageService storageService;
+
+    private final StorageService storageService;
+    private final MultipartInputStreamFileResource.SupabaseStorageService storageService1;
+
+    public ImageController(StorageService storageService, MultipartInputStreamFileResource.SupabaseStorageService storageService1 ) {
+        this.storageService = storageService;
+        this.storageService1  = storageService1;
+    }
+
+
+    @PostMapping(value = "/uploadFile"  , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file,
+                                        @RequestParam("subfolder") String subfolder) {
+        try {
+            Map<String, Object> result = storageService1.upload(file, subfolder);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", "Erreur d'écriture du fichier"));
+        }
+    }
 
     // Upload d'une image
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -31,13 +53,21 @@ public class ImageController {
 
         try {
             if (file.isEmpty()) {
-                throw new FileUploadException("Le fichier est vide");
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Le fichier est vide"));
             }
 
             // Vérifier que c'est bien une image
             String contentType = file.getContentType();
             if (contentType == null || !contentType.startsWith("image/")) {
-                throw new FileUploadException("Le fichier doit être une image");
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Le fichier doit être une image"));
+            }
+
+            // Vérifier la taille du fichier
+            if (file.getSize() > 10 * 1024 * 1024) { // 10MB max
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Le fichier ne doit pas dépasser 10MB"));
             }
 
             String filePath = storageService.saveImage(file, subfolder);
@@ -49,12 +79,22 @@ public class ImageController {
             response.put("url", storageService.getFileUrl(filePath));
             response.put("type", "image");
             response.put("subfolder", subfolder);
+            response.put("size", String.valueOf(file.getSize()));
 
             return ResponseEntity.ok(response);
 
-        } catch (Exception e) {
+        } catch (FileUploadException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Could not upload image: " + e.getMessage()));
+                    .body(Map.of("error", "Erreur d'écriture du fichier"));
+
+        } catch (Exception e) {
+            log.error("Erreur lors de l'upload d'image", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erreur interne du serveur"));
         }
     }
 

@@ -43,17 +43,10 @@ public class CourController {
         this.courMapper = courMapper;
     }
 
-    @Operation(summary = "Uploader cour avec un fichier", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping(value = "/creatCour", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public ResponseEntity<ApiResponse<CourDTO>> saveCour(
-            @Parameter(
-                    description = "Données du cours",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CourSaveDTO.class))
-            )
-            @Valid @RequestPart("courSaveDTO") CourSaveDTO courSaveDTO,
-            @Parameter(description = "Fichier thumbnail du cours",
-                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
+            @RequestPart(value = "courSaveDTO") @Valid CourSaveDTO courSaveDTO,
             @RequestPart("file") MultipartFile file,
             Authentication authentication){
         String teacherName = authentication.getName();

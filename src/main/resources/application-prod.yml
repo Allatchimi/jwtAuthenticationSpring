@@ -12,7 +12,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
@@ -22,7 +22,7 @@ supabase:
   url: ${SUPABASE_URL}
   bucket: ${SUPABASE_BUCKET:folders}
   api:
-    key: ${SUPABASE_API_KEY}
+    key: ${SUPABASE_API_KEY:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljZ3l4Y2lxYWprd3N5anRvaWliIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzI4OTkzOCwiZXhwIjoyMDcyODY1OTM4fQ.gbzagQtVtbglhACVrEqWeV0NrHA927m81eGbDdqijZo}
 
 
 
