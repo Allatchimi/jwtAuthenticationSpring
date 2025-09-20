@@ -1,7 +1,9 @@
 package com.kidami.security.services.impl;
 
 import com.kidami.security.services.StorageService;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -16,15 +18,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
+@Slf4j
 @Service
 @Profile("dev")
 @Transactional
 public class LocalStorageService implements StorageService {
 
-    @Value("${app.upload.dir:uploads}")
+    @Value("${app.upload.dir}")
     private String uploadDir;
 
-    // Méthodes générales (déjà existantes)
+    @PostConstruct
+    public void init() throws IOException {
+        // Crée les dossiers principaux si nécessaire
+        Files.createDirectories(Paths.get(uploadDir, "images"));
+        Files.createDirectories(Paths.get(uploadDir, "videos"));
+        Files.createDirectories(Paths.get(uploadDir, "documents"));
+        Files.createDirectories(Paths.get(uploadDir, "other"));
+        log.info("Upload directories initialized at: {}", Paths.get(uploadDir).toAbsolutePath());
+    }
+
+    // Méthode générale pour enregistrer un fichier
     @Override
     public String saveFile(MultipartFile file, String fileType, String subfolder) throws IOException {
         Path targetPath = determineTargetPath(fileType, subfolder);
@@ -40,21 +54,22 @@ public class LocalStorageService implements StorageService {
     }
 
     @Override
-    public Resource loadFile(String fileName) throws IOException {
-        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
-        if (!filePath.startsWith(Paths.get(uploadDir).normalize())) {
+    public Resource loadFile(String filePath) throws IOException {
+        Path fullPath = Paths.get(uploadDir, filePath).normalize();
+        if (!fullPath.startsWith(Paths.get(uploadDir))) {
             throw new IOException("Chemin non autorisé");
         }
-        return new UrlResource(filePath.toUri());
+        return new UrlResource(fullPath.toUri());
     }
 
     @Override
     public List<String> listFiles(String fileType, String subfolder) throws IOException {
         Path targetPath = determineTargetPath(fileType, subfolder);
+        log.info("Listing files in: {}", targetPath.toAbsolutePath());
         if (!Files.exists(targetPath)) {
+            log.warn("Directory does not exist: {}", targetPath.toAbsolutePath());
             return Collections.emptyList();
         }
-
         try (Stream<Path> paths = Files.list(targetPath)) {
             return paths.filter(Files::isRegularFile)
                     .map(Path::getFileName)
@@ -64,74 +79,64 @@ public class LocalStorageService implements StorageService {
     }
 
     @Override
-    public boolean deleteFile(String fileName) throws IOException {
-        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
-        if (!filePath.startsWith(Paths.get(uploadDir).normalize())) {
+    public boolean deleteFile(String filePath) throws IOException {
+        Path fullPath = Paths.get(uploadDir, filePath).normalize();
+        if (!fullPath.startsWith(Paths.get(uploadDir))) {
             throw new IOException("Chemin non autorisé");
         }
-        return Files.deleteIfExists(filePath);
+        return Files.deleteIfExists(fullPath);
     }
 
     @Override
-    public String getFileUrl(String fileName) {
-        return fileName;
+    public String getFileUrl(String filePath) {
+        return filePath;
     }
 
-    // Méthodes spécifiques pour les IMAGES
+    // Spécifique pour les images
     @Override
     public String saveImage(MultipartFile file, String subfolder) throws IOException {
-        return saveFile(file, "image", subfolder);
+        return saveFile(file, "images", subfolder);
     }
 
     @Override
     public List<String> listImages(String subfolder) throws IOException {
-        return listFiles("image", subfolder);
+        return listFiles("images", subfolder);
     }
 
-    // Méthodes spécifiques pour les VIDEOS
+    // Spécifique pour les vidéos
     @Override
     public String saveVideo(MultipartFile file, String subfolder) throws IOException {
-        return saveFile(file, "video", subfolder);
+        return saveFile(file, "videos", subfolder);
     }
 
     @Override
     public List<String> listVideos(String subfolder) throws IOException {
-        return listFiles("video", subfolder);
+        return listFiles("videos", subfolder);
     }
 
-    // Méthodes spécifiques pour les DOCUMENTS
+    // Spécifique pour les documents
     @Override
     public String saveDocument(MultipartFile file, String subfolder) throws IOException {
-        return saveFile(file, "document", subfolder);
+        return saveFile(file, "documents", subfolder);
     }
 
     @Override
     public List<String> listDocuments(String subfolder) throws IOException {
-        return listFiles("document", subfolder);
+        return listFiles("documents", subfolder);
     }
 
-    // Méthodes utilitaires privées
+    // --- Utilitaires privés ---
     private Path determineTargetPath(String fileType, String subfolder) {
-        switch (fileType.toLowerCase()) {
-            case "image": return Paths.get(uploadDir, "images", subfolder);
-            case "video": return Paths.get(uploadDir, "videos", subfolder);
-            case "document": return Paths.get(uploadDir, "documents", subfolder);
-            default: return Paths.get(uploadDir, "other", subfolder);
-        }
+        return Paths.get(uploadDir, fileType, subfolder);
     }
 
     private String getRelativePath(String fileType, String subfolder, String fileName) {
-        switch (fileType.toLowerCase()) {
-            case "image": return Paths.get("images", subfolder, fileName).toString();
-            case "video": return Paths.get("videos", subfolder, fileName).toString();
-            case "document": return Paths.get("documents", subfolder, fileName).toString();
-            default: return Paths.get("other", subfolder, fileName).toString();
-        }
+        return Paths.get(fileType, subfolder, fileName).toString();
     }
 
     private String generateSecureFileName(String originalFileName) {
         String cleanName = originalFileName != null ?
                 originalFileName.replaceAll("[^a-zA-Z0-9._-]", "_") : "file";
-        return String.format("%d_%s", System.currentTimeMillis(), cleanName);
+        return System.currentTimeMillis() + "_" + cleanName;
     }
 }

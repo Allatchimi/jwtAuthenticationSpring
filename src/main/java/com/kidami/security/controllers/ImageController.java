@@ -31,8 +31,6 @@ public class ImageController {
         this.storageService = storageService;
         this.storageService1  = storageService1;
     }
-
-
     @PostMapping(value = "/uploadFile"  , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file,
                                         @RequestParam("subfolder") String subfolder) {

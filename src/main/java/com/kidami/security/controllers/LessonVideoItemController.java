@@ -29,16 +29,12 @@ public class LessonVideoItemController {
         this.lessonVideoItemService = lessonVideoItemService;
     }
 
-    @PostMapping(value = "/add", consumes = {"multipart/form-data","application/json","application/octet-stream"} )
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public ResponseEntity<ApiResponse<LessonVideoItemDTO>> addLessonVideoItem(
-            @Parameter(description = "ID de la leçon", required = true)
+            @Parameter(description = "ID de la leçon", required = false)
             @RequestParam Long lessonId,
-            @Parameter(description = "Données de l'élément vidéo",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LessonVideoItemSaveDTO.class)))
-            @Valid
-            @RequestPart("lessonVideoItemSaveDTO") LessonVideoItemSaveDTO lessonVideoItemSaveDTO,
+            @RequestPart("lessonVideoItemSaveDTO")   @Valid LessonVideoItemSaveDTO lessonVideoItemSaveDTO,
             @Parameter(description = "Fichier vidéo (obligatoire)",
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
             @RequestPart("videoFile") MultipartFile videoFile,

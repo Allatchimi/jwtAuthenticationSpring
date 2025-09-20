@@ -12,6 +12,7 @@ import com.kidami.security.repository.LessonRepository;
 import com.kidami.security.repository.LessonVideoItemRepository;
 import com.kidami.security.services.LessonVideoItemService;
 import com.kidami.security.services.StorageService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class LessonVideoItemServiceImpl implements LessonVideoItemService {
+
     private static final Logger log = LoggerFactory.getLogger(LessonVideoItemServiceImpl.class);
     private final LessonVideoItemRepository lessonVideoItemRepository;
     private final LessonRepository lessonRepository;
     private final LessonVideoItemMapper lessonVideoItemMapper;
     private final StorageService storageService;
 
-    public LessonVideoItemServiceImpl(LessonVideoItemRepository lessonVideoItemRepository, LessonRepository lessonRepository, LessonVideoItemMapper lessonVideoItemMapper, StorageService storageService) {
+    public LessonVideoItemServiceImpl(LessonVideoItemRepository lessonVideoItemRepository,
+                                      LessonRepository lessonRepository,
+                                      LessonVideoItemMapper lessonVideoItemMapper,
+                                      StorageService storageService) {
         this.lessonVideoItemRepository = lessonVideoItemRepository;
         this.lessonRepository = lessonRepository;
         this.lessonVideoItemMapper = lessonVideoItemMapper;
@@ -36,115 +41,109 @@ public class LessonVideoItemServiceImpl implements LessonVideoItemService {
     }
 
     @Override
-    public LessonVideoItemDTO addLessonVideoItem(Long lessonId, LessonVideoItemSaveDTO lessonVideoItemSaveDTO, MultipartFile videoFile,MultipartFile imageFile) {
-        log.debug("Tantative de recuperation de laçon {} ", lessonId);
+    @Transactional
+    public LessonVideoItemDTO addLessonVideoItem(Long lessonId,
+                                                 LessonVideoItemSaveDTO dto,
+                                                 MultipartFile videoFile,
+                                                 MultipartFile imageFile) {
+        log.debug("Tantative de récupération de la leçon {}", lessonId);
 
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson", "id", lessonId.toString()));
-        if (lessonVideoItemRepository.existsByName(lessonVideoItemSaveDTO.getName())) {
-            log.warn("IL y a un video avec ce nom {}", lessonVideoItemSaveDTO.getName());
-            throw new DuplicateResourceException("LessonVideoItem", "name", lessonVideoItemSaveDTO.getName());
+
+        if (lessonVideoItemRepository.existsByName(dto.getName())) {
+            log.warn("Il y a déjà un video item avec le nom {}", dto.getName());
+            throw new DuplicateResourceException("LessonVideoItem", "name", dto.getName());
         }
+
         try {
-            LessonVideoItem lessonVideoItem = lessonVideoItemMapper.fromSaveDTO(lessonVideoItemSaveDTO);
-            lessonVideoItem.setLesson(lesson);
-            if(imageFile != null && !imageFile.isEmpty()) {
-                String imageName = storageService.saveImage(imageFile,"videoItems");
-                String thumbnailUrl = "api/"+imageName;
-                lessonVideoItem.setThumbnail(thumbnailUrl);
-            }
-            if(videoFile != null && !videoFile.isEmpty() ) {
-                String videoName = storageService.saveVideo(videoFile,"lessons");
-                String videoUrl = "api/"+videoName;
-                lessonVideoItem.setUrl(videoUrl);
-            } else {
-                throw new IllegalArgumentException("Le fichier vidéo est obligatoire");
-            }
-            LessonVideoItem savedItem = lessonVideoItemRepository.save(lessonVideoItem);
-            log.info("Video item {} : ajouter avec succés ", lessonVideoItem.getName());
+            LessonVideoItem item = lessonVideoItemMapper.fromSaveDTO(dto);
+            item.setLesson(lesson);
+            item.setUrl(handleVideoUpload(videoFile));
+            item.setThumbnail(handleImageUpload(imageFile));
+
+            LessonVideoItem savedItem = lessonVideoItemRepository.save(item);
+            log.info("Video item {} ajouté avec succès", savedItem.getName());
             return lessonVideoItemMapper.toDTO(savedItem);
 
-        }catch (Exception e) {
-            throw new RuntimeException("Erreur lors de l'ajout du video item", e);
+        } catch (RuntimeException e) {
+            log.error("Erreur lors de l'ajout du video item", e);
+            throw e;
+        }
+    }
+
+    private String handleVideoUpload(MultipartFile videoFile) {
+        if (videoFile == null || videoFile.isEmpty())
+            throw new IllegalArgumentException("Le fichier vidéo est obligatoire");
+        try {
+            return "api/" + storageService.saveVideo(videoFile, "lessons");
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur upload vidéo", e);
+        }
+    }
+
+    private String handleImageUpload(MultipartFile imageFile) {
+        if (imageFile == null || imageFile.isEmpty()) return null;
+        try {
+            return "api/" + storageService.saveImage(imageFile, "videoItems");
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur upload image", e);
         }
     }
 
     @Override
     public List<LessonVideoItemDTO> getAllLessonVideoItem() {
-        log.debug("Tantative de recuperation de tout les video items");
-        List<LessonVideoItem> lessonVideoItems = lessonVideoItemRepository.findAll();
-        log.info("Video items : {}", lessonVideoItems.size());
-        return lessonVideoItems.stream()
-                .map(lessonVideoItemMapper::toDTO)
-                .collect(Collectors.toList()
-                );
-
-    }
-
-    @Override
-    public LessonVideoItemDTO updateLessonVideoItem(LessonVideoItemUpdateDTO lessonVideoItemUpdateDTO) {
-        log.debug("Tantative de mise à jours de {} ", lessonVideoItemUpdateDTO.getName());
-        LessonVideoItem lessonVideoItem = lessonVideoItemRepository.findById(lessonVideoItemUpdateDTO.getId())
-                .orElseThrow(() -> {
-                    log.warn("le cours n existe pas: {}", lessonVideoItemUpdateDTO.getName());
-                    return new ResourceNotFoundException("LessonVideoItem non trouvé avec ID : " + lessonVideoItemUpdateDTO.getId());
-                });
-
-        if (lessonVideoItemUpdateDTO.getName() != null
-                && !lessonVideoItem.getName().equals(lessonVideoItemUpdateDTO.getName())
-                && lessonVideoItemRepository.existsByNameAndIdNot(lessonVideoItemUpdateDTO.getName(), lessonVideoItemUpdateDTO.getId())) {
-            log.warn("le nouveau nom existe deja pour un autre video item {}", lessonVideoItemUpdateDTO.getName());
-            throw new DuplicateResourceException("LessonVideoItem", "name", lessonVideoItemUpdateDTO.getName());
-        }
-
-        log.trace("Données de mise à jour valides: {}", lessonVideoItemUpdateDTO);
-        try {
-            if (lessonVideoItemUpdateDTO.getName() != null) lessonVideoItem.setName(lessonVideoItemUpdateDTO.getName());
-            if (lessonVideoItemUpdateDTO.getUrl() != null) lessonVideoItem.setUrl(lessonVideoItemUpdateDTO.getUrl());
-            if (lessonVideoItemUpdateDTO.getThumbnail() != null)
-                lessonVideoItem.setThumbnail(lessonVideoItemUpdateDTO.getThumbnail());
-            if (lessonVideoItemUpdateDTO.getDuration() != null)
-                lessonVideoItem.setDuration(lessonVideoItemUpdateDTO.getDuration());
-            if (lessonVideoItemUpdateDTO.getOrderIndex() != null)
-                lessonVideoItem.setOrderIndex(lessonVideoItemUpdateDTO.getOrderIndex());
-
-            LessonVideoItem lessonVideoItemSave = lessonVideoItemRepository.save(lessonVideoItem);
-            log.info("les video items : {} modifier avec succés", lessonVideoItemSave);
-            return lessonVideoItemMapper.toDTO(lessonVideoItemSave);
-        } catch (Exception e) {
-            log.error("Erreur lors de la mise a jour du video item : {}", e.getMessage());
-            throw e;
-        }
-    }
-
-    @Override
-    public boolean deleteLessonVideoItem(Long id) {
-        log.debug("Tentative de suppression du LessonVideoItem ID: {}", id);
-        // Vérifiez si le cours existe
-        if (!lessonVideoItemRepository.existsById(id)) {
-            log.warn("Tentative de suppression d'un video item  ID {} inexistant : ", id);
-            throw new ResourceNotFoundException("LessonVideoItem", "id", id);
-        }
-        try {
-            lessonVideoItemRepository.deleteById(id);
-            log.info("Video item ID : {}  supprimé avec succès:", id);
-            return true;
-        } catch (Exception e) {
-            log.error("Erreur lors de la suppression du Video Item ID: {} - {}", id, e.getMessage(), e);
-            throw new RuntimeException("Erreur lors de la suppression du Video Item", e);
-        }
-    }
-
-    @Override
-    public List<LessonVideoItemDTO> getVideoItemByLessonId(Long lessonId) {
-        log.debug("Tentative de recuperation de la  liste des video items par leçon  ID: {}", lessonId);
-        List<LessonVideoItem> lessonVideoItems= lessonVideoItemRepository.findByLessonId(lessonId);
-        log.info("Video items  recuprer par lesçon sont au nombre de : {}", lessonVideoItems.size());
-        return lessonVideoItems.stream()
+        List<LessonVideoItem> items = lessonVideoItemRepository.findAll();
+        log.info("Nombre total de video items : {}", items.size());
+        return items.stream()
                 .map(lessonVideoItemMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public LessonVideoItemDTO updateLessonVideoItem(LessonVideoItemUpdateDTO dto) {
+        LessonVideoItem item = lessonVideoItemRepository.findById(dto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("LessonVideoItem", "id", dto.getId()));
+
+        if (dto.getName() != null && !dto.getName().equals(item.getName())
+                && lessonVideoItemRepository.existsByNameAndIdNot(dto.getName(), dto.getId())) {
+            throw new DuplicateResourceException("LessonVideoItem", "name", dto.getName());
+        }
+
+        if (dto.getName() != null) item.setName(dto.getName());
+        if (dto.getUrl() != null) item.setUrl(dto.getUrl());
+        if (dto.getThumbnail() != null) item.setThumbnail(dto.getThumbnail());
+        if (dto.getDuration() != null) item.setDuration(dto.getDuration());
+        if (dto.getOrderIndex() != null) item.setOrderIndex(dto.getOrderIndex());
+
+        LessonVideoItem updatedItem = lessonVideoItemRepository.save(item);
+        log.info("Video item ID {} mis à jour", updatedItem.getId());
+        return lessonVideoItemMapper.toDTO(updatedItem);
+    }
+
+    @Override
+    public boolean deleteLessonVideoItem(Long id) {
+        LessonVideoItem item = lessonVideoItemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("LessonVideoItem", "id", id));
+
+        try {
+            if (item.getUrl() != null) storageService.deleteFile(item.getUrl().replace("api/", ""));
+            if (item.getThumbnail() != null) storageService.deleteFile(item.getThumbnail().replace("api/", ""));
+        } catch (Exception e) {
+            log.warn("Impossible de supprimer les fichiers du video item ID {}", id, e);
+        }
+
+        lessonVideoItemRepository.deleteById(id);
+        log.info("Video item ID {} supprimé avec succès", id);
+        return true;
+    }
+
+    @Override
+    public List<LessonVideoItemDTO> getVideoItemByLessonId(Long lessonId) {
+        List<LessonVideoItem> items = lessonVideoItemRepository.findByLessonId(lessonId);
+        log.info("Nombre de video items récupérés pour la leçon {} : {}", lessonId, items.size());
+        return items.stream()
+                .map(lessonVideoItemMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }
-
-

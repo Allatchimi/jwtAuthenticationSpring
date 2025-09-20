@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class LessonSaveDTO {
     private String name;
     private Long courId;

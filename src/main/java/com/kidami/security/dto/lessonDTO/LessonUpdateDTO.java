@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class LessonUpdateDTO {
     private Long id;
     @Size(min = 2, max = 255, message = "Le nom doit contenir entre 2 et 255 caractères")
